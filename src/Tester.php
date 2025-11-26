@@ -17,6 +17,11 @@ final readonly class Tester
         throw new TestHasFailed($reason ?? 'test was marked as failed');
     }
 
+    public function succeed(): void
+    {
+        return;
+    }
+
     public function is(mixed $expected): self
     {
         if ($expected !== $this->subject) {

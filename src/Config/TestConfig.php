@@ -12,10 +12,8 @@ final class TestConfig
         public array $tests = [],
     ) {}
 
-    public function addTest(Test $test, MethodReflector $handler): self
+    public function addTest(Test $test): self
     {
-        $test->handler = $handler;
-
         $this->tests[] = $test;
 
         return $this;
