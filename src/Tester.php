@@ -88,11 +88,25 @@ final readonly class Tester
         return $this;
     }
 
+    public function hasNotCount(int $expected): self
+    {
+        test(fn () => $this->hasCount($expected))->fails();
+
+        return $this;
+    }
+
     public function contains(mixed $search): self
     {
         if (! in_array($search, $this->subject)) {
             throw new TestHasFailed("failed asserting that array contains %s", $search);
         }
+
+        return $this;
+    }
+
+    public function containsNot(int $expected): self
+    {
+        test(fn () => $this->contains($expected))->fails();
 
         return $this;
     }
@@ -106,7 +120,7 @@ final readonly class Tester
         return $this;
     }
 
-    public function hasNoKey(mixed $key): self
+    public function missesKey(mixed $key): self
     {
         if (array_key_exists($key, $this->subject)) {
             throw new TestHasFailed("failed asserting that array does not have key %s", $key);
@@ -124,10 +138,17 @@ final readonly class Tester
         return $this;
     }
 
+    public function notInstanceOf(string $expectedClass): self
+    {
+        test(fn () => $this->instanceOf($expectedClass))->fails();
+
+        return $this;
+    }
+
     public function exceptionThrown(
         string $expectedExceptionClass,
         ?Closure $exceptionTester = null,
-    ): void
+    ): self
     {
         $this->isCallable();
 
@@ -140,9 +161,18 @@ final readonly class Tester
                 $exceptionTester($throwable);
             }
 
-            return;
+            return $this;
         }
 
         $this->fail("Expected exception {$expectedExceptionClass} was not thrown");
+
+        return $this;
+    }
+
+    public function exceptionNotThrown(string $expectedExceptionClass): self
+    {
+        test(fn () => $this->exceptionThrown($expectedExceptionClass))->fails();
+
+        return $this;
     }
 }
