@@ -1,0 +1,25 @@
+{
+    "name": "tempest/testing",
+    "description": "Test runner for Tempest",
+    "license": "MIT",
+    "require": {
+        "php": "^8.4",
+        "tempest/core":  "^2.11",
+        "tempest/event-bus":  "^2.11",
+        "tempest/console": "^2.11",
+        "symfony/process": "^7.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Tempest\\Testing\\": "src"
+        },
+        "files": [
+            "src/functions.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tempest\\Testing\\Tests\\": "tests"
+        }
+    }
+}
