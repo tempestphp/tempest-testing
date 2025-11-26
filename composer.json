@@ -3,7 +3,7 @@
     "description": "Test runner for Tempest",
     "license": "MIT",
     "require": {
-        "php": "^8.4",
+        "php": "^8.5",
         "tempest/core":  "^2.11",
         "tempest/event-bus":  "^2.11",
         "tempest/console": "^2.11",
