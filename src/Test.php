@@ -18,6 +18,9 @@ final class Test
     /** @var MethodReflector[] */
     public array $after = [];
 
+    /** @var array[] */
+    public ?array $provide = null;
+
     public string $name {
         get => $this->handler->getDeclaringClass()->getName() . '::' . $this->handler->getName();
     }
@@ -45,6 +48,8 @@ final class Test
             ->values()
             ->reverse()
             ->toArray();
+
+        $self->provide = $reflector->getAttribute(Provide::class)?->entries;
 
         return $self;
     }

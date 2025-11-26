@@ -21,10 +21,17 @@ final readonly class RunTest
     {
         $instance = $this->container->get($test->handler->getDeclaringClass()->getName());
 
+        foreach (($test->provide ?? [[]]) as $data) {
+            $this->runEntry($test, $instance, $data);
+        }
+    }
+
+    private function runEntry(Test $test, object $instance, array $data): void
+    {
         try {
             $this->runBefore($test, $instance);
 
-            $this->container->invoke($test->handler->getReflection()->getClosure($instance));
+            $instance->{$test->handler->getName()}(...$data);
 
             $this->runAfter($test, $instance);
 

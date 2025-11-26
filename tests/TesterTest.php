@@ -2,6 +2,7 @@
 
 namespace Tempest\Testing\Tests;
 
+use Tempest\Testing\Provide;
 use Tempest\Testing\Test;
 use function Tempest\Testing\test;
 
@@ -53,14 +54,24 @@ final class TesterTest
         test(fn () => test($a)->isNot($c))->succeeds();
     }
 
-    #[Test]
-    public function isEqualTo(): void
+    #[Test, Provide(
+        ['test' => 1, 'expected' => 1, 'succeeds' => true],
+        ['test' => 1, 'expected' => 2, 'succeeds' => false],
+        ['test' => 1, 'expected' => '1', 'succeeds' => true],
+        ['test' => false, 'expected' => '', 'succeeds' => true],
+    )]
+    public function isEqualTo(mixed $test, mixed $expected, bool $succeeds): void
     {
-        test(fn () => test(1)->isEqualTo(1))->succeeds();
-        test(fn () => test(1)->isEqualTo(2))->fails();
-        test(fn () => test(1)->isEqualTo('1'))->succeeds();
-        test(fn () => test(false)->isEqualTo(''))->succeeds();
+        if ($succeeds) {
+            test(fn () => test($test)->isEqualTo($expected))->succeeds();
+        } else {
+            test(fn () => test($test)->isEqualTo($expected))->fails();
+        }
+    }
 
+    #[Test]
+    public function isEqualToObject(): void
+    {
         $a = (object) [];
         $b = (object) [];
         $c = (object) ['a' => 'a'];
@@ -70,14 +81,24 @@ final class TesterTest
         test(fn () => test($a)->isEqualTo($c))->fails();
     }
 
-    #[Test]
-    public function isNotEqualTo(): void
+    #[Test, Provide(
+        ['test' => 1, 'expected' => 1, 'succeeds' => false],
+        ['test' => 1, 'expected' => 2, 'succeeds' => true],
+        ['test' => 1, 'expected' => '1', 'succeeds' => false],
+        ['test' => false, 'expected' => '', 'succeeds' => false],
+    )]
+    public function isNotEqualTo(mixed $test, mixed $expected, bool $succeeds): void
     {
-        test(fn () => test(1)->isNotEqualTo(1))->fails();
-        test(fn () => test(1)->isNotEqualTo(2))->succeeds();
-        test(fn () => test(1)->isNotEqualTo('1'))->fails();
-        test(fn () => test(false)->isNotEqualTo(''))->fails();
+        if ($succeeds) {
+            test(fn () => test($test)->isNotEqualTo($expected))->succeeds();
+        } else {
+            test(fn () => test($test)->isNotEqualTo($expected))->fails();
+        }
+    }
 
+    #[Test]
+    public function isNotEqualToObject(): void
+    {
         $a = (object) [];
         $b = (object) [];
         $c = (object) ['a' => 'a'];
