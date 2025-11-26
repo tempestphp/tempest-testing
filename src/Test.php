@@ -43,6 +43,7 @@ final class Test
         $self->after = arr($reflector->getDeclaringClass()->getPublicMethods())
             ->filter(fn (MethodReflector $otherMethod) => $otherMethod->hasAttribute(After::class))
             ->values()
+            ->reverse()
             ->toArray();
 
         return $self;

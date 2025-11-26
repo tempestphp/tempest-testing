@@ -2,7 +2,7 @@
 
 namespace Tempest\Testing\Tests;
 
-use Tempest\Testing\Plugins\TestsEvents;
+use Tempest\Testing\Testers\TestsEvents;
 use Tempest\Testing\Test;
 use function Tempest\Testing\test;
 
@@ -13,6 +13,8 @@ final class BeforeAndAfterTest
     #[Test]
     public function test_before(): void
     {
+        $this->events->preventPropagation();
+
         test()->succeed();
     }
 }
