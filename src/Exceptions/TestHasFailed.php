@@ -7,6 +7,7 @@ use Exception;
 final class TestHasFailed extends Exception implements TestException
 {
     public string $reason;
+    public string $location;
 
     public function __construct(
         string $reason,
@@ -18,14 +19,18 @@ final class TestHasFailed extends Exception implements TestException
 
         $this->reason = sprintf($reason, ...$data);
 
-        parent::__construct($this->reason);
-    }
+        $trace = $this->getTrace();
 
-    public string $location {
-        get {
-            $trace = $this->getTrace()[0];
+        foreach ($this->getTrace() as $key => $traceEntry) {
+            if (str_starts_with($trace[$key + 1]['class'] ?? null, 'Tempest\Testing\Tester')) {
+                continue;
+            }
 
-            return sprintf('%s:%d', $trace['file'], $trace['line']);
+            $this->location = sprintf('%s:%d', $traceEntry['file'], $traceEntry['line']);
+
+            break;
         }
+
+        parent::__construct($this->reason);
     }
 }

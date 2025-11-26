@@ -22,6 +22,22 @@ final readonly class Tester
         return;
     }
 
+    public function fails(): self
+    {
+        $this->exceptionThrown(TestHasFailed::class);
+
+        return $this;
+    }
+
+    public function succeeds(): self
+    {
+        $this->isCallable();
+
+        ($this->subject)();
+
+        return $this;
+    }
+
     public function is(mixed $expected): self
     {
         if ($expected !== $this->subject) {
@@ -31,10 +47,33 @@ final readonly class Tester
         return $this;
     }
 
-    public function equals(mixed $expected): self
+    public function isNot(mixed $expected): self
+    {
+        test(fn () => $this->is($expected))->fails();
+
+        return $this;
+    }
+
+    public function isEqualTo(mixed $expected): self
     {
         if ($expected != $this->subject) {
             throw new TestHasFailed("failed asserting that %s equals %s", $this->subject, $expected);
+        }
+
+        return $this;
+    }
+
+    public function isNotEqualTo(mixed $expected): self
+    {
+        test(fn () => $this->isEqualTo($expected))->fails();
+
+        return $this;
+    }
+
+    public function isCallable(): self
+    {
+        if (! is_callable($this->subject)) {
+            throw new TestHasFailed("failed asserting that %s is callable", $this->subject);
         }
 
         return $this;
@@ -81,16 +120,19 @@ final readonly class Tester
         if (! $this->subject instanceof $expectedClass) {
             throw new TestHasFailed("failed asserting that %s is an instance of %s", $this->subject, $expectedClass);
         }
+
+        return $this;
     }
 
     public function exceptionThrown(
         string $expectedExceptionClass,
-        Closure $handler,
         ?Closure $exceptionTester = null,
     ): void
     {
+        $this->isCallable();
+
         try {
-            $handler();
+            ($this->subject)();
         } catch (Throwable $throwable) {
             test($throwable)->instanceOf($expectedExceptionClass);
 

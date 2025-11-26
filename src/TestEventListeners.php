@@ -36,8 +36,8 @@ final class TestEventListeners
     public function onTestsChunked(TestsChunked $event): void
     {
         if ($this->isVerbose) {
-            $this->info(sprintf(
-                "Running on %d %s",
+            $this->writeln()->info(sprintf(
+                "will run on %d %s",
                 $event->processCount,
                 str('process')->pluralize($event->processCount),
             ))->writeln();
@@ -59,6 +59,10 @@ final class TestEventListeners
     public function onTestSkipped(TestSkipped $event): void
     {
         $this->result->addSkipped();
+
+        if ($this->isVerbose) {
+            $this->info("skipped: {$event->name}");
+        }
     }
 
     #[EventHandler]

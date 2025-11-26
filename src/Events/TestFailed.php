@@ -20,4 +20,22 @@ final readonly class TestFailed implements DispatchToParentProcess
             location: $exception->location,
         );
     }
+
+    public function serialize(): array
+    {
+        return [
+            'name' => $this->name,
+            'reason' => $this->reason,
+            'location' => $this->location,
+        ];
+    }
+
+    public static function deserialize(array $data): DispatchToParentProcess
+    {
+        return new self(
+            name: $data['name'],
+            reason: $data['reason'],
+            location: $data['location'],
+        );
+    }
 }

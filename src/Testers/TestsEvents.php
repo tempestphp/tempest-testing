@@ -18,7 +18,7 @@ trait TestsEvents
     {
         $this->originalEventBus = $container->get(EventBus::class);
 
-        $this->events = $container->get(TestEventBus::class);
+        $this->events = new TestEventBus($this->originalEventBus);
         $container->singleton(EventBus::class, $this->events);
     }
 

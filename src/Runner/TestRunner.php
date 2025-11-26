@@ -28,8 +28,11 @@ final readonly class TestRunner
         $this->process->start(function (string $type, string $buffer) {
             foreach (explode(PHP_EOL, trim($buffer)) as $line) {
                 if (str_starts_with($line, '[EVENT]')) {
-                    $output = unserialize(substr($line, strlen('[EVENT] ')));
-                    event($output);
+                    $payload = json_decode(substr($line, strlen('[EVENT] ')), true);
+
+                    $event = $payload['event']::deserialize($payload['data']);
+
+                    event($event);
                 } else {
                     echo $line . PHP_EOL;
                 }

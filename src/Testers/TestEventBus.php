@@ -6,11 +6,11 @@ use Closure;
 use Tempest\Container\Singleton;
 use Tempest\EventBus\EventBus;
 use Tempest\Support\Str;
+use function Tempest\Testing\test;
 
-#[Singleton]
 final class TestEventBus implements EventBus
 {
-    /** @var object[] */
+    /** @var object[][] */
     private array $dispatched = [];
 
     private bool $allowPropagation = true;
@@ -23,7 +23,7 @@ final class TestEventBus implements EventBus
     {
         $eventName = Str\parse($event) ?: $event::class;
 
-        $this->dispatched[$eventName] = $event;
+        $this->dispatched[$eventName][] = $event;
 
         if ($this->allowPropagation) {
             $this->eventBus->dispatch($event);
@@ -54,7 +54,21 @@ final class TestEventBus implements EventBus
         ?Closure $eventTester = null,
     ): self
     {
+        test($this->dispatched)->hasKey($expectedEventClass);
 
+        if ($eventTester) {
+            foreach ($this->dispatched[$expectedEventClass] as $event) {
+                $eventTester($event);
+            }
+        }
+
+        return $this;
+    }
+
+    public function wasNotDispatched(
+        string $expectedEventClass,
+    ): self {
+        test(fn () => $this->wasDispatched($expectedEventClass))->fails();
 
         return $this;
     }
