@@ -10,8 +10,8 @@ final readonly class Provide
     public array $entries;
 
     public function __construct(
-        /** $var array[] $entries */
-        array ...$entries
+        /** $var string|array[] $entries */
+        string|array ...$entries
     ) {
         $this->entries = $entries;
     }
