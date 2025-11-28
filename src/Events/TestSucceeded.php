@@ -2,6 +2,9 @@
 
 namespace Tempest\Testing\Events;
 
+use Tempest\EventBus\StopsPropagation;
+
+#[StopsPropagation]
 final readonly class TestSucceeded implements DispatchToParentProcess
 {
     public function __construct(

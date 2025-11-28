@@ -2,8 +2,10 @@
 
 namespace Tempest\Testing\Events;
 
+use Tempest\EventBus\StopsPropagation;
 use Tempest\Testing\Exceptions\TestHasFailed;
 
+#[StopsPropagation]
 final readonly class TestFailed implements DispatchToParentProcess
 {
     public function __construct(
