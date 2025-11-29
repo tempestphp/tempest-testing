@@ -91,6 +91,29 @@ Get immediate feedback on test failures while running them.
  2 succeeded   3 failed   0 skipped   0.12s
 ```
 
+### Compose your tests however you like
+
+```php
+final class ApplicationTest
+{
+    use TestsEvents, TestsDatbase, TestsHttp;
+
+    #[Test]
+    public function test_before(): void
+    {
+        $this->events
+            ->preventPropagation();
+        
+        $this->http
+            ->post('/books', ['title' => 'Timeline Taxi'])
+            ->assertRedirectTo('/books/timeline-taxi');
+            
+        $this->database
+            ->assertContains('books', ['title' => 'Timeline Taxi']);
+    }
+}
+```
+
 ### Tempest's no-config approach
 
 Structure your tests however you like: in a separate dev namespaces or alongside your production code. Tempest's discovery will find them for you without any configuration on your part.
