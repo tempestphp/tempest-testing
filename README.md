@@ -88,3 +88,7 @@ Parallel execution is the starting point instead of an afterthought.
 
  2 succeeded   3 failed   0 skipped   0.12s
 ```
+
+### Tempest's no-config approach
+
+Structure your tests however you like: in a separate dev namespaces or alongside your production code. Tempest's discovery will find them for you without any configuration on your part.
