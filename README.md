@@ -73,6 +73,8 @@ Parallel execution is the starting point instead of an afterthought.
 
 ### Clear output by default
 
+Get immediate feedback on test failures while running them.
+
 ```console
 × // Tempest\Testing\Tests\TestFoo::a
   // /Dev/tempest-testing/tests/TestFoo.php:13
