@@ -91,7 +91,7 @@ Get immediate feedback on test failures while running them.
  2 succeeded   3 failed   0 skipped   0.12s
 ```
 
-### Compose your tests however you like
+### Compose tests however you like
 
 ```php
 final class ApplicationTest
