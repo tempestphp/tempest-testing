@@ -2,7 +2,10 @@
 
 namespace Tempest\Testing\Actions;
 
+use Psr\Container\ContainerInterface;
 use Tempest\Container\Container;
+use Tempest\Container\Singleton;
+use Tempest\Reflection\MethodReflector;
 use Tempest\Testing\Events\TestAfterExecuted;
 use Tempest\Testing\Events\TestBeforeExecuted;
 use Tempest\Testing\Events\TestFailed;
@@ -12,15 +15,16 @@ use Tempest\Testing\Exceptions\TestHasFailed;
 use Tempest\Testing\Test;
 use function Tempest\event;
 
-final readonly class RunTest
+#[Singleton]
+final class RunTest
 {
     public function __construct(
-        private Container $container,
+        private ContainerInterface|Container $container,
     ) {}
 
     public function __invoke(Test $test): void
     {
-        $instance = $this->container->get($test->handler->getDeclaringClass()->getName());
+        $instance = $this->getInstance($test);
 
         $providedData = [];
 
@@ -55,7 +59,7 @@ final readonly class RunTest
         try {
             $this->runBefore($test, $instance);
 
-            $instance->{$test->handler->getName()}(...$data);
+            $this->callMethod($instance, $test->handler, $data);
 
             $this->runAfter($test, $instance);
 
@@ -70,7 +74,7 @@ final readonly class RunTest
     private function runBefore(Test $test, object $instance): void
     {
         foreach ($test->before as $before) {
-            $this->container->invoke($before->getReflection()->getClosure($instance));
+            $this->callMethod($instance, $before);
 
             event(new TestBeforeExecuted($test, $before));
         }
@@ -79,9 +83,35 @@ final readonly class RunTest
     private function runAfter(Test $test, object $instance): void
     {
         foreach ($test->after as $after) {
-            $this->container->invoke($after->getReflection()->getClosure($instance));
+            $this->callMethod($instance, $after);
 
             event(new TestAfterExecuted($test, $after));
         }
+    }
+
+    private function getInstance(Test $test): object
+    {
+        return $this->container->get($test->handler->getDeclaringClass()->getName());
+    }
+
+    private function callMethod(object $instance, MethodReflector $method, array $data = []): void
+    {
+        foreach ($method->getParameters() as $parameter) {
+            if (isset($data[$parameter->getName()])) {
+                continue;
+            }
+
+            if ($parameter->hasDefaultValue()) {
+                continue;
+            }
+
+            if (! $parameter->getType()->isClass()) {
+                continue;
+            }
+
+            $data[$parameter->getName()] = $this->container->get($parameter->getType()->getName());
+        }
+
+        $instance->{$method->getName()}(...$data);
     }
 }

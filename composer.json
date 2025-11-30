@@ -7,7 +7,8 @@
         "tempest/core":  "^2.12",
         "tempest/event-bus":  "^2.12",
         "tempest/console": "^2.12",
-        "symfony/process": "^7.3"
+        "symfony/process": "^7.3",
+        "psr/container": "^2.0"
     },
     "autoload": {
         "psr-4": {
