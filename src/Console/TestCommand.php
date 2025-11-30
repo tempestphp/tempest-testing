@@ -29,7 +29,10 @@ final class TestCommand
         private readonly EventBus $eventBus,
     ) {}
 
-    #[ConsoleCommand(middleware: [WithDiscoveredTestsMiddleware::class])]
+    #[ConsoleCommand(
+        aliases: ['gust'],
+        middleware: [WithDiscoveredTestsMiddleware::class],
+    )]
     public function __invoke(
         #[ConsoleArgument(description: 'Only run tests matching this fuzzy filter')]
         ?string $filter = null,
