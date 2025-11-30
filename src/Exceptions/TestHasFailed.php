@@ -14,7 +14,7 @@ final class TestHasFailed extends Exception implements TestException
         mixed ...$data,
     ) {
         foreach ($data as $key => $value) {
-            $data[$key] = var_export($value, true);
+            $data[$key] = $this->export($value);
         }
 
         $this->reason = sprintf($reason, ...$data);
@@ -32,5 +32,14 @@ final class TestHasFailed extends Exception implements TestException
         }
 
         parent::__construct($this->reason);
+    }
+
+    private function export(mixed $value): string
+    {
+        if (is_object($value)) {
+            return $value::class;
+        }
+
+        return var_export($value, true);
     }
 }

@@ -184,9 +184,9 @@ final class TesterTest
             test(fn () => throw new InvalidArgumentException())->exceptionThrown(Exception::class);
         })->succeeds();
 
-//        test(function () {
-//            test(fn () => throw new Exception())->exceptionThrown(InvalidArgumentException::class);
-//        })->fails();
+        test(function () {
+            test(fn () => throw new Exception())->exceptionThrown(InvalidArgumentException::class);
+        })->fails();
 
         test(function () {
             test()->exceptionThrown(InvalidArgumentException::class);
@@ -204,9 +204,9 @@ final class TesterTest
             test(fn () => throw new InvalidArgumentException())->exceptionNotThrown(Exception::class);
         })->fails();
 
-//        test(function () {
-//            test(fn () => throw new Exception())->exceptionNotThrown(InvalidArgumentException::class);
-//        })->fails();
+        test(function () {
+            test(fn () => throw new Exception())->exceptionNotThrown(InvalidArgumentException::class);
+        })->succeeds();
 
         test(function () {
             test()->exceptionNotThrown(InvalidArgumentException::class);
