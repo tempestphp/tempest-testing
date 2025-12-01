@@ -22,9 +22,20 @@ final readonly class Tester
         return;
     }
 
-    public function fails(): self
+    public function fails(?string $message = null): self
     {
-        $this->exceptionThrown(TestHasFailed::class);
+        $exceptionTester = null;
+
+        if ($message) {
+            $exceptionTester = function (TestHasFailed $exception) use ($message) {
+                test($exception->getMessage())->is($message);
+            };
+        }
+
+        $this->exceptionThrown(
+            expectedExceptionClass: TestHasFailed::class,
+            exceptionTester: $exceptionTester,
+        );
 
         return $this;
     }
@@ -49,7 +60,9 @@ final readonly class Tester
 
     public function isNot(mixed $expected): self
     {
-        test(fn () => $this->is($expected))->fails();
+        if ($expected === $this->subject) {
+            throw new TestHasFailed("failed asserting that %s is not %s", $this->subject, $expected);
+        }
 
         return $this;
     }
@@ -57,7 +70,7 @@ final readonly class Tester
     public function isEqualTo(mixed $expected): self
     {
         if ($expected != $this->subject) {
-            throw new TestHasFailed("failed asserting that %s equals %s", $this->subject, $expected);
+            throw new TestHasFailed("failed asserting that %s is equal to %s", $this->subject, $expected);
         }
 
         return $this;
@@ -65,7 +78,9 @@ final readonly class Tester
 
     public function isNotEqualTo(mixed $expected): self
     {
-        test(fn () => $this->isEqualTo($expected))->fails();
+        if ($expected == $this->subject) {
+            throw new TestHasFailed("failed asserting that %s is not equal to %s", $this->subject, $expected);
+        }
 
         return $this;
     }
@@ -82,7 +97,7 @@ final readonly class Tester
     public function hasCount(int $expected): self
     {
         if ($expected !== count($this->subject)) {
-            throw new TestHasFailed("failed asserting that array has %d items", $expected);
+            throw new TestHasFailed("failed asserting that array has %s items", $expected);
         }
 
         return $this;
@@ -90,7 +105,9 @@ final readonly class Tester
 
     public function hasNotCount(int $expected): self
     {
-        test(fn () => $this->hasCount($expected))->fails();
+        if ($expected === count($this->subject)) {
+            throw new TestHasFailed("failed asserting that array does not have %s items", $expected);
+        }
 
         return $this;
     }
@@ -104,9 +121,11 @@ final readonly class Tester
         return $this;
     }
 
-    public function containsNot(int $expected): self
+    public function containsNot(mixed $search): self
     {
-        test(fn () => $this->contains($expected))->fails();
+        if (in_array($search, $this->subject)) {
+            throw new TestHasFailed("failed asserting that array does not contain %s", $search);
+        }
 
         return $this;
     }
@@ -140,7 +159,9 @@ final readonly class Tester
 
     public function notInstanceOf(string $expectedClass): self
     {
-        test(fn () => $this->instanceOf($expectedClass))->fails();
+        if ($this->subject instanceof $expectedClass) {
+            throw new TestHasFailed("failed asserting that %s is not an instance of %s", $this->subject, $expectedClass);
+        }
 
         return $this;
     }
@@ -150,12 +171,16 @@ final readonly class Tester
         ?Closure $exceptionTester = null,
     ): self
     {
-        $this->isCallable();
+        if (! is_callable($this->subject)) {
+            throw new TestHasFailed("to test exceptions, the test subject must be a callable; instead got %s", $this->subject);
+        }
 
         try {
             ($this->subject)();
         } catch (Throwable $throwable) {
-            test($throwable)->instanceOf($expectedExceptionClass);
+            if (! $throwable instanceof $expectedExceptionClass) {
+                throw new TestHasFailed("Expected exception %s was not thrown, instead got %s", $expectedExceptionClass, $throwable::class);
+            }
 
             if ($exceptionTester) {
                 $exceptionTester($throwable);
@@ -164,14 +189,24 @@ final readonly class Tester
             return $this;
         }
 
-        $this->fail("Expected exception {$expectedExceptionClass} was not thrown");
+        throw new TestHasFailed("Expected exception %s was not thrown", $expectedExceptionClass);
 
         return $this;
     }
 
     public function exceptionNotThrown(string $expectedExceptionClass): self
     {
-        test(fn () => $this->exceptionThrown($expectedExceptionClass))->fails();
+        if (! is_callable($this->subject)) {
+            return $this;
+        }
+
+        try {
+            ($this->subject)();
+        } catch (Throwable $throwable) {
+            if ($throwable instanceof $expectedExceptionClass) {
+                throw new TestHasFailed("Exception %s was thrown, while it shouldn't", $throwable::class);
+            }
+        }
 
         return $this;
     }

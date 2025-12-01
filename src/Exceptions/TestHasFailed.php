@@ -13,11 +13,13 @@ final class TestHasFailed extends Exception implements TestException
         string $reason,
         mixed ...$data,
     ) {
-        foreach ($data as $key => $value) {
-            $data[$key] = $this->export($value);
+        $parsedData = [];
+
+        foreach ($data as $value) {
+            $parsedData[] = '`' . $this->export($value) . '`';
         }
 
-        $this->reason = sprintf($reason, ...$data);
+        $this->reason = sprintf($reason, ...$parsedData);
 
         $trace = $this->getTrace();
 
