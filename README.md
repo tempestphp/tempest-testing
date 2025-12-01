@@ -112,6 +112,11 @@ Structure your tests however you like: in a separate dev namespaces or alongside
 Anything that happens during tests is easy to hook into with your own event listeners.
 
 ```php
+use Tempest\Container\Singleton;
+use Tempest\Console\HasConsole;
+use Tempest\EventBus\EventHandler;
+use Tempest\Testing\Events\TestFailed;
+
 #[Singleton]
 final class TestEventListeners
 {
