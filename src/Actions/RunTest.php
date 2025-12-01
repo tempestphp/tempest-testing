@@ -39,13 +39,16 @@ final class RunTest
                     throw InvalidProviderData::invalidMethodName($test, $provider);
                 }
 
-                $data = $instance->{$provider}();
+                $provider = $instance->{$provider}(...);
+            }
 
-                if (! is_iterable($data)) {
-                    throw InvalidProviderData::providerMethodMustReturnIterable($test, $provider);
-                }
+            if (is_callable($provider)) {
+                // TODO: add DI here as well?
+                $provider = $provider();
+            }
 
-                $providedData = [...$providedData, ...iterator_to_array($data)];
+            if (is_iterable($provider)) {
+                $providedData = [...$providedData, ...iterator_to_array($provider)];
             }
         }
 

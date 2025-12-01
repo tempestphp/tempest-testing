@@ -40,9 +40,19 @@ final readonly class ProviderTest
 
     #[Test, Provide(
         'generatorData',
-        [1, 2]
+        [1, 2],
     )]
     public function provideWithGeneratorAndArrays(int $one, int $two): void
+    {
+        test($one)->is(1);
+        test($two)->is(2);
+    }
+
+    #[Test, Provide(static function (): Generator {
+        yield [1, 2];
+        yield [1, 2];
+    })]
+    public function provideWithClosure(int $one, int $two): void
     {
         test($one)->is(1);
         test($two)->is(2);
