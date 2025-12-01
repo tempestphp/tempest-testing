@@ -1,4 +1,4 @@
-## A standalone parallel test runner for modern PHP
+## A parallel test runner for modern PHP
 
 This package is an experiment in rethinking testing for PHP. It's not intended for use in real-life projects. Some of the core ideas behind this package:
 
