@@ -3,12 +3,11 @@
 namespace Tempest\Testing\Testers;
 
 use Closure;
-use Tempest\Container\Singleton;
 use Tempest\EventBus\EventBus;
 use Tempest\Support\Str;
 use function Tempest\Testing\test;
 
-final class TestEventBus implements EventBus
+final class EventBusTester implements EventBus
 {
     /** @var object[][] */
     private array $dispatched = [];

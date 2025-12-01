@@ -24,7 +24,7 @@ final class TestHasFailed extends Exception implements TestException
         $trace = $this->getTrace();
 
         foreach ($this->getTrace() as $key => $traceEntry) {
-            if (str_starts_with($trace[$key + 1]['class'] ?? null, 'Tempest\Testing\Tester')) {
+            if (str_starts_with($trace[$key + 1]['class'] ?? null, 'Tempest\Testing\Testers\Tester')) {
                 continue;
             }
 

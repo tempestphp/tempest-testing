@@ -2,8 +2,8 @@
 
 namespace Tempest\Testing\Tests;
 
-use Tempest\Testing\Testers\TestsEvents;
 use Tempest\Testing\Test;
+use Tempest\Testing\Testers\TestsEvents;
 use function Tempest\Testing\test;
 
 final class BeforeAndAfterTest

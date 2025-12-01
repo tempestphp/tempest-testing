@@ -1,10 +1,11 @@
 <?php
 
-namespace Tempest\Testing;
+namespace Tempest\Testing\Testers;
 
 use Closure;
 use Tempest\Testing\Exceptions\TestHasFailed;
 use Throwable;
+use function Tempest\Testing\test;
 
 final readonly class Tester
 {

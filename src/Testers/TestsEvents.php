@@ -9,7 +9,7 @@ use Tempest\Testing\Before;
 
 trait TestsEvents
 {
-    protected TestEventBus $events;
+    protected EventBusTester $events;
 
     protected EventBus $originalEventBus;
 
@@ -18,7 +18,7 @@ trait TestsEvents
     {
         $this->originalEventBus = $container->get(EventBus::class);
 
-        $this->events = new TestEventBus($this->originalEventBus);
+        $this->events = new EventBusTester($this->originalEventBus);
         $container->singleton(EventBus::class, $this->events);
     }
 
