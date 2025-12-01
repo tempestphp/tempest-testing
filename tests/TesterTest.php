@@ -136,6 +136,8 @@ final class TesterTest
     {
         test(fn () => test([1, 2, 3])->contains(2))->succeeds();
         test(fn () => test([1, 2, 3])->contains(4))->fails('failed asserting that array contains `4`');
+        test(fn () => test('abc')->contains('b'))->succeeds();
+        test(fn () => test('abc')->contains('d'))->fails("failed asserting that string contains `'d'`");
     }
 
     #[Test]
@@ -143,6 +145,8 @@ final class TesterTest
     {
         test(fn () => test([1, 2, 3])->containsNot(2))->fails('failed asserting that array does not contain `2`');
         test(fn () => test([1, 2, 3])->containsNot(4))->succeeds();
+        test(fn () => test('abc')->containsNot('b'))->fails("failed asserting that string does not contain `'b'`");
+        test(fn () => test('abc')->containsNot('d'))->succeeds();
     }
 
     #[Test]
