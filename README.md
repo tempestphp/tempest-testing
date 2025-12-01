@@ -5,20 +5,25 @@ This package is an experiment in rethinking testing for PHP. It's not intended f
 ### ✅ A fluent testing API
 
 ```php
-#[Test]
-public function forget_keys_mutates_array(): void
+use Tempest\Testing\Test;
+
+final class ArrayTest
 {
-    $original = [
-        'foo' => 'bar',
-        'baz' => 'qux',
-    ];
-
-    Arr\forget_keys($original, ['foo']);
-
-    test($original)
-        ->hasCount(1)
-        ->hasKey('baz')
-        ->hasNoKey('foo');
+    #[Test]
+    public function forget_keys_mutates_array(): void
+    {
+        $original = [
+            'foo' => 'bar',
+            'baz' => 'qux',
+        ];
+    
+        Arr\forget_keys($original, ['foo']);
+    
+        test($original)
+            ->hasCount(1)
+            ->hasKey('baz')
+            ->hasNoKey('foo');
+    }
 }
 ```
 
@@ -27,6 +32,8 @@ public function forget_keys_mutates_array(): void
 Use Tempest's container or any PSR-11 compatible one to inject dependencies into your tests.
 
 ```php
+use Tempest\Testing\Test;
+
 final class BookTest
 {
     public function __construct(
