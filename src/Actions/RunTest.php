@@ -105,7 +105,7 @@ final class RunTest
                 continue;
             }
 
-            if (! $parameter->getType()->isClass()) {
+            if ($parameter->getType()->isScalar()) {
                 continue;
             }
 
