@@ -2,7 +2,7 @@
 
 This package is an experiment in rethinking testing for PHP. It's not intended for use in real-life projects. Some of the core ideas behind this package:
 
-### A fluent testing API
+### ✅ A fluent testing API
 
 ```php
 #[Test]
@@ -22,56 +22,30 @@ public function forget_keys_mutates_array(): void
 }
 ```
 
-### Dependency injection support
+### ✅ Dependency injection support
+
+Use Tempest's container or any PSR-11 compatible one to inject dependencies into your tests.
 
 ```php
 class BookTest
 {
     public function __construct(
-        private BookRepository $books
+        private Database $database,
     ) {}
     
     #[Test]
-    public function book_can_be_created(): void
+    public function book_can_be_created(BookRepository $repository): void
     {
-        $book = $this->books->create(
-            title: 'Timeline Taxi',
-        );
-        
-        test($book->id)->isNotNull();
-        
-        test($book->creationDate)
-            ->isNotNull()
-            ->equals(new DateTimeImmutable());
+        // …
     }
 }
 ```
 
-### A simple event-driven architecture
-
-```php
-
-#[Singleton]
-final class TestEventListeners
-{
-    use HasConsole;
-
-    #[EventHandler]
-    public function onTestFailed(TestFailed $event): void
-    {
-        $this->error(sprintf('<style="fg-red">%s</style>', $event->name));
-        $this->writeln(sprintf('  <style="fg-red dim">//</style> <style="fg-red underline">%s</style>', $event->location));
-        $this->writeln(sprintf('  <style="fg-red dim">//</style> <style="fg-red">%s</style>', $event->reason));
-        $this->writeln();
-    }
-}
-```
-
-### Parallel by default
+### ✅ Parallel by default
 
 Parallel execution is the starting point instead of an afterthought.
 
-### Clear output by default
+### ✅ Clear output by default
 
 Get immediate feedback on test failures while running them.
 
@@ -91,7 +65,7 @@ Get immediate feedback on test failures while running them.
  2 succeeded   3 failed   0 skipped   0.12s
 ```
 
-### Compose tests however you like
+### ✅ Compose tests however you like
 
 ```php
 final class ApplicationTest
@@ -114,6 +88,27 @@ final class ApplicationTest
 }
 ```
 
-### Tempest's no-config approach
+### ✅ Tempest's no-config approach
 
 Structure your tests however you like: in a separate dev namespaces or alongside your production code. Tempest's discovery will find them for you without any configuration on your part.
+
+### ✅ Extensible event-driven architecture
+
+Anything that happens during tests is easy to hook into with your own event listeners.
+
+```php
+#[Singleton]
+final class TestEventListeners
+{
+    use HasConsole;
+
+    #[EventHandler]
+    public function onTestFailed(TestFailed $event): void
+    {
+        $this->error(sprintf('<style="fg-red">%s</style>', $event->name));
+        $this->writeln(sprintf('  <style="fg-red dim">//</style> <style="fg-red underline">%s</style>', $event->location));
+        $this->writeln(sprintf('  <style="fg-red dim">//</style> <style="fg-red">%s</style>', $event->reason));
+        $this->writeln();
+    }
+}
+```
