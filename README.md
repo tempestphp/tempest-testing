@@ -27,7 +27,7 @@ public function forget_keys_mutates_array(): void
 Use Tempest's container or any PSR-11 compatible one to inject dependencies into your tests.
 
 ```php
-class BookTest
+final class BookTest
 {
     public function __construct(
         private Database $database,
@@ -41,11 +41,26 @@ class BookTest
 }
 ```
 
-### ✅ Parallel by default
+```php
+use Tempest\Container\Initializer;
+use Tempest\Container\Singleton;
+use Tempest\Testing\Actions\RunTest;
 
-Parallel execution is the starting point instead of an afterthought.
+final class RunTestInitializer implements Initializer
+{
+    #[Singleton]
+    public function initialize(Container $container): RunTest
+    {
+    	return new RunTest(container: new YourOwnContainer());
+    }
+}
+```
 
-### ✅ Clear output by default
+### ✅ Parallel execution
+
+Parallel execution by default instead of an afterthought.
+
+### ✅ Immediate output
 
 Get immediate feedback on test failures while running them.
 
