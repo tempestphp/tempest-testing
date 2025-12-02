@@ -173,7 +173,7 @@ final readonly class Tester
         return $this;
     }
 
-    public function notInstanceOf(string $expectedClass): self
+    public function isNotInstanceOf(string $expectedClass): self
     {
         if ($this->subject instanceof $expectedClass) {
             throw new TestHasFailed("failed asserting that %s is not an instance of %s", $this->subject, $expectedClass);
@@ -227,55 +227,367 @@ final readonly class Tester
         return $this;
     }
 
-// TODO
-// final public static function assertArrayHasKey(mixed $key, array|ArrayAccess $array, string $message = ''): void
-// final public static function assertArrayNotHasKey(mixed $key, array|ArrayAccess $array, string $message = ''): void
-// final public static function assertIsList(mixed $array, string $message = ''): void
-// final public static function assertContains(mixed $needle, iterable $haystack, string $message = ''): void
-// final public static function assertNotContains(mixed $needle, iterable $haystack, string $message = ''): void
-// final public static function assertCount(int $expectedCount, Countable|iterable $haystack, string $message = ''): void
-// final public static function assertNotCount(int $expectedCount, Countable|iterable $haystack, string $message = ''): void
-// final public static function assertEquals(mixed $expected, mixed $actual, string $message = ''): void
-// final public static function assertNotEquals(mixed $expected, mixed $actual, string $message = ''): void
-// final public static function assertEmpty(mixed $actual, string $message = ''): void
-// final public static function assertNotEmpty(mixed $actual, string $message = ''): void
-// final public static function assertGreaterThan(mixed $minimum, mixed $actual, string $message = ''): void
-// final public static function assertGreaterThanOrEqual(mixed $minimum, mixed $actual, string $message = ''): void
-// final public static function assertLessThan(mixed $maximum, mixed $actual, string $message = ''): void
-// final public static function assertLessThanOrEqual(mixed $maximum, mixed $actual, string $message = ''): void
-// final public static function assertTrue(mixed $condition, string $message = ''): void
-// final public static function assertFalse(mixed $condition, string $message = ''): void
-// final public static function assertNull(mixed $actual, string $message = ''): void
-// final public static function assertNotNull(mixed $actual, string $message = ''): void
-// final public static function assertSame(mixed $expected, mixed $actual, string $message = ''): void
-// final public static function assertNotSame(mixed $expected, mixed $actual, string $message = ''): void
-// final public static function assertInstanceOf(string $expected, mixed $actual, string $message = ''): void
-// final public static function assertNotInstanceOf(string $expected, mixed $actual, string $message = ''): void
-// final public static function assertIsArray(mixed $actual, string $message = ''): void
-// final public static function assertIsBool(mixed $actual, string $message = ''): void
-// final public static function assertIsFloat(mixed $actual, string $message = ''): void
-// final public static function assertIsInt(mixed $actual, string $message = ''): void
-// final public static function assertIsNumeric(mixed $actual, string $message = ''): void
-// final public static function assertIsObject(mixed $actual, string $message = ''): void
-// final public static function assertIsResource(mixed $actual, string $message = ''): void
-// final public static function assertIsString(mixed $actual, string $message = ''): void
-// final public static function assertIsScalar(mixed $actual, string $message = ''): void
-// final public static function assertIsCallable(mixed $actual, string $message = ''): void
-// final public static function assertIsIterable(mixed $actual, string $message = ''): void
-// final public static function assertIsNotArray(mixed $actual, string $message = ''): void
-// final public static function assertIsNotBool(mixed $actual, string $message = ''): void
-// final public static function assertIsNotFloat(mixed $actual, string $message = ''): void
-// final public static function assertIsNotInt(mixed $actual, string $message = ''): void
-// final public static function assertIsNotNumeric(mixed $actual, string $message = ''): void
-// final public static function assertIsNotObject(mixed $actual, string $message = ''): void
-// final public static function assertIsNotResource(mixed $actual, string $message = ''): void
-// final public static function assertIsNotString(mixed $actual, string $message = ''): void
-// final public static function assertIsNotScalar(mixed $actual, string $message = ''): void
-// final public static function assertIsNotCallable(mixed $actual, string $message = ''): void
-// final public static function assertIsNotIterable(mixed $actual, string $message = ''): void
-// final public static function assertStringStartsWith(string $prefix, string $string, string $message = ''): void
-// final public static function assertStringStartsNotWith(string $prefix, string $string, string $message = ''): void
-// final public static function assertStringEndsWith(string $suffix, string $string, string $message = ''): void
-// final public static function assertStringEndsNotWith(string $suffix, string $string, string $message = ''): void
-// final public static function assertJson(string $actual, string $message = ''): void
+    public function isList(): self
+    {
+        if (! is_array($this->subject) || ! array_is_list($this->subject)) {
+            throw new TestHasFailed('failed asserting that array is a list');
+        }
+
+        return $this;
+    }
+
+    public function isNotList(): self
+    {
+        if (! is_array($this->subject) || array_is_list($this->subject)) {
+            throw new TestHasFailed('failed asserting that array is not a list');
+        }
+
+        return $this;
+    }
+
+    public function isEmpty(): self
+    {
+        if (! empty($this->subject)) {
+            throw new TestHasFailed('failed asserting that value is empty', $this->subject);
+        }
+
+        return $this;
+    }
+
+    public function isNotEmpty(): self
+    {
+        if (empty($this->subject)) {
+            throw new TestHasFailed('failed asserting that value is not empty');
+        }
+
+        return $this;
+    }
+
+    public function greaterThan(mixed $minimum): self
+    {
+        if (! $this->subject > $minimum) {
+            throw new TestHasFailed('failed asserting that %s is greater than %s', $this->subject, $minimum);
+        }
+
+        return $this;
+    }
+
+    public function greaterThanOrEqual(mixed $minimum): self
+    {
+        if (! $this->subject >= $minimum) {
+            throw new TestHasFailed('failed asserting that %s is greater than or equal to %s', $this->subject, $minimum);
+        }
+
+        return $this;
+    }
+
+    public function lessThan(mixed $maximum): self
+    {
+        if (! $this->subject < $maximum) {
+            throw new TestHasFailed('failed asserting that %s is less than %s', $this->subject, $maximum);
+        }
+
+        return $this;
+    }
+
+    public function lessThanOrEqual(mixed $maximum): self
+    {
+        if (! $this->subject <= $maximum) {
+            throw new TestHasFailed('failed asserting that %s is less than or equal to %s', $this->subject, $maximum);
+        }
+
+        return $this;
+    }
+
+    public function isTrue(): self
+    {
+        if ($this->subject !== true) {
+            throw new TestHasFailed('failed asserting that value is true', $this->subject);
+        }
+
+        return $this;
+    }
+
+    public function isFalse(): self
+    {
+        if ($this->subject !== false) {
+            throw new TestHasFailed('failed asserting that value is false', $this->subject);
+        }
+
+        return $this;
+    }
+
+    public function isTrueish(): self
+    {
+        if (((bool) $this->subject) !== true) {
+            throw new TestHasFailed('failed asserting that value is trueish', $this->subject);
+        }
+
+        return $this;
+    }
+
+    public function isFalseish(): self
+    {
+        if (((bool) $this->subject) !== false) {
+            throw new TestHasFailed('failed asserting that value is falseish', $this->subject);
+        }
+
+        return $this;
+    }
+
+    public function isNull(): self
+    {
+        if (! is_null($this->subject)) {
+            throw new TestHasFailed('failed asserting that value is null', $this->subject);
+        }
+
+        return $this;
+    }
+
+    public function isNotNull(): self
+    {
+        if (is_null($this->subject)) {
+            throw new TestHasFailed("failed asserting that value is not null");
+        }
+
+        return $this;
+    }
+
+    public function isArray(): self
+    {
+        if (! is_array($this->subject)) {
+            throw new TestHasFailed('failed asserting that value is array', $this->subject);
+        }
+
+        return $this;
+    }
+
+    public function isBool(): self
+    {
+        if (! is_bool($this->subject)) {
+            throw new TestHasFailed('failed asserting that value is bool', $this->subject);
+        }
+
+        return $this;
+    }
+
+    public function isFloat(): self
+    {
+        if (! is_float($this->subject)) {
+            throw new TestHasFailed('failed asserting that value is float', $this->subject);
+        }
+
+        return $this;
+    }
+
+    public function isInt(): self
+    {
+        if (! is_int($this->subject)) {
+            throw new TestHasFailed('failed asserting that value is int', $this->subject);
+        }
+
+        return $this;
+    }
+
+    public function isNumeric(): self
+    {
+        if (! is_numeric($this->subject)) {
+            throw new TestHasFailed('failed asserting that value is numeric', $this->subject);
+        }
+
+        return $this;
+    }
+
+    public function isObject(): self
+    {
+        if (! is_object($this->subject)) {
+            throw new TestHasFailed('failed asserting that value is object', $this->subject);
+        }
+
+        return $this;
+    }
+
+    public function isResource(): self
+    {
+        if (! is_resource($this->subject)) {
+            throw new TestHasFailed('failed asserting that value is resource', $this->subject);
+        }
+
+        return $this;
+    }
+
+    public function isString(): self
+    {
+        if (! is_string($this->subject)) {
+            throw new TestHasFailed('failed asserting that value is string', $this->subject);
+        }
+
+        return $this;
+    }
+
+    public function isScalar(): self
+    {
+        if (! is_scalar($this->subject)) {
+            throw new TestHasFailed('failed asserting that value is scalar', $this->subject);
+        }
+
+        return $this;
+    }
+
+    public function isIterable(): self
+    {
+        if (! is_iterable($this->subject)) {
+            throw new TestHasFailed('failed asserting that value is iterable', $this->subject);
+        }
+
+        return $this;
+    }
+
+    public function isNotArray(): self
+    {
+        if (is_array($this->subject)) {
+            throw new TestHasFailed('failed asserting that value is not array');
+        }
+
+        return $this;
+    }
+
+    public function isNotBool(): self
+    {
+        if (is_bool($this->subject)) {
+            throw new TestHasFailed('failed asserting that value is not bool');
+        }
+
+        return $this;
+    }
+
+    public function isNotFloat(): self
+    {
+        if (is_float($this->subject)) {
+            throw new TestHasFailed('failed asserting that value is not float');
+        }
+
+        return $this;
+    }
+
+    public function isNotInt(): self
+    {
+        if (is_int($this->subject)) {
+            throw new TestHasFailed('failed asserting that value is not int');
+        }
+
+        return $this;
+    }
+
+    public function isNotNumeric(): self
+    {
+        if (is_numeric($this->subject)) {
+            throw new TestHasFailed('failed asserting that value is not numeric');
+        }
+
+        return $this;
+    }
+
+    public function isNotObject(): self
+    {
+        if (is_object($this->subject)) {
+            throw new TestHasFailed('failed asserting that value is not object');
+        }
+
+        return $this;
+    }
+
+    public function isNotResource(): self
+    {
+        if (is_resource($this->subject)) {
+            throw new TestHasFailed('failed asserting that value is not resource');
+        }
+
+        return $this;
+    }
+
+    public function isNotString(): self
+    {
+        if (is_string($this->subject)) {
+            throw new TestHasFailed('failed asserting that value is not string');
+        }
+
+        return $this;
+    }
+
+    public function isNotScalar(): self
+    {
+        if (is_scalar($this->subject)) {
+            throw new TestHasFailed('failed asserting that value is not scalar');
+        }
+
+        return $this;
+    }
+
+    public function isNotCallable(): self
+    {
+        if (is_callable($this->subject)) {
+            throw new TestHasFailed('failed asserting that value is not callable');
+        }
+
+        return $this;
+    }
+
+    public function isNotIterable(): self
+    {
+        if (is_iterable($this->subject)) {
+            throw new TestHasFailed('failed asserting that value is not iterable');
+        }
+
+        return $this;
+    }
+
+    public function stringStartsWith(string $prefix): self
+    {
+        if (is_string($this->subject) && ! str_starts_with($this->subject, $prefix)) {
+            throw new TestHasFailed('failed asserting that string starts with %s', $prefix);
+        }
+
+        return $this;
+    }
+
+    public function stringStartsNotWith(string $prefix): self
+    {
+        if (is_string($this->subject) && str_starts_with($this->subject, $prefix)) {
+            throw new TestHasFailed('failed asserting that string does not start with %s', $prefix);
+        }
+
+        return $this;
+    }
+
+    public function stringEndsWith(string $suffix): self
+    {
+        if (is_string($this->subject) && ! str_ends_with($this->subject, $suffix)) {
+            throw new TestHasFailed('failed asserting that string ends with %s', $suffix);
+        }
+
+        return $this;
+    }
+
+    public function stringEndsNotWith(string $suffix): self
+    {
+        if (is_string($this->subject) && str_ends_with($this->subject, $suffix)) {
+            throw new TestHasFailed('failed asserting that string does not end with %s', $suffix);
+        }
+
+        return $this;
+    }
+
+    public function json(): self
+    {
+        if (! is_string($this->subject)) {
+            throw new TestHasFailed('failed asserting that value %s is valid JSON', $this->subject);
+        }
+
+        if (! json_validate($this->subject)) {
+            throw new TestHasFailed('failed asserting that value %s is valid JSON', $this->subject);
+        }
+
+        return $this;
+    }
 }

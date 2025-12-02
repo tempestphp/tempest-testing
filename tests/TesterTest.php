@@ -173,8 +173,8 @@ final class TesterTest
     #[Test]
     public function notInstanceOf(): void
     {
-        test(fn () => test($this)->notInstanceOf(self::class))->fails("failed asserting that `Tempest\\Testing\\Tests\\TesterTest` is not an instance of `'Tempest\\\\Testing\\\\Tests\\\\TesterTest'`");
-        test(fn () => test('')->notInstanceOf(self::class))->succeeds();
+        test(fn () => test($this)->isNotInstanceOf(self::class))->fails("failed asserting that `Tempest\\Testing\\Tests\\TesterTest` is not an instance of `'Tempest\\\\Testing\\\\Tests\\\\TesterTest'`");
+        test(fn () => test('')->isNotInstanceOf(self::class))->succeeds();
     }
 
     #[Test]
