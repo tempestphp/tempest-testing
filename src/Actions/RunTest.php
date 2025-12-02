@@ -9,6 +9,7 @@ use Tempest\Reflection\MethodReflector;
 use Tempest\Testing\Events\TestAfterExecuted;
 use Tempest\Testing\Events\TestBeforeExecuted;
 use Tempest\Testing\Events\TestFailed;
+use Tempest\Testing\Events\TestStarted;
 use Tempest\Testing\Events\TestSucceeded;
 use Tempest\Testing\Exceptions\InvalidProviderData;
 use Tempest\Testing\Exceptions\TestHasFailed;
@@ -59,6 +60,8 @@ final class RunTest
 
     private function runEntry(Test $test, object $instance, array $data): void
     {
+        event(new TestStarted($test->name));
+
         try {
             $this->runBefore($test, $instance);
 

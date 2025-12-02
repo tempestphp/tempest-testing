@@ -1,41 +1,31 @@
 <?php
 
-namespace Tempest\Testing;
+namespace Tempest\Testing\Output;
 
 use Tempest\Console\HasConsole;
-use Tempest\Console\Input\ConsoleArgumentBag;
-use Tempest\Container\Singleton;
-use Tempest\EventBus\EventHandler;
 use Tempest\Testing\Events\TestFailed;
 use Tempest\Testing\Events\TestRunEnded;
 use Tempest\Testing\Events\TestRunStarted;
 use Tempest\Testing\Events\TestsChunked;
 use Tempest\Testing\Events\TestSkipped;
+use Tempest\Testing\Events\TestStarted;
 use Tempest\Testing\Events\TestSucceeded;
 use Tempest\Testing\Runner\TestResult;
+use Tempest\Testing\TestOutput;
 use function Tempest\Support\str;
 
-#[Singleton]
-final class TestEventListeners
+final class DefaultOutput implements TestOutput
 {
     use HasConsole;
 
-    private TestResult $result;
-
     public function __construct(
-        private readonly ConsoleArgumentBag $argumentBag,
-    ) {
-        $this->result = new TestResult();
-    }
+        public bool $verbose = false,
+        private TestResult $result = new TestResult(),
+    ) {}
 
-    private bool $isVerbose {
-        get => $this->argumentBag->has('verbose', '-v');
-    }
-
-    #[EventHandler]
     public function onTestsChunked(TestsChunked $event): void
     {
-        if ($this->isVerbose) {
+        if ($this->verbose) {
             $this->writeln()->info(sprintf(
                 "will run on %d %s",
                 $event->processCount,
@@ -44,7 +34,11 @@ final class TestEventListeners
         }
     }
 
-    #[EventHandler]
+    public function onTestStarted(TestStarted $event): void
+    {
+        return;
+    }
+
     public function onTestFailed(TestFailed $event): void
     {
         $this->result->addFailed();
@@ -55,33 +49,29 @@ final class TestEventListeners
         $this->writeln();
     }
 
-    #[EventHandler]
     public function onTestSkipped(TestSkipped $event): void
     {
         $this->result->addSkipped();
 
-        if ($this->isVerbose) {
+        if ($this->verbose) {
             $this->info("skipped: {$event->name}");
         }
     }
 
-    #[EventHandler]
     public function onTestSucceeded(TestSucceeded $event): void
     {
         $this->result->addSucceeded();
 
-        if ($this->isVerbose) {
+        if ($this->verbose) {
             $this->success($event->name);
         }
     }
 
-    #[EventHandler]
     public function onTestRunStarted(TestRunStarted $event): void
     {
         $this->result->startTime();
     }
 
-    #[EventHandler]
     public function onTestRunEnded(TestRunEnded $event): void
     {
         $this->result->endTime();
@@ -94,7 +84,7 @@ final class TestEventListeners
             $this->result->elapsedTime,
         );
 
-        if ($this->result->failed > 0 || $this->isVerbose) {
+        if ($this->result->failed > 0 || $this->verbose) {
             $this->writeln();
         }
 
