@@ -220,7 +220,7 @@ final class TesterTest
             test()->exceptionNotThrown(InvalidArgumentException::class);
         })->succeeds();
     }
-
+// TODO: review
     #[Test]
     public function countableChecks(): void
     {
