@@ -107,7 +107,7 @@ final readonly class Tester
         $this->isCountable();
 
         if ($expected !== count($this->subject)) {
-            throw new TestHasFailed("failed asserting that array has %s items", $expected);
+            throw new TestHasFailed("failed asserting that %s has %s items", $this->subject, $expected);
         }
 
         return $this;
@@ -118,7 +118,7 @@ final readonly class Tester
         $this->isCountable();
 
         if ($expected === count($this->subject)) {
-            throw new TestHasFailed("failed asserting that array does not have %s items", $expected);
+            throw new TestHasFailed("failed asserting that %s does not have %s items", $this->subject, $expected);
         }
 
         return $this;
@@ -136,7 +136,7 @@ final readonly class Tester
     public function isNotCountable(): self
     {
         if (is_countable($this->subject)) {
-            throw new TestHasFailed('failed asserting that value is not countable');
+            throw new TestHasFailed('failed asserting that %s is not countable', $this->subject);
         }
 
         return $this;
@@ -149,11 +149,11 @@ final readonly class Tester
         }
 
         if (is_string($this->subject) && ! str_contains($this->subject, $search)) {
-            throw new TestHasFailed("failed asserting that string contains %s", $search);
+            throw new TestHasFailed("failed asserting that %s contains %s", $this->subject, $search);
         }
 
         if (is_array($this->subject) && ! in_array($search, $this->subject)) {
-            throw new TestHasFailed("failed asserting that array contains %s", $search);
+            throw new TestHasFailed("failed asserting that %s contains %s", $this->subject, $search);
         }
 
         return $this;
@@ -166,11 +166,11 @@ final readonly class Tester
         }
 
         if (is_string($this->subject) && str_contains($this->subject, $search)) {
-            throw new TestHasFailed("failed asserting that string does not contain %s", $search);
+            throw new TestHasFailed("failed asserting that %s does not contain %s", $this->subject, $search);
         }
 
         if (is_array($this->subject) && in_array($search, $this->subject)) {
-            throw new TestHasFailed("failed asserting that array does not contain %s", $search);
+            throw new TestHasFailed("failed asserting that %s does not contain %s", $this->subject, $search);
         }
 
         return $this;
@@ -183,7 +183,7 @@ final readonly class Tester
         }
 
         if (! array_key_exists($key, $this->subject)) {
-            throw new TestHasFailed("failed asserting that array has key %s", $key);
+            throw new TestHasFailed("failed asserting that %s has key %s", $this->subject, $key);
         }
 
         return $this;
@@ -196,7 +196,7 @@ final readonly class Tester
         }
 
         if (array_key_exists($key, $this->subject)) {
-            throw new TestHasFailed("failed asserting that array does not have key %s", $key);
+            throw new TestHasFailed("failed asserting that %s does not have key %s", $this->subject, $key);
         }
 
         return $this;
@@ -270,7 +270,7 @@ final readonly class Tester
         $this->isArray();
 
         if (! array_is_list($this->subject)) {
-            throw new TestHasFailed('failed asserting that array is a list');
+            throw new TestHasFailed('failed asserting that %s is a list', $this->subject);
         }
 
         return $this;
@@ -279,7 +279,7 @@ final readonly class Tester
     public function isNotList(): self
     {
         if (is_array($this->subject) && array_is_list($this->subject)) {
-            throw new TestHasFailed('failed asserting that array is not a list');
+            throw new TestHasFailed('failed asserting that %s is not a list', $this->subject);
         }
 
         return $this;
@@ -288,7 +288,7 @@ final readonly class Tester
     public function isEmpty(): self
     {
         if (! empty($this->subject)) {
-            throw new TestHasFailed('failed asserting that value is empty', $this->subject);
+            throw new TestHasFailed('failed asserting that %s is empty', $this->subject);
         }
 
         return $this;
@@ -297,7 +297,7 @@ final readonly class Tester
     public function isNotEmpty(): self
     {
         if (empty($this->subject)) {
-            throw new TestHasFailed('failed asserting that value is not empty');
+            throw new TestHasFailed('failed asserting that %s is not empty', $this->subject);
         }
 
         return $this;
@@ -358,7 +358,7 @@ final readonly class Tester
     public function isTrue(): self
     {
         if ($this->subject !== true) {
-            throw new TestHasFailed('failed asserting that value is true', $this->subject);
+            throw new TestHasFailed('failed asserting that %s is true', $this->subject);
         }
 
         return $this;
@@ -367,7 +367,7 @@ final readonly class Tester
     public function isFalse(): self
     {
         if ($this->subject !== false) {
-            throw new TestHasFailed('failed asserting that value is false', $this->subject);
+            throw new TestHasFailed('failed asserting that %s is false', $this->subject);
         }
 
         return $this;
@@ -376,7 +376,7 @@ final readonly class Tester
     public function isTrueish(): self
     {
         if (((bool)$this->subject) !== true) {
-            throw new TestHasFailed('failed asserting that value is trueish', $this->subject);
+            throw new TestHasFailed('failed asserting that %s is trueish', $this->subject);
         }
 
         return $this;
@@ -385,7 +385,7 @@ final readonly class Tester
     public function isFalseish(): self
     {
         if (((bool)$this->subject) !== false) {
-            throw new TestHasFailed('failed asserting that value is falseish', $this->subject);
+            throw new TestHasFailed('failed asserting that %s is falseish', $this->subject);
         }
 
         return $this;
@@ -394,7 +394,7 @@ final readonly class Tester
     public function isNull(): self
     {
         if (! is_null($this->subject)) {
-            throw new TestHasFailed('failed asserting that value is null', $this->subject);
+            throw new TestHasFailed('failed asserting that %s is null', $this->subject);
         }
 
         return $this;
@@ -403,7 +403,7 @@ final readonly class Tester
     public function isNotNull(): self
     {
         if (is_null($this->subject)) {
-            throw new TestHasFailed("failed asserting that value is not null");
+            throw new TestHasFailed("failed asserting that %s is not null", $this->subject);
         }
 
         return $this;
@@ -412,7 +412,7 @@ final readonly class Tester
     public function isArray(): self
     {
         if (! is_array($this->subject)) {
-            throw new TestHasFailed('failed asserting that value is array', $this->subject);
+            throw new TestHasFailed('failed asserting that %s is array', $this->subject);
         }
 
         return $this;
@@ -421,7 +421,7 @@ final readonly class Tester
     public function isBool(): self
     {
         if (! is_bool($this->subject)) {
-            throw new TestHasFailed('failed asserting that value is bool', $this->subject);
+            throw new TestHasFailed('failed asserting that %s is bool', $this->subject);
         }
 
         return $this;
@@ -430,7 +430,7 @@ final readonly class Tester
     public function isFloat(): self
     {
         if (! is_float($this->subject)) {
-            throw new TestHasFailed('failed asserting that value is float', $this->subject);
+            throw new TestHasFailed('failed asserting that %s is float', $this->subject);
         }
 
         return $this;
@@ -439,7 +439,7 @@ final readonly class Tester
     public function isInt(): self
     {
         if (! is_int($this->subject)) {
-            throw new TestHasFailed('failed asserting that value is int', $this->subject);
+            throw new TestHasFailed('failed asserting that %s is int', $this->subject);
         }
 
         return $this;
@@ -448,7 +448,7 @@ final readonly class Tester
     public function isNumeric(): self
     {
         if (! is_numeric($this->subject)) {
-            throw new TestHasFailed('failed asserting that value is numeric', $this->subject);
+            throw new TestHasFailed('failed asserting that %s is numeric', $this->subject);
         }
 
         return $this;
@@ -457,7 +457,7 @@ final readonly class Tester
     public function isObject(): self
     {
         if (! is_object($this->subject)) {
-            throw new TestHasFailed('failed asserting that value is object', $this->subject);
+            throw new TestHasFailed('failed asserting that %s is object', $this->subject);
         }
 
         return $this;
@@ -466,7 +466,7 @@ final readonly class Tester
     public function isResource(): self
     {
         if (! is_resource($this->subject)) {
-            throw new TestHasFailed('failed asserting that value is resource', $this->subject);
+            throw new TestHasFailed('failed asserting that %s is resource', $this->subject);
         }
 
         return $this;
@@ -475,7 +475,7 @@ final readonly class Tester
     public function isString(): self
     {
         if (! is_string($this->subject)) {
-            throw new TestHasFailed('failed asserting that value is string', $this->subject);
+            throw new TestHasFailed('failed asserting that %s is string', $this->subject);
         }
 
         return $this;
@@ -484,7 +484,7 @@ final readonly class Tester
     public function isScalar(): self
     {
         if (! is_scalar($this->subject)) {
-            throw new TestHasFailed('failed asserting that value is scalar', $this->subject);
+            throw new TestHasFailed('failed asserting that %s is scalar', $this->subject);
         }
 
         return $this;
@@ -493,7 +493,7 @@ final readonly class Tester
     public function isIterable(): self
     {
         if (! is_iterable($this->subject)) {
-            throw new TestHasFailed('failed asserting that value is iterable', $this->subject);
+            throw new TestHasFailed('failed asserting that %s is iterable', $this->subject);
         }
 
         return $this;
@@ -502,7 +502,7 @@ final readonly class Tester
     public function isNotArray(): self
     {
         if (is_array($this->subject)) {
-            throw new TestHasFailed('failed asserting that value is not array');
+            throw new TestHasFailed('failed asserting that %s is not array', $this->subject);
         }
 
         return $this;
@@ -511,7 +511,7 @@ final readonly class Tester
     public function isNotBool(): self
     {
         if (is_bool($this->subject)) {
-            throw new TestHasFailed('failed asserting that value is not bool');
+            throw new TestHasFailed('failed asserting that %s is not bool', $this->subject);
         }
 
         return $this;
@@ -520,7 +520,7 @@ final readonly class Tester
     public function isNotFloat(): self
     {
         if (is_float($this->subject)) {
-            throw new TestHasFailed('failed asserting that value is not float');
+            throw new TestHasFailed('failed asserting that %s is not float', $this->subject);
         }
 
         return $this;
@@ -529,7 +529,7 @@ final readonly class Tester
     public function isNotInt(): self
     {
         if (is_int($this->subject)) {
-            throw new TestHasFailed('failed asserting that value is not int');
+            throw new TestHasFailed('failed asserting that %s is not int', $this->subject);
         }
 
         return $this;
@@ -538,7 +538,7 @@ final readonly class Tester
     public function isNotNumeric(): self
     {
         if (is_numeric($this->subject)) {
-            throw new TestHasFailed('failed asserting that value is not numeric');
+            throw new TestHasFailed('failed asserting that %s is not numeric', $this->subject);
         }
 
         return $this;
@@ -547,7 +547,7 @@ final readonly class Tester
     public function isNotObject(): self
     {
         if (is_object($this->subject)) {
-            throw new TestHasFailed('failed asserting that value is not object');
+            throw new TestHasFailed('failed asserting that %s is not object', $this->subject);
         }
 
         return $this;
@@ -556,7 +556,7 @@ final readonly class Tester
     public function isNotResource(): self
     {
         if (is_resource($this->subject)) {
-            throw new TestHasFailed('failed asserting that value is not resource');
+            throw new TestHasFailed('failed asserting that %s is not resource', $this->subject);
         }
 
         return $this;
@@ -565,7 +565,7 @@ final readonly class Tester
     public function isNotString(): self
     {
         if (is_string($this->subject)) {
-            throw new TestHasFailed('failed asserting that value is not string');
+            throw new TestHasFailed('failed asserting that %s is not string', $this->subject);
         }
 
         return $this;
@@ -574,7 +574,7 @@ final readonly class Tester
     public function isNotScalar(): self
     {
         if (is_scalar($this->subject)) {
-            throw new TestHasFailed('failed asserting that value is not scalar');
+            throw new TestHasFailed('failed asserting that %s is not scalar', $this->subject);
         }
 
         return $this;
@@ -583,7 +583,7 @@ final readonly class Tester
     public function isNotCallable(): self
     {
         if (is_callable($this->subject)) {
-            throw new TestHasFailed('failed asserting that value is not callable');
+            throw new TestHasFailed('failed asserting that %s is not callable', $this->subject);
         }
 
         return $this;
@@ -592,7 +592,7 @@ final readonly class Tester
     public function isNotIterable(): self
     {
         if (is_iterable($this->subject)) {
-            throw new TestHasFailed('failed asserting that value is not iterable');
+            throw new TestHasFailed('failed asserting that %s is not iterable', $this->subject);
         }
 
         return $this;
@@ -600,12 +600,10 @@ final readonly class Tester
 
     public function stringStartsWith(string $prefix): self
     {
-        if (! is_string($this->subject)) {
-            throw new TestHasFailed('to check string prefixes/suffixes, the test subject must be a string; instead got %s', $this->subject);
-        }
+        $this->isString();
 
-        if (is_string($this->subject) && ! str_starts_with($this->subject, $prefix)) {
-            throw new TestHasFailed('failed asserting that string starts with %s', $prefix);
+        if (! str_starts_with($this->subject, $prefix)) {
+            throw new TestHasFailed('failed asserting that %s starts with %s', $this->subject, $prefix);
         }
 
         return $this;
@@ -613,12 +611,10 @@ final readonly class Tester
 
     public function stringStartsNotWith(string $prefix): self
     {
-        if (! is_string($this->subject)) {
-            throw new TestHasFailed('to check string prefixes/suffixes, the test subject must be a string; instead got %s', $this->subject);
-        }
+        $this->isString();
 
-        if (is_string($this->subject) && str_starts_with($this->subject, $prefix)) {
-            throw new TestHasFailed('failed asserting that string does not start with %s', $prefix);
+        if (str_starts_with($this->subject, $prefix)) {
+            throw new TestHasFailed('failed asserting that %s does not start with %s', $this->subject, $prefix);
         }
 
         return $this;
@@ -626,12 +622,10 @@ final readonly class Tester
 
     public function stringEndsWith(string $suffix): self
     {
-        if (! is_string($this->subject)) {
-            throw new TestHasFailed('to check string prefixes/suffixes, the test subject must be a string; instead got %s', $this->subject);
-        }
+        $this->isString();
 
         if (! str_ends_with($this->subject, $suffix)) {
-            throw new TestHasFailed('failed asserting that string ends with %s', $suffix);
+            throw new TestHasFailed('failed asserting that %s ends with %s', $this->subject, $suffix);
         }
 
         return $this;
@@ -639,23 +633,34 @@ final readonly class Tester
 
     public function stringEndsNotWith(string $suffix): self
     {
-        if (! is_string($this->subject)) {
-            throw new TestHasFailed('to check string prefixes/suffixes, the test subject must be a string; instead got %s', $this->subject);
-        }
+        $this->isString();
 
         if (str_ends_with($this->subject, $suffix)) {
-            throw new TestHasFailed('failed asserting that string does not end with %s', $suffix);
+            throw new TestHasFailed('failed asserting that %s does not end with %s', $this->subject, $suffix);
         }
 
         return $this;
     }
 
-    public function json(): self
+    public function isJson(): self
     {
         $this->isString();
 
         if (! json_validate($this->subject)) {
-            throw new TestHasFailed('failed asserting that value %s is valid JSON', $this->subject);
+            throw new TestHasFailed('failed asserting that %s is valid JSON', $this->subject);
+        }
+
+        return $this;
+    }
+
+    public function isNotJson(): self
+    {
+        if (! is_string($this->subject)) {
+            return $this;
+        }
+
+        if (json_validate($this->subject)) {
+            throw new TestHasFailed('failed asserting that %s is not valid JSON', $this->subject);
         }
 
         return $this;

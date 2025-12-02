@@ -42,6 +42,14 @@ final class TestHasFailed extends Exception implements TestException
             return $value::class;
         }
 
+        if (is_array($value)) {
+            return 'array';
+        }
+
+        if (is_resource($value)) {
+            return 'resource';
+        }
+
         return var_export($value, true);
     }
 }
