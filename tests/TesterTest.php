@@ -220,4 +220,203 @@ final class TesterTest
             test()->exceptionNotThrown(InvalidArgumentException::class);
         })->succeeds();
     }
+
+    #[Test]
+    public function countableChecks(): void
+    {
+        test(fn () => test([1, 2])->isCountable())->succeeds();
+        test(fn () => test('a')->isCountable())->fails("failed asserting that `'a'` is countable");
+
+        test(fn () => test([1, 2])->isNotCountable())->fails('failed asserting that value is not countable');
+        test(fn () => test('a')->isNotCountable())->succeeds();
+    }
+
+    #[Test]
+    public function contains_type_guard(): void
+    {
+        test(fn () => test(123)->contains('1'))
+            ->fails('to check contains, the test subject must be a string or an array; instead got `123`');
+        test(fn () => test(123)->containsNot('1'))
+            ->fails('to check contains, the test subject must be a string or an array; instead got `123`');
+    }
+
+    #[Test]
+    public function hasKey_missesKey_type_guard(): void
+    {
+        test(fn () => test(123)->hasKey(0))
+            ->fails('to check array keys, the test subject must be an array; instead got `123`');
+        test(fn () => test(123)->missesKey(0))
+            ->fails('to check array keys, the test subject must be an array; instead got `123`');
+    }
+
+    #[Test]
+    public function string_prefix_suffix_and_guards(): void
+    {
+        test(fn () => test('abc')->stringStartsWith('ab'))->succeeds();
+        test(fn () => test('abc')->stringStartsWith('zz'))->fails("failed asserting that string starts with `'zz'`");
+
+        test(fn () => test('abc')->stringStartsNotWith('ab'))->fails("failed asserting that string does not start with `'ab'`");
+        test(fn () => test('abc')->stringStartsNotWith('zz'))->succeeds();
+
+        test(fn () => test('abc')->stringEndsWith('bc'))->succeeds();
+        test(fn () => test('abc')->stringEndsWith('zz'))->fails("failed asserting that string ends with `'zz'`");
+
+        test(fn () => test('abc')->stringEndsNotWith('bc'))->fails("failed asserting that string does not end with `'bc'`");
+        test(fn () => test('abc')->stringEndsNotWith('zz'))->succeeds();
+
+        test(fn () => test(123)->stringStartsWith('1'))
+            ->fails('to check string prefixes/suffixes, the test subject must be a string; instead got `123`');
+        test(fn () => test(123)->stringEndsWith('3'))
+            ->fails('to check string prefixes/suffixes, the test subject must be a string; instead got `123`');
+    }
+
+    #[Test]
+    public function listChecks(): void
+    {
+        test(fn () => test([1, 2, 3])->isList())->succeeds();
+        test(fn () => test([1 => 'a'])->isList())->fails('failed asserting that array is a list');
+
+        test(fn () => test([1, 2, 3])->isNotList())->fails('failed asserting that array is not a list');
+        test(fn () => test([1 => 'a'])->isNotList())->succeeds();
+    }
+
+    #[Test]
+    public function emptinessChecks(): void
+    {
+        test(fn () => test([])->isEmpty())->succeeds();
+        test(fn () => test('a')->isEmpty())->fails('failed asserting that value is empty');
+
+        test(fn () => test('a')->isNotEmpty())->succeeds();
+        test(fn () => test('')->isNotEmpty())->fails('failed asserting that value is not empty');
+    }
+
+    #[Test]
+    public function numericComparisons_and_guards(): void
+    {
+        test(fn () => test(5)->greaterThan(4))->succeeds();
+        test(fn () => test(5)->greaterThan(5))->fails('failed asserting that `5` is greater than `5`');
+
+        test(fn () => test(5)->greaterThanOrEqual(5))->succeeds();
+        test(fn () => test(4)->greaterThanOrEqual(5))->fails('failed asserting that `4` is greater than or equal to `5`');
+
+        test(fn () => test(4)->lessThan(5))->succeeds();
+        test(fn () => test(5)->lessThan(5))->fails('failed asserting that `5` is less than `5`');
+
+        test(fn () => test(5)->lessThanOrEqual(5))->succeeds();
+        test(fn () => test(6)->lessThanOrEqual(5))->fails('failed asserting that `6` is less than or equal to `5`');
+
+        test(fn () => test('abc')->greaterThan(1))
+            ->fails("to compare numerically, the test subject must be numeric; instead got `'abc'`");
+    }
+
+    #[Test]
+    public function booleanExactChecks(): void
+    {
+        test(fn () => test(true)->isTrue())->succeeds();
+        test(fn () => test(false)->isTrue())->fails('failed asserting that value is true');
+
+        test(fn () => test(false)->isFalse())->succeeds();
+        test(fn () => test(true)->isFalse())->fails('failed asserting that value is false');
+    }
+
+    #[Test]
+    public function booleanLooseChecks(): void
+    {
+        test(fn () => test(1)->isTrueish())->succeeds();
+        test(fn () => test(0)->isTrueish())->fails('failed asserting that value is trueish');
+
+        test(fn () => test(0)->isFalseish())->succeeds();
+        test(fn () => test(1)->isFalseish())->fails('failed asserting that value is falseish');
+    }
+
+    #[Test]
+    public function nullChecks(): void
+    {
+        test(fn () => test(null)->isNull())->succeeds();
+        test(fn () => test(0)->isNull())->fails('failed asserting that value is null');
+
+        test(fn () => test(0)->isNotNull())->succeeds();
+        test(fn () => test(null)->isNotNull())->fails('failed asserting that value is not null');
+    }
+
+    #[Test]
+    public function typeChecks_positive(): void
+    {
+        $res = fopen('php://temp', 'r');
+        test(fn () => test([1])->isArray())->succeeds();
+        test(fn () => test(true)->isBool())->succeeds();
+        test(fn () => test(1.2)->isFloat())->succeeds();
+        test(fn () => test(1)->isInt())->succeeds();
+        test(fn () => test('1')->isNumeric())->succeeds();
+        test(fn () => test((object) [])->isObject())->succeeds();
+        test(fn () => test($res)->isResource())->succeeds();
+        test(fn () => test('a')->isString())->succeeds();
+        test(fn () => test(1)->isScalar())->succeeds();
+        test(fn () => test([1])->isIterable())->succeeds();
+        fclose($res);
+    }
+
+    #[Test]
+    public function typeChecks_negative(): void
+    {
+        test(fn () => test(1)->isArray())->fails('failed asserting that value is array');
+        test(fn () => test(1)->isBool())->fails('failed asserting that value is bool');
+        test(fn () => test(1)->isFloat())->fails('failed asserting that value is float');
+        test(fn () => test(1.1)->isInt())->fails('failed asserting that value is int');
+        test(fn () => test('a')->isNumeric())->fails('failed asserting that value is numeric');
+        test(fn () => test(1)->isObject())->fails('failed asserting that value is object');
+        test(fn () => test(1)->isResource())->fails('failed asserting that value is resource');
+        test(fn () => test(1)->isString())->fails('failed asserting that value is string');
+        test(fn () => test([])->isScalar())->fails('failed asserting that value is scalar');
+        test(fn () => test(1)->isIterable())->fails('failed asserting that value is iterable');
+    }
+
+    #[Test]
+    public function notTypeChecks(): void
+    {
+        $res = fopen('php://temp', 'r');
+        test(fn () => test([1])->isNotArray())->fails('failed asserting that value is not array');
+        test(fn () => test(true)->isNotBool())->fails('failed asserting that value is not bool');
+        test(fn () => test(1.2)->isNotFloat())->fails('failed asserting that value is not float');
+        test(fn () => test(1)->isNotInt())->fails('failed asserting that value is not int');
+        test(fn () => test('1')->isNotNumeric())->fails('failed asserting that value is not numeric');
+        test(fn () => test((object) [])->isNotObject())->fails('failed asserting that value is not object');
+        test(fn () => test($res)->isNotResource())->fails('failed asserting that value is not resource');
+        test(fn () => test('a')->isNotString())->fails('failed asserting that value is not string');
+        test(fn () => test(1)->isNotScalar())->fails('failed asserting that value is not scalar');
+        test(fn () => test([1])->isNotIterable())->fails('failed asserting that value is not iterable');
+
+        test(fn () => test(1)->isNotArray())->succeeds();
+        test(fn () => test(1)->isNotBool())->succeeds();
+        test(fn () => test(1)->isNotFloat())->succeeds();
+        test(fn () => test(1.1)->isNotInt())->succeeds();
+        test(fn () => test('a')->isNotNumeric())->succeeds();
+        test(fn () => test(1)->isNotObject())->succeeds();
+        test(fn () => test(1)->isNotResource())->succeeds();
+        test(fn () => test(1)->isNotString())->succeeds();
+        test(fn () => test([])->isNotScalar())->succeeds();
+        test(fn () => test(1)->isNotIterable())->succeeds();
+        fclose($res);
+    }
+
+    #[Test]
+    public function callableNegation(): void
+    {
+        test(fn () => test(fn () => true)->isNotCallable())->fails('failed asserting that value is not callable');
+        test(fn () => test('not_callable')->isNotCallable())->succeeds();
+    }
+
+    #[Test]
+    public function iterablePositiveAndNegative(): void
+    {
+        test(fn () => test([1])->isIterable())->succeeds();
+        test(fn () => test(1)->isIterable())->fails('failed asserting that value is iterable');
+    }
+
+    #[Test]
+    public function jsonChecks(): void
+    {
+        test(fn () => test('{"a":1}')->json())->succeeds();
+        test(fn () => test('not json')->json())->fails("failed asserting that value `'not json'` is valid JSON");
+    }
 }
