@@ -1,6 +1,6 @@
 <?php
 
-namespace Tempest\Testing;
+namespace Tempest\Testing\Output;
 
 use Tempest\Testing\Events\TestFailed;
 use Tempest\Testing\Events\TestFinished;

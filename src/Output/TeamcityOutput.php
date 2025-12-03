@@ -12,7 +12,6 @@ use Tempest\Testing\Events\TestSkipped;
 use Tempest\Testing\Events\TestStarted;
 use Tempest\Testing\Events\TestSucceeded;
 use Tempest\Testing\Runner\TestResult;
-use Tempest\Testing\TestOutput;
 
 final class TeamcityOutput implements TestOutput
 {

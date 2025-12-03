@@ -6,19 +6,15 @@ use Tempest\Console\ConsoleArgument;
 use Tempest\Console\ConsoleCommand;
 use Tempest\Console\HasConsole;
 use Tempest\Container\Container;
-use Tempest\Core\Kernel\LoadDiscoveryClasses;
-use Tempest\Discovery\DiscoveryLocation;
-use Tempest\EventBus\EventBus;
-use Tempest\EventBus\EventBusDiscovery;
 use Tempest\Support\Arr\ImmutableArray;
 use Tempest\Testing\Actions\ChunkAndRunTests;
 use Tempest\Testing\Config\TestConfig;
 use Tempest\Testing\Events\TestSkipped;
 use Tempest\Testing\Output\DefaultOutput;
 use Tempest\Testing\Output\TeamcityOutput;
+use Tempest\Testing\Output\TestOutput;
 use Tempest\Testing\Runner\TestResult;
 use Tempest\Testing\Test;
-use Tempest\Testing\TestOutput;
 use function Tempest\event;
 use function Tempest\Support\arr;
 
@@ -49,16 +45,6 @@ final class TestCommand
         bool $teamcity = false,
     ): void
     {
-        if ($teamcity) {
-            $output = $this->container->get(TeamCityOutput::class);
-        } else {
-            $output = $this->container->get(DefaultOutput::class);
-        }
-
-        $output->verbose = $verbose;
-
-        $this->container->singleton(TestOutput::class, $output);
-
         new ChunkAndRunTests()(
             tests: $this->getTests($filter),
             processes: $processes,

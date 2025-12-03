@@ -1,6 +1,6 @@
 <?php
 
-namespace Tempest\Testing;
+namespace Tempest\Testing\Output;
 
 use Tempest\Console\HasConsole;
 use Tempest\Container\Singleton;
