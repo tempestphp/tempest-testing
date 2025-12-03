@@ -11,6 +11,12 @@ use function Tempest\Testing\test;
 final class TesterTest
 {
     #[Test]
+    public function failnow(): void
+    {
+        test()->fail();
+    }
+
+    #[Test]
     public function fail(): void
     {
         test(fn () => test()->fail())->fails();

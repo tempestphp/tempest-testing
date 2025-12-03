@@ -4,6 +4,7 @@ namespace Tempest\Testing\Output;
 
 use Tempest\Console\HasConsole;
 use Tempest\Testing\Events\TestFailed;
+use Tempest\Testing\Events\TestFinished;
 use Tempest\Testing\Events\TestRunEnded;
 use Tempest\Testing\Events\TestRunStarted;
 use Tempest\Testing\Events\TestsChunked;
@@ -29,31 +30,36 @@ final class TeamcityOutput implements TestOutput
 
     public function onTestStarted(TestStarted $event): void
     {
-        $this->writeln("##teamcity[testStarted name='{$event->name}']");
+        $this->writeln($event->teamcityMessage);
     }
 
     public function onTestFailed(TestFailed $event): void
     {
-        $this->writeln("##teamcity[testFailed name='{$event->name}']");
+        $this->writeln($event->teamcityMessage);
     }
 
     public function onTestSkipped(TestSkipped $event): void
     {
-        $this->writeln("##teamcity[testSkipped name='{$event->name}']");
+        $this->writeln($event->teamcityMessage);
     }
 
     public function onTestSucceeded(TestSucceeded $event): void
     {
-        $this->writeln("##teamcity[testFinished name='{$event->name}']");
+        return;
+    }
+
+    public function onTestFinished(TestFinished $event): void
+    {
+        $this->writeln($event->teamcityMessage);
     }
 
     public function onTestRunStarted(TestRunStarted $event): void
     {
-        $this->writeln("##teamcity[testSuiteStarted]");
+        $this->writeln($event->teamcityMessage);
     }
 
     public function onTestRunEnded(TestRunEnded $event): void
     {
-        $this->writeln("##teamcity[testSuiteFinished]");
+        $this->writeln($event->teamcityMessage);
     }
 }

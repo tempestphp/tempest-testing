@@ -4,6 +4,7 @@ namespace Tempest\Testing\Output;
 
 use Tempest\Console\HasConsole;
 use Tempest\Testing\Events\TestFailed;
+use Tempest\Testing\Events\TestFinished;
 use Tempest\Testing\Events\TestRunEnded;
 use Tempest\Testing\Events\TestRunStarted;
 use Tempest\Testing\Events\TestsChunked;
@@ -65,6 +66,11 @@ final class DefaultOutput implements TestOutput
         if ($this->verbose) {
             $this->success($event->name);
         }
+    }
+
+    public function onTestFinished(TestFinished $event): void
+    {
+        return;
     }
 
     public function onTestRunStarted(TestRunStarted $event): void
