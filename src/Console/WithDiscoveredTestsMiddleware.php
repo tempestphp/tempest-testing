@@ -29,6 +29,8 @@ final readonly class WithDiscoveredTestsMiddleware implements ConsoleMiddleware
                 TestDiscovery::class,
             ],
             discoveryLocations: arr($this->composer->devNamespaces)
+                ->add($this->composer->mainNamespace)
+                ->filter()
                 ->map(fn (Psr4Namespace $namespace) => DiscoveryLocation::fromNamespace($namespace))
                 ->toArray(),
         );

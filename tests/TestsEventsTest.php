@@ -3,7 +3,7 @@
 namespace Tempest\Testing\Tests;
 
 use Tempest\Testing\Test;
-use Tempest\Testing\Testers\TestsEvents;
+use Tempest\Testing\Testers\EventBus\TestsEvents;
 use Tempest\Testing\Tests\Fixtures\TestEvent;
 use function Tempest\event;
 

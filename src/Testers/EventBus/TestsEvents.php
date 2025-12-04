@@ -1,6 +1,6 @@
 <?php
 
-namespace Tempest\Testing\Testers;
+namespace Tempest\Testing\Testers\EventBus;
 
 use Tempest\Container\Container;
 use Tempest\EventBus\EventBus;

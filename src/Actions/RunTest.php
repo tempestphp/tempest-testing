@@ -3,6 +3,8 @@
 namespace Tempest\Testing\Actions;
 
 use Psr\Container\ContainerInterface;
+use Tempest\Console\Console;
+use Tempest\Console\OutputBuffer;
 use Tempest\Container\Container;
 use Tempest\Container\Singleton;
 use Tempest\Reflection\MethodReflector;
@@ -106,6 +108,7 @@ final class RunTest
     private function callMethod(object $instance, MethodReflector $method, array $data = []): void
     {
         foreach ($method->getParameters() as $parameter) {
+
             if (isset($data[$parameter->getName()])) {
                 continue;
             }
