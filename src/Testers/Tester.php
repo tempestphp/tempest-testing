@@ -64,9 +64,10 @@ final readonly class Tester
         if ($expected !== $this->subject) {
             $this->fail(
                 $reason ?? "failed asserting that %s is %s",
-                $this->subject,
-                $expected,
-                ...$reasonData,
+                ...($reasonData ?? [
+                    $this->subject,
+                    $expected,
+                ]),
             );
         }
 
