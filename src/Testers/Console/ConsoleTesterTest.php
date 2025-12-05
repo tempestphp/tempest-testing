@@ -9,10 +9,18 @@ final class ConsoleTesterTest
     use TestsConsole;
 
     #[Test]
-    public function assertFail(): void
+    public function assertSuccess(): void
     {
         $this->console
-            ->call('fixture')
+            ->call('')
+            ->assertSuccess();
+    }
+
+    #[Test]
+    public function assertError(): void
+    {
+        $this->console
+            ->call('unknown')
             ->assertError();
     }
 }

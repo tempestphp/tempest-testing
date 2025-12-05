@@ -20,9 +20,11 @@ final readonly class Tester
         return $this;
     }
 
-    public function fail(?string $reason = null): never
+    public function fail(?string $reason = null, mixed ...$reasonData): never
     {
-        throw new TestHasFailed($reason ?? 'test was marked as failed');
+        $reason ??= 'test was marked as failed';
+
+        throw new TestHasFailed($reason, ...$reasonData);
     }
 
     public function succeed(): void
@@ -57,10 +59,15 @@ final readonly class Tester
         return $this;
     }
 
-    public function is(mixed $expected): self
+    public function is(mixed $expected, ?string $reason = null, mixed ...$reasonData): self
     {
         if ($expected !== $this->subject) {
-            throw new TestHasFailed("failed asserting that %s is %s", $this->subject, $expected);
+            $this->fail(
+                $reason ?? "failed asserting that %s is %s",
+                $this->subject,
+                $expected,
+                ...$reasonData,
+            );
         }
 
         return $this;

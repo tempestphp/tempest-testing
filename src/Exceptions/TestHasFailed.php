@@ -2,7 +2,9 @@
 
 namespace Tempest\Testing\Exceptions;
 
+use BackedEnum;
 use Exception;
+use UnitEnum;
 
 final class TestHasFailed extends Exception implements TestException
 {
@@ -38,6 +40,10 @@ final class TestHasFailed extends Exception implements TestException
 
     private function export(mixed $value): string
     {
+        if ($value instanceof UnitEnum) {
+            return sprintf('%s::%s', $value::class, $value->name);
+        }
+
         if (is_object($value)) {
             return $value::class;
         }
