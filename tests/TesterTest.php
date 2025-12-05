@@ -547,6 +547,6 @@ final class TesterTest
     #[Test]
     public function isReasonMessage(): void
     {
-        test(1)->is('1', 'it %s', 'failed');
+        test(fn () => test(1)->is('1', 'it %s', 'failed'))->fails("it `'failed'`");
     }
 }
