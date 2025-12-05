@@ -12,6 +12,7 @@ use Tempest\EventBus\EventBusConfig;
 use Tempest\Testing\Actions\RunTest;
 use Tempest\Testing\Events\DispatchToParentProcessMiddleware;
 use Tempest\Testing\Test;
+use function Tempest\reflect;
 
 final class TestRunCommand
 {
@@ -28,7 +29,9 @@ final class TestRunCommand
     )]
     public function __invoke(array $tests): void
     {
-        $runTest = new RunTest($this->resolveContainer());
+        $container = $this->resolveContainer();
+        $runTest = new RunTest($container);
+        $container->singleton(RunTest::class, $runTest);
 
         $this->eventBusConfig->middleware->add(DispatchToParentProcessMiddleware::class);
 
@@ -74,6 +77,9 @@ final class TestRunCommand
         );
 
         $clone->singleton(Container::class, $clone);
+
+        $property = reflect($clone)->getProperty('instance');
+        $property->setValue($clone, $clone);
 
         return $clone;
     }

@@ -26,11 +26,11 @@ final readonly class PsrInjectionTest
     {
         $runTest = $this->container->get(RunTest::class);
 
-        $class = reflect($runTest);
+        $container = new PsrContainer();
 
-        $property = $class->getProperty('container');
-
-        $property->setValue($runTest, new PsrContainer());
+        reflect($runTest)
+            ->getProperty('container')
+            ->setValue($runTest, $container);
     }
 
     #[After]
@@ -38,11 +38,9 @@ final readonly class PsrInjectionTest
     {
         $runTest = $this->container->get(RunTest::class);
 
-        $class = reflect($runTest);
-
-        $property = $class->getProperty('container');
-
-        $property->setValue($runTest, $this->container);
+        reflect($runTest)
+            ->getProperty('container')
+            ->setValue($runTest, $this->container);
     }
 
     #[Test]

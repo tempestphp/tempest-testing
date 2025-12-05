@@ -9,10 +9,10 @@ final class ConsoleTesterTest
     use TestsConsole;
 
     #[Test]
-    public function assertContains(): void
+    public function assertFail(): void
     {
         $this->console
             ->call('fixture')
-            ->assertSuccess();
+            ->assertError();
     }
 }

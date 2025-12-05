@@ -14,8 +14,6 @@ final class TestsEventsTest
     #[Test]
     public function was_dispatched(): void
     {
-        $this->events->preventPropagation();
-
         event(new TestEvent());
 
         $this->events->wasDispatched(TestEvent::class);
