@@ -549,4 +549,352 @@ final class TesterTest
     {
         test(fn () => test(1)->is('1', 'it %s', 'failed'))->fails("it `'failed'`");
     }
+
+    #[Test]
+    public function isNotReasonMessage(): void
+    {
+        test(fn () => test(1)->isNot(1, 'custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isEqualToReasonMessage(): void
+    {
+        test(fn () => test(1)->isEqualTo('2', 'custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isNotEqualToReasonMessage(): void
+    {
+        test(fn () => test(1)->isNotEqualTo('1', 'custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isCallableReasonMessage(): void
+    {
+        test(fn () => test('a')->isCallable('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isNotCallableReasonMessage(): void
+    {
+        test(fn () => test(fn () => true)->isNotCallable('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function hasCountReasonMessage(): void
+    {
+        test(fn () => test([1, 2, 3])->hasCount(4, 'custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function hasNotCountReasonMessage(): void
+    {
+        test(fn () => test([1, 2, 3])->hasNotCount(3, 'custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isCountableReasonMessage(): void
+    {
+        test(fn () => test('a')->isCountable('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isNotCountableReasonMessage(): void
+    {
+        test(fn () => test([1, 2])->isNotCountable('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function containsReasonMessage(): void
+    {
+        test(fn () => test([1, 2, 3])->contains(4, 'custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function containsNotReasonMessage(): void
+    {
+        test(fn () => test([1, 2, 3])->containsNot(2, 'custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function hasKeyReasonMessage(): void
+    {
+        test(fn () => test([1, 2, 3])->hasKey(4, 'custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function missesKeyReasonMessage(): void
+    {
+        test(fn () => test([1, 2, 3])->missesKey(2, 'custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function instanceOfReasonMessage(): void
+    {
+        test(fn () => test('')->instanceOf(self::class, 'custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isNotInstanceOfReasonMessage(): void
+    {
+        test(fn () => test($this)->isNotInstanceOf(self::class, 'custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function exceptionThrownReasonMessage(): void
+    {
+        test(function () {
+            test(fn () => true)->exceptionThrown(Exception::class, null, 'custom %s', 'reason');
+        })->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function exceptionNotThrownReasonMessage(): void
+    {
+        test(function () {
+            test(fn () => throw new Exception())->exceptionNotThrown(Exception::class, 'custom %s', 'reason');
+        })->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isListReasonMessage(): void
+    {
+        test(fn () => test([1 => 'a'])->isList('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isNotListReasonMessage(): void
+    {
+        test(fn () => test([1, 2, 3])->isNotList('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isEmptyReasonMessage(): void
+    {
+        test(fn () => test('a')->isEmpty('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isNotEmptyReasonMessage(): void
+    {
+        test(fn () => test('')->isNotEmpty('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function greaterThanReasonMessage(): void
+    {
+        test(fn () => test(5)->greaterThan(5, 'custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function greaterThanOrEqualReasonMessage(): void
+    {
+        test(fn () => test(4)->greaterThanOrEqual(5, 'custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function lessThanReasonMessage(): void
+    {
+        test(fn () => test(5)->lessThan(5, 'custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function lessThanOrEqualReasonMessage(): void
+    {
+        test(fn () => test(6)->lessThanOrEqual(5, 'custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isTrueReasonMessage(): void
+    {
+        test(fn () => test(false)->isTrue('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isFalseReasonMessage(): void
+    {
+        test(fn () => test(true)->isFalse('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isTrueishReasonMessage(): void
+    {
+        test(fn () => test(0)->isTrueish('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isFalseishReasonMessage(): void
+    {
+        test(fn () => test(1)->isFalseish('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isNullReasonMessage(): void
+    {
+        test(fn () => test(0)->isNull('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isNotNullReasonMessage(): void
+    {
+        test(fn () => test(null)->isNotNull('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isArrayReasonMessage(): void
+    {
+        test(fn () => test(1)->isArray('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isNotArrayReasonMessage(): void
+    {
+        test(fn () => test([1])->isNotArray('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isBoolReasonMessage(): void
+    {
+        test(fn () => test(1)->isBool('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isNotBoolReasonMessage(): void
+    {
+        test(fn () => test(true)->isNotBool('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isFloatReasonMessage(): void
+    {
+        test(fn () => test(1)->isFloat('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isNotFloatReasonMessage(): void
+    {
+        test(fn () => test(1.2)->isNotFloat('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isIntReasonMessage(): void
+    {
+        test(fn () => test(1.1)->isInt('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isNotIntReasonMessage(): void
+    {
+        test(fn () => test(1)->isNotInt('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isNumericReasonMessage(): void
+    {
+        test(fn () => test('a')->isNumeric('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isNotNumericReasonMessage(): void
+    {
+        test(fn () => test('1')->isNotNumeric('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isObjectReasonMessage(): void
+    {
+        test(fn () => test(1)->isObject('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isNotObjectReasonMessage(): void
+    {
+        test(fn () => test((object) [])->isNotObject('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isResourceReasonMessage(): void
+    {
+        test(fn () => test(1)->isResource('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isNotResourceReasonMessage(): void
+    {
+        $res = fopen('php://temp', 'r');
+        test(fn () => test($res)->isNotResource('custom %s', 'reason'))->fails("custom `'reason'`");
+        fclose($res);
+    }
+
+    #[Test]
+    public function isStringReasonMessage(): void
+    {
+        test(fn () => test(1)->isString('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isNotStringReasonMessage(): void
+    {
+        test(fn () => test('a')->isNotString('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isScalarReasonMessage(): void
+    {
+        test(fn () => test([])->isScalar('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isNotScalarReasonMessage(): void
+    {
+        test(fn () => test(1)->isNotScalar('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isIterableReasonMessage(): void
+    {
+        test(fn () => test(1)->isIterable('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isNotIterableReasonMessage(): void
+    {
+        test(fn () => test([1])->isNotIterable('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function startsWithReasonMessage(): void
+    {
+        test(fn () => test('abc')->startsWith('zz', 'custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function startsNotWithReasonMessage(): void
+    {
+        test(fn () => test('abc')->startsNotWith('ab', 'custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function endsWithReasonMessage(): void
+    {
+        test(fn () => test('abc')->endsWith('zz', 'custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function endsNotWithReasonMessage(): void
+    {
+        test(fn () => test('abc')->endsNotWith('bc', 'custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isJsonReasonMessage(): void
+    {
+        test(fn () => test('not json')->isJson('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
+    public function isNotJsonReasonMessage(): void
+    {
+        test(fn () => test('{"a":1}')->isNotJson('custom %s', 'reason'))->fails("custom `'reason'`");
+    }
 }

@@ -74,160 +74,217 @@ final readonly class Tester
         return $this;
     }
 
-    public function isNot(mixed $expected): self
+    public function isNot(mixed $expected, ?string $reason = null, mixed ...$reasonData): self
     {
         if ($expected === $this->subject) {
-            throw new TestHasFailed("failed asserting that %s is not %s", $this->subject, $expected);
+            $this->fail(
+                $reason ?? "failed asserting that %s is not %s",
+                ...($reasonData ?: [$this->subject, $expected]),
+            );
         }
 
         return $this;
     }
 
-    public function isEqualTo(mixed $expected): self
+    public function isEqualTo(mixed $expected, ?string $reason = null, mixed ...$reasonData): self
     {
         if ($expected != $this->subject) {
-            throw new TestHasFailed("failed asserting that %s is equal to %s", $this->subject, $expected);
+            $this->fail(
+                $reason ?? "failed asserting that %s is equal to %s",
+                ...($reasonData ?: [$this->subject, $expected]),
+            );
         }
 
         return $this;
     }
 
-    public function isNotEqualTo(mixed $expected): self
+    public function isNotEqualTo(mixed $expected, ?string $reason = null, mixed ...$reasonData): self
     {
         if ($expected == $this->subject) {
-            throw new TestHasFailed("failed asserting that %s is not equal to %s", $this->subject, $expected);
+            $this->fail(
+                $reason ?? "failed asserting that %s is not equal to %s",
+                ...($reasonData ?: [$this->subject, $expected]),
+            );
         }
 
         return $this;
     }
 
-    public function isCallable(): self
+    public function isCallable(?string $reason = null, mixed ...$reasonData): self
     {
         if (! is_callable($this->subject)) {
-            throw new TestHasFailed("failed asserting that %s is callable", $this->subject);
+            $this->fail(
+                $reason ?? "failed asserting that %s is callable",
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function isNotCallable(): self
+    public function isNotCallable(?string $reason = null, mixed ...$reasonData): self
     {
         if (is_callable($this->subject)) {
-            throw new TestHasFailed('failed asserting that %s is not callable', $this->subject);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is not callable',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function hasCount(int $expected): self
+    public function hasCount(int $expected, ?string $reason = null, mixed ...$reasonData): self
     {
         $this->isCountable();
 
         if ($expected !== count($this->subject)) {
-            throw new TestHasFailed("failed asserting that %s has %s items", $this->subject, $expected);
+            $this->fail(
+                $reason ?? "failed asserting that %s has %s items",
+                ...($reasonData ?: [$this->subject, $expected]),
+            );
         }
 
         return $this;
     }
 
-    public function hasNotCount(int $expected): self
+    public function hasNotCount(int $expected, ?string $reason = null, mixed ...$reasonData): self
     {
         $this->isCountable();
 
         if ($expected === count($this->subject)) {
-            throw new TestHasFailed("failed asserting that %s does not have %s items", $this->subject, $expected);
+            $this->fail(
+                $reason ?? "failed asserting that %s does not have %s items",
+                ...($reasonData ?: [$this->subject, $expected]),
+            );
         }
 
         return $this;
     }
 
-    public function isCountable(): self
+    public function isCountable(?string $reason = null, mixed ...$reasonData): self
     {
         if (! is_countable($this->subject)) {
-            throw new TestHasFailed("failed asserting that %s is countable", $this->subject);
+            $this->fail(
+                $reason ?? "failed asserting that %s is countable",
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function isNotCountable(): self
+    public function isNotCountable(?string $reason = null, mixed ...$reasonData): self
     {
         if (is_countable($this->subject)) {
-            throw new TestHasFailed('failed asserting that %s is not countable', $this->subject);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is not countable',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function contains(mixed $search): self
+    public function contains(mixed $search, ?string $reason = null, mixed ...$reasonData): self
     {
         if (! is_string($this->subject) && ! is_array($this->subject)) {
-            throw new TestHasFailed('to check contains, the test subject must be a string or an array; instead got %s', $this->subject);
+            $this->fail(
+                $reason ?? 'to check contains, the test subject must be a string or an array; instead got %s',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         if (is_string($this->subject) && ! str_contains($this->subject, $search)) {
-            throw new TestHasFailed("failed asserting that %s contains %s", $this->subject, $search);
+            $this->fail(
+                $reason ?? "failed asserting that %s contains %s",
+                ...($reasonData ?: [$this->subject, $search]),
+            );
         }
 
         if (is_array($this->subject) && ! in_array($search, $this->subject)) {
-            throw new TestHasFailed("failed asserting that %s contains %s", $this->subject, $search);
+            $this->fail(
+                $reason ?? "failed asserting that %s contains %s",
+                ...($reasonData ?: [$this->subject, $search]),
+            );
         }
 
         return $this;
     }
 
-    public function containsNot(mixed $search): self
+    public function containsNot(mixed $search, ?string $reason = null, mixed ...$reasonData): self
     {
         if (! is_string($this->subject) && ! is_array($this->subject)) {
-            throw new TestHasFailed('to check contains, the test subject must be a string or an array; instead got %s', $this->subject);
+            $this->fail(
+                $reason ?? 'to check contains, the test subject must be a string or an array; instead got %s',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         if (is_string($this->subject) && str_contains($this->subject, $search)) {
-            throw new TestHasFailed("failed asserting that %s does not contain %s", $this->subject, $search);
+            $this->fail(
+                $reason ?? "failed asserting that %s does not contain %s",
+                ...($reasonData ?: [$this->subject, $search]),
+            );
         }
 
         if (is_array($this->subject) && in_array($search, $this->subject)) {
-            throw new TestHasFailed("failed asserting that %s does not contain %s", $this->subject, $search);
+            $this->fail(
+                $reason ?? "failed asserting that %s does not contain %s",
+                ...($reasonData ?: [$this->subject, $search]),
+            );
         }
 
         return $this;
     }
 
-    public function hasKey(mixed $key): self
+    public function hasKey(mixed $key, ?string $reason = null, mixed ...$reasonData): self
     {
         $this->isArray();
 
         if (! array_key_exists($key, $this->subject)) {
-            throw new TestHasFailed("failed asserting that %s has key %s", $this->subject, $key);
+            $this->fail(
+                $reason ?? "failed asserting that %s has key %s",
+                ...($reasonData ?: [$this->subject, $key]),
+            );
         }
 
         return $this;
     }
 
-    public function missesKey(mixed $key): self
+    public function missesKey(mixed $key, ?string $reason = null, mixed ...$reasonData): self
     {
         $this->isArray();
 
         if (array_key_exists($key, $this->subject)) {
-            throw new TestHasFailed("failed asserting that %s does not have key %s", $this->subject, $key);
+            $this->fail(
+                $reason ?? "failed asserting that %s does not have key %s",
+                ...($reasonData ?: [$this->subject, $key]),
+            );
         }
 
         return $this;
     }
 
-    public function instanceOf(string $expectedClass): self
+    public function instanceOf(string $expectedClass, ?string $reason = null, mixed ...$reasonData): self
     {
         if (! $this->subject instanceof $expectedClass) {
-            throw new TestHasFailed("failed asserting that %s is an instance of %s", $this->subject, $expectedClass);
+            $this->fail(
+                $reason ?? "failed asserting that %s is an instance of %s",
+                ...($reasonData ?: [$this->subject, $expectedClass]),
+            );
         }
 
         return $this;
     }
 
-    public function isNotInstanceOf(string $expectedClass): self
+    public function isNotInstanceOf(string $expectedClass, ?string $reason = null, mixed ...$reasonData): self
     {
         if ($this->subject instanceof $expectedClass) {
-            throw new TestHasFailed("failed asserting that %s is not an instance of %s", $this->subject, $expectedClass);
+            $this->fail(
+                $reason ?? "failed asserting that %s is not an instance of %s",
+                ...($reasonData ?: [$this->subject, $expectedClass]),
+            );
         }
 
         return $this;
@@ -236,17 +293,25 @@ final readonly class Tester
     public function exceptionThrown(
         string $expectedExceptionClass,
         ?Closure $exceptionTester = null,
+        ?string $reason = null,
+        mixed ...$reasonData
     ): self
     {
         if (! is_callable($this->subject)) {
-            throw new TestHasFailed('to test exceptions, the test subject must be a callable; instead got %s', $this->subject);
+            $this->fail(
+                $reason ?? 'to test exceptions, the test subject must be a callable; instead got %s',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         try {
             ($this->subject)();
         } catch (Throwable $throwable) {
             if (! $throwable instanceof $expectedExceptionClass) {
-                throw new TestHasFailed("Expected exception %s was not thrown, instead got %s", $expectedExceptionClass, $throwable::class);
+                $this->fail(
+                    $reason ?? "Expected exception %s was not thrown, instead got %s",
+                    ...($reasonData ?: [$expectedExceptionClass, $throwable::class]),
+                );
             }
 
             if ($exceptionTester) {
@@ -256,12 +321,13 @@ final readonly class Tester
             return $this;
         }
 
-        throw new TestHasFailed("Expected exception %s was not thrown", $expectedExceptionClass);
-
-        return $this;
+        $this->fail(
+            $reason ?? "Expected exception %s was not thrown",
+            ...($reasonData ?: [$expectedExceptionClass]),
+        );
     }
 
-    public function exceptionNotThrown(string $expectedExceptionClass): self
+    public function exceptionNotThrown(string $expectedExceptionClass, ?string $reason = null, mixed ...$reasonData): self
     {
         if (! is_callable($this->subject)) {
             return $this;
@@ -271,394 +337,517 @@ final readonly class Tester
             ($this->subject)();
         } catch (Throwable $throwable) {
             if ($throwable instanceof $expectedExceptionClass) {
-                throw new TestHasFailed("Exception %s was thrown, while it shouldn't", $throwable::class);
+                $this->fail(
+                    $reason ?? "Exception %s was thrown, while it shouldn't",
+                    ...($reasonData ?: [$throwable::class]),
+                );
             }
         }
 
         return $this;
     }
 
-    public function isList(): self
+    public function isList(?string $reason = null, mixed ...$reasonData): self
     {
         $this->isArray();
 
         if (! array_is_list($this->subject)) {
-            throw new TestHasFailed('failed asserting that %s is a list', $this->subject);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is a list',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function isNotList(): self
+    public function isNotList(?string $reason = null, mixed ...$reasonData): self
     {
         $this->isArray();
 
         if (array_is_list($this->subject)) {
-            throw new TestHasFailed('failed asserting that %s is not a list', $this->subject);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is not a list',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function isEmpty(): self
+    public function isEmpty(?string $reason = null, mixed ...$reasonData): self
     {
         if (! empty($this->subject)) {
-            throw new TestHasFailed('failed asserting that %s is empty', $this->subject);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is empty',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function isNotEmpty(): self
+    public function isNotEmpty(?string $reason = null, mixed ...$reasonData): self
     {
         if (empty($this->subject)) {
-            throw new TestHasFailed('failed asserting that %s is not empty', $this->subject);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is not empty',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function greaterThan(int|float $minimum): self
+    public function greaterThan(int|float $minimum, ?string $reason = null, mixed ...$reasonData): self
     {
         $this->isNumeric();
 
         if ($this->subject <= $minimum) {
-            throw new TestHasFailed('failed asserting that %s is greater than %s', $this->subject, $minimum);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is greater than %s',
+                ...($reasonData ?: [$this->subject, $minimum]),
+            );
         }
 
         return $this;
     }
 
-    public function greaterThanOrEqual(int|float $minimum): self
+    public function greaterThanOrEqual(int|float $minimum, ?string $reason = null, mixed ...$reasonData): self
     {
         $this->isNumeric();
 
         if ($this->subject < $minimum) {
-            throw new TestHasFailed('failed asserting that %s is greater than or equal to %s', $this->subject, $minimum);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is greater than or equal to %s',
+                ...($reasonData ?: [$this->subject, $minimum]),
+            );
         }
 
         return $this;
     }
 
-    public function lessThan(int|float $maximum): self
+    public function lessThan(int|float $maximum, ?string $reason = null, mixed ...$reasonData): self
     {
         $this->isNumeric();
 
         if ($this->subject >= $maximum) {
-            throw new TestHasFailed('failed asserting that %s is less than %s', $this->subject, $maximum);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is less than %s',
+                ...($reasonData ?: [$this->subject, $maximum]),
+            );
         }
 
         return $this;
     }
 
-    public function lessThanOrEqual(int|float $maximum): self
+    public function lessThanOrEqual(int|float $maximum, ?string $reason = null, mixed ...$reasonData): self
     {
         $this->isNumeric();
 
         if ($this->subject > $maximum) {
-            throw new TestHasFailed('failed asserting that %s is less than or equal to %s', $this->subject, $maximum);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is less than or equal to %s',
+                ...($reasonData ?: [$this->subject, $maximum]),
+            );
         }
 
         return $this;
     }
 
-    public function isTrue(): self
+    public function isTrue(?string $reason = null, mixed ...$reasonData): self
     {
         if ($this->subject !== true) {
-            throw new TestHasFailed('failed asserting that %s is true', $this->subject);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is true',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function isFalse(): self
+    public function isFalse(?string $reason = null, mixed ...$reasonData): self
     {
         if ($this->subject !== false) {
-            throw new TestHasFailed('failed asserting that %s is false', $this->subject);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is false',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function isTrueish(): self
+    public function isTrueish(?string $reason = null, mixed ...$reasonData): self
     {
         if (((bool)$this->subject) !== true) {
-            throw new TestHasFailed('failed asserting that %s is trueish', $this->subject);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is trueish',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function isFalseish(): self
+    public function isFalseish(?string $reason = null, mixed ...$reasonData): self
     {
         if (((bool)$this->subject) !== false) {
-            throw new TestHasFailed('failed asserting that %s is falseish', $this->subject);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is falseish',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function isNull(): self
+    public function isNull(?string $reason = null, mixed ...$reasonData): self
     {
         if (! is_null($this->subject)) {
-            throw new TestHasFailed('failed asserting that %s is null', $this->subject);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is null',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function isNotNull(): self
+    public function isNotNull(?string $reason = null, mixed ...$reasonData): self
     {
         if (is_null($this->subject)) {
-            throw new TestHasFailed("failed asserting that %s is not null", $this->subject);
+            $this->fail(
+                $reason ?? "failed asserting that %s is not null",
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function isArray(): self
+    public function isArray(?string $reason = null, mixed ...$reasonData): self
     {
         if (! is_array($this->subject)) {
-            throw new TestHasFailed('failed asserting that %s is array', $this->subject);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is array',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function isNotArray(): self
+    public function isNotArray(?string $reason = null, mixed ...$reasonData): self
     {
         if (is_array($this->subject)) {
-            throw new TestHasFailed('failed asserting that %s is not array', $this->subject);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is not array',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function isBool(): self
+    public function isBool(?string $reason = null, mixed ...$reasonData): self
     {
         if (! is_bool($this->subject)) {
-            throw new TestHasFailed('failed asserting that %s is bool', $this->subject);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is bool',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function isNotBool(): self
+    public function isNotBool(?string $reason = null, mixed ...$reasonData): self
     {
         if (is_bool($this->subject)) {
-            throw new TestHasFailed('failed asserting that %s is not bool', $this->subject);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is not bool',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function isFloat(): self
+    public function isFloat(?string $reason = null, mixed ...$reasonData): self
     {
         if (! is_float($this->subject)) {
-            throw new TestHasFailed('failed asserting that %s is float', $this->subject);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is float',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function isNotFloat(): self
+    public function isNotFloat(?string $reason = null, mixed ...$reasonData): self
     {
         if (is_float($this->subject)) {
-            throw new TestHasFailed('failed asserting that %s is not float', $this->subject);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is not float',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function isInt(): self
+    public function isInt(?string $reason = null, mixed ...$reasonData): self
     {
         if (! is_int($this->subject)) {
-            throw new TestHasFailed('failed asserting that %s is int', $this->subject);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is int',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function isNotInt(): self
+    public function isNotInt(?string $reason = null, mixed ...$reasonData): self
     {
         if (is_int($this->subject)) {
-            throw new TestHasFailed('failed asserting that %s is not int', $this->subject);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is not int',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function isNumeric(): self
+    public function isNumeric(?string $reason = null, mixed ...$reasonData): self
     {
         if (! is_numeric($this->subject)) {
-            throw new TestHasFailed('failed asserting that %s is numeric', $this->subject);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is numeric',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function isNotNumeric(): self
+    public function isNotNumeric(?string $reason = null, mixed ...$reasonData): self
     {
         if (is_numeric($this->subject)) {
-            throw new TestHasFailed('failed asserting that %s is not numeric', $this->subject);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is not numeric',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function isObject(): self
+    public function isObject(?string $reason = null, mixed ...$reasonData): self
     {
         if (! is_object($this->subject)) {
-            throw new TestHasFailed('failed asserting that %s is object', $this->subject);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is object',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function isNotObject(): self
+    public function isNotObject(?string $reason = null, mixed ...$reasonData): self
     {
         if (is_object($this->subject)) {
-            throw new TestHasFailed('failed asserting that %s is not object', $this->subject);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is not object',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function isResource(): self
+    public function isResource(?string $reason = null, mixed ...$reasonData): self
     {
         if (! is_resource($this->subject)) {
-            throw new TestHasFailed('failed asserting that %s is resource', $this->subject);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is resource',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function isNotResource(): self
+    public function isNotResource(?string $reason = null, mixed ...$reasonData): self
     {
         if (is_resource($this->subject)) {
-            throw new TestHasFailed('failed asserting that %s is not resource', $this->subject);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is not resource',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function isString(): self
+    public function isString(?string $reason = null, mixed ...$reasonData): self
     {
         if (! is_string($this->subject)) {
-            throw new TestHasFailed('failed asserting that %s is string', $this->subject);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is string',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function isNotString(): self
+    public function isNotString(?string $reason = null, mixed ...$reasonData): self
     {
         if (is_string($this->subject)) {
-            throw new TestHasFailed('failed asserting that %s is not string', $this->subject);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is not string',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function isScalar(): self
+    public function isScalar(?string $reason = null, mixed ...$reasonData): self
     {
         if (! is_scalar($this->subject)) {
-            throw new TestHasFailed('failed asserting that %s is scalar', $this->subject);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is scalar',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function isNotScalar(): self
+    public function isNotScalar(?string $reason = null, mixed ...$reasonData): self
     {
         if (is_scalar($this->subject)) {
-            throw new TestHasFailed('failed asserting that %s is not scalar', $this->subject);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is not scalar',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function isIterable(): self
+    public function isIterable(?string $reason = null, mixed ...$reasonData): self
     {
         if (! is_iterable($this->subject)) {
-            throw new TestHasFailed('failed asserting that %s is iterable', $this->subject);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is iterable',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function isNotIterable(): self
+    public function isNotIterable(?string $reason = null, mixed ...$reasonData): self
     {
         if (is_iterable($this->subject)) {
-            throw new TestHasFailed('failed asserting that %s is not iterable', $this->subject);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is not iterable',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function startsWith(string $prefix): self
+    public function startsWith(string $prefix, ?string $reason = null, mixed ...$reasonData): self
     {
         $this->isString();
 
         if (! str_starts_with($this->subject, $prefix)) {
-            throw new TestHasFailed('failed asserting that %s starts with %s', $this->subject, $prefix);
+            $this->fail(
+                $reason ?? 'failed asserting that %s starts with %s',
+                ...($reasonData ?: [$this->subject, $prefix]),
+            );
         }
 
         return $this;
     }
 
-    public function startsNotWith(string $prefix): self
+    public function startsNotWith(string $prefix, ?string $reason = null, mixed ...$reasonData): self
     {
         $this->isString();
 
         if (str_starts_with($this->subject, $prefix)) {
-            throw new TestHasFailed('failed asserting that %s does not start with %s', $this->subject, $prefix);
+            $this->fail(
+                $reason ?? 'failed asserting that %s does not start with %s',
+                ...($reasonData ?: [$this->subject, $prefix]),
+            );
         }
 
         return $this;
     }
 
-    public function endsWith(string $suffix): self
+    public function endsWith(string $suffix, ?string $reason = null, mixed ...$reasonData): self
     {
         $this->isString();
 
         if (! str_ends_with($this->subject, $suffix)) {
-            throw new TestHasFailed('failed asserting that %s ends with %s', $this->subject, $suffix);
+            $this->fail(
+                $reason ?? 'failed asserting that %s ends with %s',
+                ...($reasonData ?: [$this->subject, $suffix]),
+            );
         }
 
         return $this;
     }
 
-    public function endsNotWith(string $suffix): self
+    public function endsNotWith(string $suffix, ?string $reason = null, mixed ...$reasonData): self
     {
         $this->isString();
 
         if (str_ends_with($this->subject, $suffix)) {
-            throw new TestHasFailed('failed asserting that %s does not end with %s', $this->subject, $suffix);
+            $this->fail(
+                $reason ?? 'failed asserting that %s does not end with %s',
+                ...($reasonData ?: [$this->subject, $suffix]),
+            );
         }
 
         return $this;
     }
 
-    public function isJson(): self
+    public function isJson(?string $reason = null, mixed ...$reasonData): self
     {
         $this->isString();
 
         if (! json_validate($this->subject)) {
-            throw new TestHasFailed('failed asserting that %s is valid JSON', $this->subject);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is valid JSON',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
     }
 
-    public function isNotJson(): self
+    public function isNotJson(?string $reason = null, mixed ...$reasonData): self
     {
         if (! is_string($this->subject)) {
             return $this;
         }
 
         if (json_validate($this->subject)) {
-            throw new TestHasFailed('failed asserting that %s is not valid JSON', $this->subject);
+            $this->fail(
+                $reason ?? 'failed asserting that %s is not valid JSON',
+                ...($reasonData ?: [$this->subject]),
+            );
         }
 
         return $this;
