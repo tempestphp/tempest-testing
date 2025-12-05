@@ -37,6 +37,8 @@ final class TesterTest
         test(fn () => test($a)->is($a))->succeeds();
         test(fn () => test($a)->is($b))->fails('failed asserting that `stdClass` is `stdClass`');
         test(fn () => test($a)->is($c))->fails('failed asserting that `stdClass` is `stdClass`');
+
+        test(fn () => test(1)->is('1', 'it %s', 'failed'))->fails("it `'failed'`");
     }
 
     #[Test]
@@ -54,6 +56,7 @@ final class TesterTest
         test(fn () => test($a)->isNot($a))->fails('failed asserting that `stdClass` is not `stdClass`');
         test(fn () => test($a)->isNot($b))->succeeds();
         test(fn () => test($a)->isNot($c))->succeeds();
+        test(fn () => test(1)->isNot(1, 'custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test, Provide(
@@ -69,6 +72,11 @@ final class TesterTest
         } else {
             test(fn () => test($test)->isEqualTo($expected))->fails();
         }
+    }
+
+    public function isEqualToWithFailMessage(): void
+    {
+        test(fn () => test(1)->isEqualTo('2', 'custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -99,6 +107,12 @@ final class TesterTest
     }
 
     #[Test]
+    public function isNotEqualToWithFailMessage(): void
+    {
+        test(fn () => test(1)->isNotEqualTo('1', 'custom %s', 'reason'))->fails("custom `'reason'`");
+    }
+
+    #[Test]
     public function isNotEqualToObject(): void
     {
         $a = (object) [];
@@ -115,6 +129,7 @@ final class TesterTest
     {
         test(fn () => test(fn () => true)->isCallable())->succeeds();
         test(fn () => test('a')->isCallable())->fails("failed asserting that `'a'` is callable");
+        test(fn () => test('a')->isCallable('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -122,6 +137,7 @@ final class TesterTest
     {
         test(fn () => test(fn () => true)->isNotCallable())->fails('failed asserting that `Closure` is not callable');
         test(fn () => test('not_callable')->isNotCallable())->succeeds();
+        test(fn () => test(fn () => true)->isNotCallable('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -130,6 +146,7 @@ final class TesterTest
         test(fn () => test([1, 2, 3])->hasCount(3))->succeeds();
         test(fn () => test([1, 2, 3])->hasCount(4))->fails('failed asserting that `array` has `4` items');
         test(fn () => test(1)->hasCount(4))->fails('failed asserting that `1` is countable');
+        test(fn () => test([1, 2, 3])->hasCount(4, 'custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -138,6 +155,7 @@ final class TesterTest
         test(fn () => test([1, 2, 3])->hasNotCount(3))->fails('failed asserting that `array` does not have `3` items');
         test(fn () => test([1, 2, 3])->hasNotCount(4))->succeeds();
         test(fn () => test(1)->hasNotCount(4))->fails('failed asserting that `1` is countable');
+        test(fn () => test([1, 2, 3])->hasNotCount(3, 'custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -148,6 +166,7 @@ final class TesterTest
         test(fn () => test('abc')->contains('b'))->succeeds();
         test(fn () => test('abc')->contains('d'))->fails("failed asserting that `'abc'` contains `'d'`");
         test(fn () => test(1)->contains('d'))->fails('to check contains, the test subject must be a string or an array; instead got `1`');
+        test(fn () => test([1, 2, 3])->contains(4, 'custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -158,6 +177,7 @@ final class TesterTest
         test(fn () => test('abc')->containsNot('b'))->fails("failed asserting that `'abc'` does not contain `'b'`");
         test(fn () => test('abc')->containsNot('d'))->succeeds();
         test(fn () => test(1)->containsNot('d'))->fails('to check contains, the test subject must be a string or an array; instead got `1`');
+        test(fn () => test([1, 2, 3])->containsNot(2, 'custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -166,6 +186,7 @@ final class TesterTest
         test(fn () => test([1, 2, 3])->hasKey(2))->succeeds();
         test(fn () => test([1, 2, 3])->hasKey(4))->fails('failed asserting that `array` has key `4`');
         test(fn () => test(1)->hasKey(4))->fails('failed asserting that `1` is array');
+        test(fn () => test([1, 2, 3])->hasKey(4, 'custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -174,6 +195,7 @@ final class TesterTest
         test(fn () => test([1, 2, 3])->missesKey(2))->fails('failed asserting that `array` does not have key `2`');
         test(fn () => test([1, 2, 3])->missesKey(4))->succeeds();
         test(fn () => test(1)->missesKey(4))->fails('failed asserting that `1` is array');
+        test(fn () => test([1, 2, 3])->missesKey(2, 'custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -181,6 +203,7 @@ final class TesterTest
     {
         test(fn () => test($this)->instanceOf(self::class))->succeeds();
         test(fn () => test('')->instanceOf(self::class))->fails("failed asserting that `''` is an instance of `'Tempest\\\\Testing\\\\Tests\\\\TesterTest'`");
+        test(fn () => test('')->instanceOf(self::class, 'custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -188,6 +211,7 @@ final class TesterTest
     {
         test(fn () => test($this)->isNotInstanceOf(self::class))->fails("failed asserting that `Tempest\\Testing\\Tests\\TesterTest` is not an instance of `'Tempest\\\\Testing\\\\Tests\\\\TesterTest'`");
         test(fn () => test('')->isNotInstanceOf(self::class))->succeeds();
+        test(fn () => test($this)->isNotInstanceOf(self::class, 'custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -212,6 +236,10 @@ final class TesterTest
         test(function () {
             test()->exceptionThrown(InvalidArgumentException::class);
         })->fails('to test exceptions, the test subject must be a callable; instead got `NULL`');
+
+        test(function () {
+            test(fn () => true)->exceptionThrown(Exception::class, null, 'custom %s', 'reason');
+        })->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -232,6 +260,10 @@ final class TesterTest
         test(function () {
             test()->exceptionNotThrown(InvalidArgumentException::class);
         })->succeeds();
+
+        test(function () {
+            test(fn () => throw new Exception())->exceptionNotThrown(Exception::class, 'custom %s', 'reason');
+        })->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -239,6 +271,7 @@ final class TesterTest
     {
         test(fn () => test([1, 2])->isCountable())->succeeds();
         test(fn () => test('a')->isCountable())->fails("failed asserting that `'a'` is countable");
+        test(fn () => test('a')->isCountable('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -246,6 +279,7 @@ final class TesterTest
     {
         test(fn () => test([1, 2])->isNotCountable())->fails('failed asserting that `array` is not countable');
         test(fn () => test('a')->isNotCountable())->succeeds();
+        test(fn () => test([1, 2])->isNotCountable('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -254,6 +288,7 @@ final class TesterTest
         test(fn () => test('abc')->startsWith('ab'))->succeeds();
         test(fn () => test('abc')->startsWith('zz'))->fails("failed asserting that `'abc'` starts with `'zz'`");
         test(fn () => test(1)->startsWith('zz'))->fails('failed asserting that `1` is string');
+        test(fn () => test('abc')->startsWith('zz', 'custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -262,6 +297,7 @@ final class TesterTest
         test(fn () => test('abc')->endsWith('bc'))->succeeds();
         test(fn () => test('abc')->endsWith('zz'))->fails("failed asserting that `'abc'` ends with `'zz'`");
         test(fn () => test(1)->endsWith('zz'))->fails('failed asserting that `1` is string');
+        test(fn () => test('abc')->endsWith('zz', 'custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -270,6 +306,7 @@ final class TesterTest
         test(fn () => test('abc')->startsNotWith('ab'))->fails("failed asserting that `'abc'` does not start with `'ab'`");
         test(fn () => test('abc')->startsNotWith('zz'))->succeeds();
         test(fn () => test(1)->startsNotWith('zz'))->fails('failed asserting that `1` is string');
+        test(fn () => test('abc')->startsNotWith('ab', 'custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -278,6 +315,7 @@ final class TesterTest
         test(fn () => test('abc')->endsNotWith('bc'))->fails("failed asserting that `'abc'` does not end with `'bc'`");
         test(fn () => test('abc')->endsNotWith('zz'))->succeeds();
         test(fn () => test(1)->endsNotWith('zz'))->fails('failed asserting that `1` is string');
+        test(fn () => test('abc')->endsNotWith('bc', 'custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -286,6 +324,7 @@ final class TesterTest
         test(fn () => test([1, 2, 3])->isList())->succeeds();
         test(fn () => test([1 => 'a'])->isList())->fails('failed asserting that `array` is a list');
         test(fn () => test('a')->isList())->fails('failed asserting that `\'a\'` is array');
+        test(fn () => test([1 => 'a'])->isList('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -294,6 +333,7 @@ final class TesterTest
         test(fn () => test([1, 2, 3])->isNotList())->fails('failed asserting that `array` is not a list');
         test(fn () => test([1 => 'a'])->isNotList())->succeeds();
         test(fn () => test('a')->isNotList())->fails('failed asserting that `\'a\'` is array');
+        test(fn () => test([1, 2, 3])->isNotList('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -301,6 +341,7 @@ final class TesterTest
     {
         test(fn () => test([])->isEmpty())->succeeds();
         test(fn () => test('a')->isEmpty())->fails("failed asserting that `'a'` is empty");
+        test(fn () => test('a')->isEmpty('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -308,6 +349,7 @@ final class TesterTest
     {
         test(fn () => test('a')->isNotEmpty())->succeeds();
         test(fn () => test('')->isNotEmpty())->fails("failed asserting that `''` is not empty");
+        test(fn () => test('')->isNotEmpty('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -316,6 +358,7 @@ final class TesterTest
         test(fn () => test(5)->greaterThan(4))->succeeds();
         test(fn () => test(5)->greaterThan(5))->fails('failed asserting that `5` is greater than `5`');
         test(fn () => test('a')->greaterThan(4))->fails('failed asserting that `\'a\'` is numeric');
+        test(fn () => test(5)->greaterThan(5, 'custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -324,6 +367,7 @@ final class TesterTest
         test(fn () => test(5)->greaterThanOrEqual(5))->succeeds();
         test(fn () => test(4)->greaterThanOrEqual(5))->fails('failed asserting that `4` is greater than or equal to `5`');
         test(fn () => test('a')->greaterThanOrEqual(4))->fails('failed asserting that `\'a\'` is numeric');
+        test(fn () => test(4)->greaterThanOrEqual(5, 'custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -332,6 +376,7 @@ final class TesterTest
         test(fn () => test(4)->lessThan(5))->succeeds();
         test(fn () => test(5)->lessThan(5))->fails('failed asserting that `5` is less than `5`');
         test(fn () => test('a')->lessThan(4))->fails('failed asserting that `\'a\'` is numeric');
+        test(fn () => test(5)->lessThan(5, 'custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -340,6 +385,7 @@ final class TesterTest
         test(fn () => test(5)->lessThanOrEqual(5))->succeeds();
         test(fn () => test(6)->lessThanOrEqual(5))->fails('failed asserting that `6` is less than or equal to `5`');
         test(fn () => test('a')->lessThanOrEqual(4))->fails('failed asserting that `\'a\'` is numeric');
+        test(fn () => test(6)->lessThanOrEqual(5, 'custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -347,6 +393,7 @@ final class TesterTest
     {
         test(fn () => test(true)->isTrue())->succeeds();
         test(fn () => test(false)->isTrue())->fails('failed asserting that `false` is true');
+        test(fn () => test(false)->isTrue('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -354,6 +401,7 @@ final class TesterTest
     {
         test(fn () => test(false)->isFalse())->succeeds();
         test(fn () => test(true)->isFalse())->fails('failed asserting that `true` is false');
+        test(fn () => test(true)->isFalse('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -361,6 +409,7 @@ final class TesterTest
     {
         test(fn () => test(1)->isTrueish())->succeeds();
         test(fn () => test(0)->isTrueish())->fails('failed asserting that `0` is trueish');
+        test(fn () => test(0)->isTrueish('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -368,6 +417,7 @@ final class TesterTest
     {
         test(fn () => test(0)->isFalseish())->succeeds();
         test(fn () => test(1)->isFalseish())->fails('failed asserting that `1` is falseish');
+        test(fn () => test(1)->isFalseish('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -375,6 +425,7 @@ final class TesterTest
     {
         test(fn () => test(null)->isNull())->succeeds();
         test(fn () => test(0)->isNull())->fails('failed asserting that `0` is null');
+        test(fn () => test(0)->isNull('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -382,6 +433,7 @@ final class TesterTest
     {
         test(fn () => test(0)->isNotNull())->succeeds();
         test(fn () => test(null)->isNotNull())->fails('failed asserting that `NULL` is not null');
+        test(fn () => test(null)->isNotNull('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -389,6 +441,7 @@ final class TesterTest
     {
         test(fn () => test([1])->isArray())->succeeds();
         test(fn () => test(1)->isArray())->fails('failed asserting that `1` is array');
+        test(fn () => test(1)->isArray('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -396,6 +449,7 @@ final class TesterTest
     {
         test(fn () => test([1])->isNotArray())->fails('failed asserting that `array` is not array');
         test(fn () => test(1)->isNotArray())->succeeds();
+        test(fn () => test([1])->isNotArray('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -403,6 +457,7 @@ final class TesterTest
     {
         test(fn () => test(true)->isBool())->succeeds();
         test(fn () => test(1)->isBool())->fails('failed asserting that `1` is bool');
+        test(fn () => test(1)->isBool('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -410,6 +465,7 @@ final class TesterTest
     {
         test(fn () => test(true)->isNotBool())->fails('failed asserting that `true` is not bool');
         test(fn () => test(1)->isNotBool())->succeeds();
+        test(fn () => test(true)->isNotBool('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -417,6 +473,7 @@ final class TesterTest
     {
         test(fn () => test(1.2)->isFloat())->succeeds();
         test(fn () => test(1)->isFloat())->fails('failed asserting that `1` is float');
+        test(fn () => test(1)->isFloat('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -424,6 +481,7 @@ final class TesterTest
     {
         test(fn () => test(1.2)->isNotFloat())->fails('failed asserting that `1.2` is not float');
         test(fn () => test(1)->isNotFloat())->succeeds();
+        test(fn () => test(1.2)->isNotFloat('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -431,6 +489,7 @@ final class TesterTest
     {
         test(fn () => test(1)->isInt())->succeeds();
         test(fn () => test(1.1)->isInt())->fails('failed asserting that `1.1` is int');
+        test(fn () => test(1.1)->isInt('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -438,6 +497,7 @@ final class TesterTest
     {
         test(fn () => test(1)->isNotInt())->fails('failed asserting that `1` is not int');
         test(fn () => test(1.1)->isNotInt())->succeeds();
+        test(fn () => test(1)->isNotInt('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -445,6 +505,7 @@ final class TesterTest
     {
         test(fn () => test('1')->isNumeric())->succeeds();
         test(fn () => test('a')->isNumeric())->fails("failed asserting that `'a'` is numeric");
+        test(fn () => test('a')->isNumeric('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -452,6 +513,7 @@ final class TesterTest
     {
         test(fn () => test('1')->isNotNumeric())->fails("failed asserting that `'1'` is not numeric");
         test(fn () => test('a')->isNotNumeric())->succeeds();
+        test(fn () => test('1')->isNotNumeric('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -459,6 +521,7 @@ final class TesterTest
     {
         test(fn () => test((object) [])->isObject())->succeeds();
         test(fn () => test(1)->isObject())->fails('failed asserting that `1` is object');
+        test(fn () => test(1)->isObject('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -466,6 +529,7 @@ final class TesterTest
     {
         test(fn () => test((object) [])->isNotObject())->fails('failed asserting that `stdClass` is not object');
         test(fn () => test(1)->isNotObject())->succeeds();
+        test(fn () => test((object) [])->isNotObject('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -473,8 +537,10 @@ final class TesterTest
     {
         $res = fopen('php://temp', 'r');
         test(fn () => test($res)->isResource())->succeeds();
-        test(fn () => test(1)->isResource())->fails('failed asserting that `1` is resource');
         fclose($res);
+
+        test(fn () => test(1)->isResource())->fails('failed asserting that `1` is resource');
+        test(fn () => test(1)->isResource('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -483,6 +549,7 @@ final class TesterTest
         $res = fopen('php://temp', 'r');
         test(fn () => test($res)->isNotResource())->fails('failed asserting that `resource` is not resource');
         test(fn () => test(1)->isNotResource())->succeeds();
+        test(fn () => test($res)->isNotResource('custom %s', 'reason'))->fails("custom `'reason'`");
         fclose($res);
     }
 
@@ -491,6 +558,7 @@ final class TesterTest
     {
         test(fn () => test('a')->isString())->succeeds();
         test(fn () => test(1)->isString())->fails('failed asserting that `1` is string');
+        test(fn () => test(1)->isString('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -498,6 +566,7 @@ final class TesterTest
     {
         test(fn () => test('a')->isNotString())->fails("failed asserting that `'a'` is not string");
         test(fn () => test(1)->isNotString())->succeeds();
+        test(fn () => test('a')->isNotString('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -505,6 +574,7 @@ final class TesterTest
     {
         test(fn () => test(1)->isScalar())->succeeds();
         test(fn () => test([])->isScalar())->fails('failed asserting that `array` is scalar');
+        test(fn () => test([])->isScalar('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -512,6 +582,7 @@ final class TesterTest
     {
         test(fn () => test(1)->isNotScalar())->fails('failed asserting that `1` is not scalar');
         test(fn () => test([])->isNotScalar())->succeeds();
+        test(fn () => test(1)->isNotScalar('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -519,6 +590,7 @@ final class TesterTest
     {
         test(fn () => test([1])->isIterable())->succeeds();
         test(fn () => test(1)->isIterable())->fails('failed asserting that `1` is iterable');
+        test(fn () => test(1)->isIterable('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -526,6 +598,7 @@ final class TesterTest
     {
         test(fn () => test([1])->isNotIterable())->fails('failed asserting that `array` is not iterable');
         test(fn () => test(1)->isNotIterable())->succeeds();
+        test(fn () => test([1])->isNotIterable('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -534,6 +607,7 @@ final class TesterTest
         test(fn () => test('{"a":1}')->isJson())->succeeds();
         test(fn () => test('not json')->isJson())->fails("failed asserting that `'not json'` is valid JSON");
         test(fn () => test(1)->isJson())->fails('failed asserting that `1` is string');
+        test(fn () => test('not json')->isJson('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
     #[Test]
@@ -542,359 +616,6 @@ final class TesterTest
         test(fn () => test('{"a":1}')->isNotJson())->fails("failed asserting that `'{\"a\":1}'` is not valid JSON");
         test(fn () => test('not json')->isNotJson())->succeeds();
         test(fn () => test(1)->isNotJson())->succeeds();
-    }
-
-    #[Test]
-    public function isReasonMessage(): void
-    {
-        test(fn () => test(1)->is('1', 'it %s', 'failed'))->fails("it `'failed'`");
-    }
-
-    #[Test]
-    public function isNotReasonMessage(): void
-    {
-        test(fn () => test(1)->isNot(1, 'custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isEqualToReasonMessage(): void
-    {
-        test(fn () => test(1)->isEqualTo('2', 'custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isNotEqualToReasonMessage(): void
-    {
-        test(fn () => test(1)->isNotEqualTo('1', 'custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isCallableReasonMessage(): void
-    {
-        test(fn () => test('a')->isCallable('custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isNotCallableReasonMessage(): void
-    {
-        test(fn () => test(fn () => true)->isNotCallable('custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function hasCountReasonMessage(): void
-    {
-        test(fn () => test([1, 2, 3])->hasCount(4, 'custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function hasNotCountReasonMessage(): void
-    {
-        test(fn () => test([1, 2, 3])->hasNotCount(3, 'custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isCountableReasonMessage(): void
-    {
-        test(fn () => test('a')->isCountable('custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isNotCountableReasonMessage(): void
-    {
-        test(fn () => test([1, 2])->isNotCountable('custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function containsReasonMessage(): void
-    {
-        test(fn () => test([1, 2, 3])->contains(4, 'custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function containsNotReasonMessage(): void
-    {
-        test(fn () => test([1, 2, 3])->containsNot(2, 'custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function hasKeyReasonMessage(): void
-    {
-        test(fn () => test([1, 2, 3])->hasKey(4, 'custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function missesKeyReasonMessage(): void
-    {
-        test(fn () => test([1, 2, 3])->missesKey(2, 'custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function instanceOfReasonMessage(): void
-    {
-        test(fn () => test('')->instanceOf(self::class, 'custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isNotInstanceOfReasonMessage(): void
-    {
-        test(fn () => test($this)->isNotInstanceOf(self::class, 'custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function exceptionThrownReasonMessage(): void
-    {
-        test(function () {
-            test(fn () => true)->exceptionThrown(Exception::class, null, 'custom %s', 'reason');
-        })->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function exceptionNotThrownReasonMessage(): void
-    {
-        test(function () {
-            test(fn () => throw new Exception())->exceptionNotThrown(Exception::class, 'custom %s', 'reason');
-        })->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isListReasonMessage(): void
-    {
-        test(fn () => test([1 => 'a'])->isList('custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isNotListReasonMessage(): void
-    {
-        test(fn () => test([1, 2, 3])->isNotList('custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isEmptyReasonMessage(): void
-    {
-        test(fn () => test('a')->isEmpty('custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isNotEmptyReasonMessage(): void
-    {
-        test(fn () => test('')->isNotEmpty('custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function greaterThanReasonMessage(): void
-    {
-        test(fn () => test(5)->greaterThan(5, 'custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function greaterThanOrEqualReasonMessage(): void
-    {
-        test(fn () => test(4)->greaterThanOrEqual(5, 'custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function lessThanReasonMessage(): void
-    {
-        test(fn () => test(5)->lessThan(5, 'custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function lessThanOrEqualReasonMessage(): void
-    {
-        test(fn () => test(6)->lessThanOrEqual(5, 'custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isTrueReasonMessage(): void
-    {
-        test(fn () => test(false)->isTrue('custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isFalseReasonMessage(): void
-    {
-        test(fn () => test(true)->isFalse('custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isTrueishReasonMessage(): void
-    {
-        test(fn () => test(0)->isTrueish('custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isFalseishReasonMessage(): void
-    {
-        test(fn () => test(1)->isFalseish('custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isNullReasonMessage(): void
-    {
-        test(fn () => test(0)->isNull('custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isNotNullReasonMessage(): void
-    {
-        test(fn () => test(null)->isNotNull('custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isArrayReasonMessage(): void
-    {
-        test(fn () => test(1)->isArray('custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isNotArrayReasonMessage(): void
-    {
-        test(fn () => test([1])->isNotArray('custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isBoolReasonMessage(): void
-    {
-        test(fn () => test(1)->isBool('custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isNotBoolReasonMessage(): void
-    {
-        test(fn () => test(true)->isNotBool('custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isFloatReasonMessage(): void
-    {
-        test(fn () => test(1)->isFloat('custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isNotFloatReasonMessage(): void
-    {
-        test(fn () => test(1.2)->isNotFloat('custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isIntReasonMessage(): void
-    {
-        test(fn () => test(1.1)->isInt('custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isNotIntReasonMessage(): void
-    {
-        test(fn () => test(1)->isNotInt('custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isNumericReasonMessage(): void
-    {
-        test(fn () => test('a')->isNumeric('custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isNotNumericReasonMessage(): void
-    {
-        test(fn () => test('1')->isNotNumeric('custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isObjectReasonMessage(): void
-    {
-        test(fn () => test(1)->isObject('custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isNotObjectReasonMessage(): void
-    {
-        test(fn () => test((object) [])->isNotObject('custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isResourceReasonMessage(): void
-    {
-        test(fn () => test(1)->isResource('custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isNotResourceReasonMessage(): void
-    {
-        $res = fopen('php://temp', 'r');
-        test(fn () => test($res)->isNotResource('custom %s', 'reason'))->fails("custom `'reason'`");
-        fclose($res);
-    }
-
-    #[Test]
-    public function isStringReasonMessage(): void
-    {
-        test(fn () => test(1)->isString('custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isNotStringReasonMessage(): void
-    {
-        test(fn () => test('a')->isNotString('custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isScalarReasonMessage(): void
-    {
-        test(fn () => test([])->isScalar('custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isNotScalarReasonMessage(): void
-    {
-        test(fn () => test(1)->isNotScalar('custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isIterableReasonMessage(): void
-    {
-        test(fn () => test(1)->isIterable('custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isNotIterableReasonMessage(): void
-    {
-        test(fn () => test([1])->isNotIterable('custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function startsWithReasonMessage(): void
-    {
-        test(fn () => test('abc')->startsWith('zz', 'custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function startsNotWithReasonMessage(): void
-    {
-        test(fn () => test('abc')->startsNotWith('ab', 'custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function endsWithReasonMessage(): void
-    {
-        test(fn () => test('abc')->endsWith('zz', 'custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function endsNotWithReasonMessage(): void
-    {
-        test(fn () => test('abc')->endsNotWith('bc', 'custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isJsonReasonMessage(): void
-    {
-        test(fn () => test('not json')->isJson('custom %s', 'reason'))->fails("custom `'reason'`");
-    }
-
-    #[Test]
-    public function isNotJsonReasonMessage(): void
-    {
         test(fn () => test('{"a":1}')->isNotJson('custom %s', 'reason'))->fails("custom `'reason'`");
     }
 }
