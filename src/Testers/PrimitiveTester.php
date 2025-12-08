@@ -7,7 +7,7 @@ use Tempest\Testing\Exceptions\TestHasFailed;
 use Throwable;
 use function Tempest\Testing\test;
 
-final readonly class Tester
+final readonly class PrimitiveTester
 {
     public function __construct(
         private mixed $subject = null,

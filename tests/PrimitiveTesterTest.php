@@ -8,7 +8,7 @@ use Tempest\Testing\Provide;
 use Tempest\Testing\Test;
 use function Tempest\Testing\test;
 
-final class TesterTest
+final class PrimitiveTesterTest
 {
     #[Test]
     public function fail(): void

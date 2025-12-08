@@ -3,10 +3,10 @@
 namespace Tempest\Testing
 {
 
-    use Tempest\Testing\Testers\Tester;
+    use Tempest\Testing\Testers\PrimitiveTester;
 
-    function test(mixed $subject = null): Tester
+    function test(mixed $subject = null): PrimitiveTester
     {
-        return new Tester($subject);
+        return new PrimitiveTester($subject);
     }
 }

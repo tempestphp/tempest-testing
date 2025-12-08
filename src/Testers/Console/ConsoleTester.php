@@ -208,28 +208,15 @@ final class ConsoleTester
     public function assertContains(string $text): self
     {
         test($this->output->asUnformattedString())
-            ->contains($text);
-
-//            sprintf(
-//                'Failed to assert that console output included text: %s. These lines were printed: %s',
-//                $text,
-//                PHP_EOL . PHP_EOL . $this->output->asUnformattedString() . PHP_EOL,
-//        );
+            ->contains($text, 'console output did not contain: %s', $text);
 
         return $this;
     }
 
     public function assertDoesNotContain(string $text): self
     {
-        Assert::assertStringNotContainsString(
-            $text,
-            $this->output->asUnformattedString(),
-            sprintf(
-                'Failed to assert that console output did not include text: %s. These lines were printed: %s',
-                $text,
-                PHP_EOL . PHP_EOL . $this->output->asUnformattedString() . PHP_EOL,
-            ),
-        );
+        test($this->output->asUnformattedString())
+            ->containsNot($text, "console output contained %s while it shouldn't", $text);
 
         return $this;
     }
@@ -260,7 +247,7 @@ final class ConsoleTester
     {
         test($this->exitCode)
             ->isNotNull()
-            ->is($exitCode);
+            ->is($exitCode, 'console exit code did not match expected %s, instead got %s', $exitCode, $this->exitCode);
 
         return $this;
     }
