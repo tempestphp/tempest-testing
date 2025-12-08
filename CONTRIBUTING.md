@@ -11,7 +11,8 @@ test(['a'])->missesKey(2);
 
 ### For failure messages
 
-Failure message should always start with a lowercase letter. They should be written in the past tense:
+- Failure message should always start with a lowercase letter. 
+- They should be written in the past tense
 
 ```php
 "$actual was not expected $expected";
