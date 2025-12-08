@@ -179,7 +179,7 @@ final class ConsoleTester
 
     public function assertSee(string $text): self
     {
-        return $this->assertContains($text);
+        return $this->contains($text);
     }
 
     public function assertSeeCount(string $text, int $expectedCount): self
@@ -202,10 +202,10 @@ final class ConsoleTester
 
     public function assertNotSee(string $text): self
     {
-        return $this->assertDoesNotContain($text);
+        return $this->containsNot($text);
     }
 
-    public function assertContains(string $text): self
+    public function contains(string $text): self
     {
         test($this->output->asUnformattedString())
             ->contains($text, 'console output did not contain: %s', $text);
@@ -213,7 +213,7 @@ final class ConsoleTester
         return $this;
     }
 
-    public function assertDoesNotContain(string $text): self
+    public function containsNot(string $text): self
     {
         test($this->output->asUnformattedString())
             ->containsNot($text, "console output contained %s while it shouldn't", $text);
@@ -236,14 +236,14 @@ final class ConsoleTester
         return $this;
     }
 
-    public function assertJson(): self
+    public function isJson(): self
     {
-        Assert::assertJson($this->output->asUnformattedString());
+        test($this->output->asUnformattedString())->isJson();
 
         return $this;
     }
 
-    public function assertExitCode(ExitCode $exitCode): self
+    public function hasExitCode(ExitCode $exitCode): self
     {
         test($this->exitCode)
             ->isNotNull()
@@ -252,30 +252,30 @@ final class ConsoleTester
         return $this;
     }
 
-    public function assertSuccess(): self
+    public function succeeds(): self
     {
-        $this->assertExitCode(ExitCode::SUCCESS);
+        $this->hasExitCode(ExitCode::SUCCESS);
 
         return $this;
     }
 
-    public function assertError(): self
+    public function fails(): self
     {
-        $this->assertExitCode(ExitCode::ERROR);
+        $this->hasExitCode(ExitCode::ERROR);
 
         return $this;
     }
 
     public function assertCancelled(): self
     {
-        $this->assertExitCode(ExitCode::CANCELLED);
+        $this->hasExitCode(ExitCode::CANCELLED);
 
         return $this;
     }
 
     public function assertInvalid(): self
     {
-        $this->assertExitCode(ExitCode::INVALID);
+        $this->hasExitCode(ExitCode::INVALID);
 
         return $this;
     }

@@ -2,9 +2,14 @@
 <?php
 
 use Tempest\Console\ConsoleApplication;
+use Tempest\Discovery\DiscoveryLocation;
 
 require_once getcwd() . '/vendor/autoload.php';
 
-ConsoleApplication::boot()->run();
+ConsoleApplication::boot(
+        discoveryLocations: [
+                new DiscoveryLocation('Tempest\Testing\Tests\Fixtures', __DIR__ . '/tests/Fixtures')
+        ],
+)->run();
 
 exit;
