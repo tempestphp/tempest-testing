@@ -4,9 +4,9 @@
     "license": "MIT",
     "require": {
         "php": "^8.5",
-        "tempest/core":  "^2.13",
-        "tempest/event-bus":  "^2.13",
-        "tempest/console": "^2.13",
+        "tempest/core":  "*",
+        "tempest/event-bus":  "*",
+        "tempest/console": "*",
         "symfony/process": "^7.3",
         "psr/container": "^2.0"
     },
