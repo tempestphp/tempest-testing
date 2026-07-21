@@ -7,7 +7,7 @@ use Tempest\Testing\Events\TestRunEnded;
 use Tempest\Testing\Events\TestRunStarted;
 use Tempest\Testing\Events\TestsChunked;
 use Tempest\Testing\Runner\TestRunner;
-use function Tempest\event;
+use function Tempest\EventBus\event;
 
 final class ChunkAndRunTests
 {

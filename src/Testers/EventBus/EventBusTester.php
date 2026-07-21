@@ -5,6 +5,7 @@ namespace Tempest\Testing\Testers\EventBus;
 use Closure;
 use Tempest\EventBus\EventBus;
 use Tempest\Support\Str;
+use UnitEnum;
 use function Tempest\Testing\test;
 
 final class EventBusTester implements EventBus
@@ -29,7 +30,7 @@ final class EventBusTester implements EventBus
         }
     }
 
-    public function listen(Closure $handler, ?string $event = null): void
+    public function listen(Closure $handler, string|UnitEnum|null $event = null): void
     {
         $this->eventBus->listen($handler, $event);
     }

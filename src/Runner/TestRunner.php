@@ -5,7 +5,7 @@ namespace Tempest\Testing\Runner;
 use Symfony\Component\Process\Process;
 use Tempest\Support\Arr\ImmutableArray;
 use Tempest\Testing\Test;
-use function Tempest\event;
+use function Tempest\EventBus\event;
 
 final readonly class TestRunner
 {

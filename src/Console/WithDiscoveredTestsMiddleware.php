@@ -7,8 +7,8 @@ use Tempest\Console\ConsoleMiddlewareCallable;
 use Tempest\Console\ExitCode;
 use Tempest\Console\Initializers\Invocation;
 use Tempest\Container\Container;
-use Tempest\Core\Composer;
-use Tempest\Core\Kernel\LoadDiscoveryClasses;
+use Tempest\Discovery\BootDiscovery;
+use Tempest\Discovery\Composer;
 use Tempest\Discovery\DiscoveryLocation;
 use Tempest\Support\Namespace\Psr4Namespace;
 use Tempest\Testing\Discovery\TestDiscovery;
@@ -24,7 +24,7 @@ final readonly class WithDiscoveredTestsMiddleware implements ConsoleMiddleware
     public function __invoke(Invocation $invocation, ConsoleMiddlewareCallable $next): ExitCode|int
     {
         $this->container->invoke(
-            LoadDiscoveryClasses::class,
+            BootDiscovery::class,
             discoveryClasses: [
                 TestDiscovery::class,
             ],

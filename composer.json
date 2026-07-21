@@ -22,5 +22,8 @@
         "psr-4": {
             "Tempest\\Testing\\Tests\\": "tests"
         }
+    },
+    "scripts":{
+        "qa": "@php tempest test"
     }
 }

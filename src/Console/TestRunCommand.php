@@ -12,7 +12,7 @@ use Tempest\EventBus\EventBusConfig;
 use Tempest\Testing\Actions\RunTest;
 use Tempest\Testing\Events\DispatchToParentProcessMiddleware;
 use Tempest\Testing\Test;
-use function Tempest\reflect;
+use function Tempest\Reflection\reflect;
 
 final class TestRunCommand
 {
@@ -58,7 +58,7 @@ final class TestRunCommand
 
         $clonedSingletons = new ArrayIterator();
 
-        foreach ($container->singletons as $index => $singleton) {
+        foreach ($container->singletonDefinitions as $index => $singleton) {
             $clonedSingletons[$index] = is_object($singleton) ? clone $singleton : $singleton;
         }
 
@@ -70,7 +70,7 @@ final class TestRunCommand
 
         $clone = new GenericContainer(
             definitions: $clonedDefinitions,
-            singletons: $clonedSingletons,
+            singletonDefinitions: $clonedSingletons,
             initializers: $container->initializers,
             dynamicInitializers: $container->dynamicInitializers,
             decorators: $container->decorators,

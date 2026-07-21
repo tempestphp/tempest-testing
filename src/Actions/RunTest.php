@@ -15,7 +15,7 @@ use Tempest\Testing\Events\TestSucceeded;
 use Tempest\Testing\Exceptions\InvalidProviderData;
 use Tempest\Testing\Exceptions\TestHasFailed;
 use Tempest\Testing\Test;
-use function Tempest\event;
+use function Tempest\EventBus\event;
 
 #[Singleton]
 final class RunTest
