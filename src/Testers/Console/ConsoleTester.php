@@ -298,7 +298,7 @@ final class ConsoleTester
     {
         ld($this->outputBuffer()->asUnformattedString());
 
-        return $this;
+        return $this; // @mago-expect analysis:unevaluated-code
     }
 
     private function outputBuffer(): OutputBuffer&MemoryOutputBuffer

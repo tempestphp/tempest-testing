@@ -11,7 +11,6 @@ use Tempest\Testing\Events\TestsChunked;
 use Tempest\Testing\Events\TestSkipped;
 use Tempest\Testing\Events\TestStarted;
 use Tempest\Testing\Events\TestSucceeded;
-use Tempest\Testing\Runner\TestResult;
 
 final class TeamcityOutput implements TestOutput
 {
@@ -19,7 +18,6 @@ final class TeamcityOutput implements TestOutput
 
     public function __construct(
         public bool $verbose = false,
-        private TestResult $result = new TestResult(),
     ) {}
 
     public function onTestsChunked(TestsChunked $event): void

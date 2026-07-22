@@ -45,6 +45,8 @@ final class RunTest
                     throw InvalidProviderData::invalidMethodName($test, $provider);
                 }
 
+                // @mago-expect analysis:string-member-selector
+                // @mago-expect analysis:impossible-assignment
                 $provider = $instance->{$provider}(...);
             }
 
@@ -110,7 +112,7 @@ final class RunTest
 
     private function getInstance(Test $test): object
     {
-        return $this->container->get($test->handler->getDeclaringClass()->getName());
+        return $this->container->get($test->handler->getDeclaringClass()->getName()); // @mago-expect analysis:mixed-return-statement
     }
 
     private function callMethod(object $instance, MethodReflector $method, array $data = []): void
@@ -142,6 +144,6 @@ final class RunTest
             $data[$parameterName] = $this->container->get($typeName);
         }
 
-        $instance->{$method->getName()}(...$data);
+        $instance->{$method->getName()}(...$data); // @mago-expect analysis:string-member-selector
     }
 }

@@ -19,7 +19,7 @@ final class ChunkAndRunTests
 
         $tests = $tests
             ->chunk($chunks)
-            ->map(function (ImmutableArray $tests, int|string $i): TestRunner {
+            ->map(function (ImmutableArray $tests, int|string $i): TestRunner { // @mago-expect lint:prefer-arrow-function
                 /** @var ImmutableArray<array-key, Test> $tests */
                 return new TestRunner((string) $i)->run($tests);
             });

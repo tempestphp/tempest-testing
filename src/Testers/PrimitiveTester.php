@@ -55,7 +55,7 @@ final readonly class PrimitiveTester
     {
         $this->isCallable();
 
-        ($this->subject)();
+        ($this->subject)(); // @mago-expect analysis:invalid-callable
 
         return $this;
     }

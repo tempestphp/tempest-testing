@@ -5,12 +5,10 @@ namespace Tempest\Testing\Console;
 use Tempest\Console\ConsoleArgument;
 use Tempest\Console\ConsoleCommand;
 use Tempest\Console\HasConsole;
-use Tempest\Container\Container;
 use Tempest\Support\Arr\ImmutableArray;
 use Tempest\Testing\Actions\ChunkAndRunTests;
 use Tempest\Testing\Config\TestConfig;
 use Tempest\Testing\Events\TestSkipped;
-use Tempest\Testing\Runner\TestResult;
 use Tempest\Testing\Test;
 
 use function Tempest\EventBus\event;
@@ -20,12 +18,8 @@ final class TestCommand
 {
     use HasConsole;
 
-    private bool $verbose = false;
-    private TestResult $result;
-
     public function __construct(
         private readonly TestConfig $testConfig,
-        private readonly Container $container,
     ) {}
 
     #[ConsoleCommand(
@@ -42,6 +36,8 @@ final class TestCommand
         #[ConsoleArgument(description: 'Use teamcity output format')]
         bool $teamcity = false,
     ): void {
+        // TODO: verbose
+
         (new ChunkAndRunTests())(
             tests: $this->getTests($filter),
             processes: $processes,

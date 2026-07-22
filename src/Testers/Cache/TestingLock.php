@@ -65,13 +65,13 @@ final class TestingLock implements Lock
 
             test($this->duration)->isNotNull('Expected lock %s to have a duration, but it has none.', $this->key);
 
-            test($this->duration->getTotalSeconds())
+            test($this->duration->getTotalSeconds()) // @mago-expect analysis:possible-method-access-on-null
                 ->greaterThanOrEqual(
                     $for->getTotalSeconds(),
                     'Expected lock %s to have a duration of at least %s seconds, but it has %s seconds.',
                     $this->key,
                     $for->getTotalSeconds(),
-                    $this->duration->getTotalSeconds(),
+                    $this->duration->getTotalSeconds(), // @mago-expect analysis:possible-method-access-on-null
                 );
         }
 
