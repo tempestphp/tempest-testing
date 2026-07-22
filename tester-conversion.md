@@ -23,5 +23,5 @@ These are the tester classes that still need convertion. Work on them one by one
 - [x] `\Tempest\Mail\Testing\AttachmentTester`
 - [x] `\Tempest\Framework\Testing\Http\HttpRouterTester` (should become `HttpTester` instead)
 - [x] `\Tempest\Process\Testing\ProcessTester`
-- [ ] `\Tempest\Storage\Testing\StorageTester`
+- [x] `\Tempest\Storage\Testing\StorageTester`
 - [ ] `\Tempest\Framework\Testing\View\ViewTester`
