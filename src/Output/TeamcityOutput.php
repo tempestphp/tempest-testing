@@ -29,17 +29,17 @@ final class TeamcityOutput implements TestOutput
 
     public function onTestStarted(TestStarted $event): void
     {
-        $this->writeln($event->teamcityMessage);
+        $this->writeln((string) $event->teamcityMessage);
     }
 
     public function onTestFailed(TestFailed $event): void
     {
-        $this->writeln($event->teamcityMessage);
+        $this->writeln((string) $event->teamcityMessage);
     }
 
     public function onTestSkipped(TestSkipped $event): void
     {
-        $this->writeln($event->teamcityMessage);
+        $this->writeln((string) $event->teamcityMessage);
     }
 
     public function onTestSucceeded(TestSucceeded $event): void
@@ -49,16 +49,16 @@ final class TeamcityOutput implements TestOutput
 
     public function onTestFinished(TestFinished $event): void
     {
-        $this->writeln($event->teamcityMessage);
+        $this->writeln((string) $event->teamcityMessage);
     }
 
     public function onTestRunStarted(TestRunStarted $event): void
     {
-        $this->writeln($event->teamcityMessage);
+        $this->writeln((string) $event->teamcityMessage);
     }
 
     public function onTestRunEnded(TestRunEnded $event): void
     {
-        $this->writeln($event->teamcityMessage);
+        $this->writeln((string) $event->teamcityMessage);
     }
 }

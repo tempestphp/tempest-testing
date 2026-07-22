@@ -12,6 +12,6 @@ final class JsonCommand
     #[ConsoleCommand]
     public function __invoke(): void
     {
-        $this->writeln(json_encode(['foo' => 'bar']));
+        $this->writeln(json_encode(['foo' => 'bar']) ?: '{}');
     }
 }

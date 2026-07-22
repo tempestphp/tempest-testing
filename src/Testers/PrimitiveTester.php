@@ -90,7 +90,7 @@ final readonly class PrimitiveTester
 
     public function isEqualTo(mixed $expected, ?string $reason = null, mixed ...$reasonData): self
     {
-        if ($expected != $this->subject) { // @mago-expect lint:identity-comparison
+        if (! $this->looselyEquals($expected, $this->subject)) {
             $this->fail(
                 $reason ?? '%s was not equal to expected %s',
                 ...$reasonData ?: [$this->subject, $expected],
@@ -102,7 +102,7 @@ final readonly class PrimitiveTester
 
     public function isNotEqualTo(mixed $expected, ?string $reason = null, mixed ...$reasonData): self
     {
-        if ($expected == $this->subject) { // @mago-expect lint:identity-comparison
+        if ($this->looselyEquals($expected, $this->subject)) {
             $this->fail(
                 $reason ?? '%s was equal to %s while it should not',
                 ...$reasonData ?: [$this->subject, $expected],
@@ -292,6 +292,7 @@ final readonly class PrimitiveTester
         return $this;
     }
 
+    /** @param class-string $expectedExceptionClass */
     public function exceptionThrown(
         string $expectedExceptionClass,
         ?Closure $exceptionTester = null,
@@ -309,9 +310,12 @@ final readonly class PrimitiveTester
             ($this->subject)();
         } catch (Throwable $throwable) {
             if (! $throwable instanceof $expectedExceptionClass) {
+                /** @mago-ignore analysis:no-value */
+                $actualExceptionClass = get_class($throwable);
+
                 $this->fail(
                     $reason ?? 'expected exception %s was not thrown, instead got %s',
-                    ...$reasonData ?: [$expectedExceptionClass, $throwable::class],
+                    ...$reasonData ?: [$expectedExceptionClass, $actualExceptionClass],
                 );
             }
 
@@ -328,6 +332,7 @@ final readonly class PrimitiveTester
         );
     }
 
+    /** @param class-string $expectedExceptionClass */
     public function exceptionNotThrown(string $expectedExceptionClass, ?string $reason = null, mixed ...$reasonData): self
     {
         if (! is_callable($this->subject)) {
@@ -403,8 +408,13 @@ final readonly class PrimitiveTester
     public function greaterThan(int|float $minimum, ?string $reason = null, mixed ...$reasonData): self
     {
         $this->isNumeric();
+        $subject = $this->subject;
 
-        if ($this->subject <= $minimum) {
+        if (! is_int($subject) && ! is_float($subject)) {
+            $this->fail('%s was not numeric', $subject);
+        }
+
+        if ($subject <= $minimum) {
             $this->fail(
                 $reason ?? '%s was not greater than %s',
                 ...$reasonData ?: [$this->subject, $minimum],
@@ -417,8 +427,13 @@ final readonly class PrimitiveTester
     public function greaterThanOrEqual(int|float $minimum, ?string $reason = null, mixed ...$reasonData): self
     {
         $this->isNumeric();
+        $subject = $this->subject;
 
-        if ($this->subject < $minimum) {
+        if (! is_int($subject) && ! is_float($subject)) {
+            $this->fail('%s was not numeric', $subject);
+        }
+
+        if ($subject < $minimum) {
             $this->fail(
                 $reason ?? '%s was not greater than or equal to %s',
                 ...$reasonData ?: [$this->subject, $minimum],
@@ -431,8 +446,13 @@ final readonly class PrimitiveTester
     public function lessThan(int|float $maximum, ?string $reason = null, mixed ...$reasonData): self
     {
         $this->isNumeric();
+        $subject = $this->subject;
 
-        if ($this->subject >= $maximum) {
+        if (! is_int($subject) && ! is_float($subject)) {
+            $this->fail('%s was not numeric', $subject);
+        }
+
+        if ($subject >= $maximum) {
             $this->fail(
                 $reason ?? '%s was not less than %s',
                 ...$reasonData ?: [$this->subject, $maximum],
@@ -445,8 +465,13 @@ final readonly class PrimitiveTester
     public function lessThanOrEqual(int|float $maximum, ?string $reason = null, mixed ...$reasonData): self
     {
         $this->isNumeric();
+        $subject = $this->subject;
 
-        if ($this->subject > $maximum) {
+        if (! is_int($subject) && ! is_float($subject)) {
+            $this->fail('%s was not numeric', $subject);
+        }
+
+        if ($subject > $maximum) {
             $this->fail(
                 $reason ?? '%s was not less than or equal to %s',
                 ...$reasonData ?: [$this->subject, $maximum],
@@ -502,6 +527,12 @@ final readonly class PrimitiveTester
         }
 
         return $this;
+    }
+
+    private function looselyEquals(mixed $expected, mixed $actual): bool
+    {
+        /** @mago-ignore analysis:mixed-operand */
+        return $expected == $actual; // @mago-expect lint:identity-comparison
     }
 
     public function isNull(?string $reason = null, mixed ...$reasonData): self

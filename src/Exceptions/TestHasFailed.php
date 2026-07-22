@@ -24,12 +24,18 @@ final class TestHasFailed extends Exception implements TestException
 
         $trace = $this->getTrace();
 
-        foreach ($this->getTrace() as $key => $traceEntry) {
-            if (str_starts_with($trace[$key + 1]['class'] ?? null, 'Tempest\Testing\Testers\PrimitiveTester')) {
+        foreach ($trace as $key => $traceEntry) {
+            $nextKey = is_int($key) ? $key + 1 : null;
+            $nextClass = $nextKey === null ? null : ($trace[$nextKey]['class'] ?? null);
+
+            if (is_string($nextClass) && str_starts_with($nextClass, 'Tempest\Testing\Testers\PrimitiveTester')) {
                 continue;
             }
 
-            $this->location = sprintf('%s:%d', $traceEntry['file'], $traceEntry['line']);
+            $file = is_string($traceEntry['file'] ?? null) ? $traceEntry['file'] : 'unknown';
+            $line = is_int($traceEntry['line'] ?? null) ? $traceEntry['line'] : 0;
+
+            $this->location = sprintf('%s:%d', $file, $line);
 
             break;
         }

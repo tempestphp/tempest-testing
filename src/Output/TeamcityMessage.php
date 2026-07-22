@@ -17,7 +17,7 @@ final class TeamcityMessage
         return sprintf(
             '##teamcity[%s %s]',
             $this->name->value,
-            arr($this->parameters)->map(fn (string $value, string $key) => "{$key}='{$value}'")->implode(' '),
+            arr($this->parameters)->map(fn (mixed $value, int|string $key) => "{$key}='{$value}'")->implode(' '),
         );
     }
 }

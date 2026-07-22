@@ -4,12 +4,12 @@ namespace Tempest\Testing\Console;
 
 use ArrayIterator;
 use ReflectionException;
+use ReflectionProperty;
 use Tempest\Console\ConsoleCommand;
 use Tempest\Console\HasConsole;
 use Tempest\Container\Container;
 use Tempest\Container\GenericContainer;
 use Tempest\EventBus\EventBusConfig;
-use Tempest\Reflection\ClassReflector;
 use Tempest\Testing\Actions\RunTest;
 use Tempest\Testing\Events\DispatchToParentProcessMiddleware;
 use Tempest\Testing\Test;
@@ -78,7 +78,7 @@ final class TestRunCommand
 
         $clone->singleton(Container::class, $clone);
 
-        $property = new ClassReflector($clone)->getProperty('instance');
+        $property = new ReflectionProperty($clone, 'instance');
         $property->setValue($clone, $clone);
 
         return $clone;

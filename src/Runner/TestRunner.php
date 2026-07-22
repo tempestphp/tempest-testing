@@ -8,13 +8,13 @@ use Tempest\Testing\Test;
 
 use function Tempest\EventBus\event;
 
-final readonly class TestRunner
+final class TestRunner
 {
     public function __construct(
-        private string $name = 'Default',
+        private readonly string $name = 'Default',
     ) {}
 
-    private Process $process;
+    private ?Process $process = null;
 
     /** @param ImmutableArray<array-key, \Tempest\Testing\Test> $tests */
     public function run(ImmutableArray $tests): self
@@ -30,10 +30,19 @@ final readonly class TestRunner
 
         $this->process->start(function (string $type, string $buffer) {
             foreach (explode(PHP_EOL, trim($buffer)) as $line) {
-                if (str_starts_with($line, '[EVENT]')) {
-                    $payload = '[EVENT] ' |> strlen(...) |> (fn ($x) => substr($line, $x)) |> (fn ($x) => json_decode($x, true));
+                if ($line === '') {
+                    continue;
+                }
 
-                    $event = $payload['event']::deserialize($payload['data']);
+                if (str_starts_with($line, '[EVENT]')) {
+                    $payload = json_decode(substr($line, strlen('[EVENT] ')), true);
+
+                    if (! is_array($payload) || ! is_string($payload['event'] ?? null) || ! array_key_exists('data', $payload)) {
+                        continue;
+                    }
+
+                    $eventClass = $payload['event'];
+                    $event = $eventClass::deserialize($payload['data']);
 
                     event($event);
                 } else {
@@ -47,7 +56,7 @@ final readonly class TestRunner
 
     public function wait(): self
     {
-        $this->process->wait();
+        $this->process?->wait();
 
         return $this;
     }

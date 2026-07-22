@@ -19,7 +19,7 @@ final class Test
     /** @var MethodReflector[] */
     public array $after = [];
 
-    /** @var array[] */
+    /** @var array<array-key, mixed>|null */
     public ?array $provide = null;
 
     public string $name {
@@ -39,16 +39,22 @@ final class Test
 
         $self->handler = $reflector;
 
-        $self->before = arr($reflector->getDeclaringClass()->getPublicMethods())
+        /** @var MethodReflector[] $before */
+        $before = arr($reflector->getDeclaringClass()->getPublicMethods())
             ->filter(fn (MethodReflector $otherMethod) => $otherMethod->hasAttribute(Before::class))
             ->values()
             ->toArray();
 
-        $self->after = arr($reflector->getDeclaringClass()->getPublicMethods())
+        $self->before = $before;
+
+        /** @var MethodReflector[] $after */
+        $after = arr($reflector->getDeclaringClass()->getPublicMethods())
             ->filter(fn (MethodReflector $otherMethod) => $otherMethod->hasAttribute(After::class))
             ->values()
             ->reverse()
             ->toArray();
+
+        $self->after = $after;
 
         $self->provide = $reflector->getAttribute(Provide::class)?->entries;
 

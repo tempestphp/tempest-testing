@@ -18,7 +18,7 @@ final class DispatchToParentProcessMiddleware implements EventBusMiddleware
             $payload = json_encode([
                 'event' => $event::class,
                 'data' => $event->serialize(),
-            ]);
+            ]) ?: '{}';
 
             //            echo '[EVENT] ' . $payload . PHP_EOL;
             $this->writeln('[EVENT] ' . $payload);

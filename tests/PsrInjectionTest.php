@@ -3,6 +3,7 @@
 namespace Tempest\Testing\Tests;
 
 use Psr\Container\ContainerInterface;
+use ReflectionProperty;
 use Tempest\Container\Container;
 use Tempest\Testing\Actions\RunTest;
 use Tempest\Testing\After;
@@ -10,7 +11,6 @@ use Tempest\Testing\Before;
 use Tempest\Testing\Test;
 use Tempest\Testing\Tests\Fixtures\Dependency;
 
-use function Tempest\Reflection\reflect;
 use function Tempest\Testing\test;
 
 /**
@@ -29,9 +29,8 @@ final readonly class PsrInjectionTest
 
         $container = new PsrContainer();
 
-        reflect($runTest)
-            ->getProperty('container')
-            ->setValue($runTest, $container);
+        $property = new ReflectionProperty($runTest, 'container');
+        $property->setValue($runTest, $container);
     }
 
     #[After]
@@ -39,9 +38,8 @@ final readonly class PsrInjectionTest
     {
         $runTest = $this->container->get(RunTest::class);
 
-        reflect($runTest)
-            ->getProperty('container')
-            ->setValue($runTest, $this->container);
+        $property = new ReflectionProperty($runTest, 'container');
+        $property->setValue($runTest, $this->container);
     }
 
     #[Test]

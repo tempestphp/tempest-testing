@@ -4,14 +4,13 @@ namespace Tempest\Testing\Testers\EventBus;
 
 use Closure;
 use Tempest\EventBus\EventBus;
-use Tempest\Support\Str;
 use UnitEnum;
 
 use function Tempest\Testing\test;
 
 final class EventBusTester implements EventBus
 {
-    /** @var object[][] */
+    /** @var array<string, array<object|string>> */
     private array $dispatched = [];
 
     private bool $allowPropagation = true;
@@ -22,7 +21,7 @@ final class EventBusTester implements EventBus
 
     public function dispatch(object|string $event): void
     {
-        $eventName = Str\parse($event) ?: $event::class;
+        $eventName = is_string($event) ? $event : $event::class;
 
         $this->dispatched[$eventName][] = $event;
 

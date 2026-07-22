@@ -3,12 +3,13 @@ php-version = "8.5.0"
 [source]
 paths = ["src", "tests"]
 includes = ["vendor"]
-excludes = []
+excludes = ["tests/Fixtures/phpunit_test.stub.php"]
 
 [analyzer]
 ignore = [
     "mixed-argument",
     "mixed-assignment",
+    "mixed-operand",
 ]
 excludes = []
 

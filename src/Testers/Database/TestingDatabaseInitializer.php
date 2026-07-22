@@ -32,24 +32,24 @@ final class TestingDatabaseInitializer implements DynamicInitializer
     #[Singleton]
     public function initialize(ClassReflector $class, string|UnitEnum|null $tag, Container $container): Database
     {
-        $tag = Str\parse($tag) ?? 'default';
+        $parsedTag = Str\parse($tag) ?? 'default';
 
         /** @var PDOConnection|null $connection */
-        $connection = self::$connections[$tag] ?? null;
+        $connection = self::$connections[$parsedTag] ?? null;
 
         if ($connection === null) {
-            $config = $container->get(DatabaseConfig::class, $tag === 'default' ? null : $tag);
+            $config = $container->get(DatabaseConfig::class, $parsedTag === 'default' ? null : $parsedTag);
             $connection = new PDOConnection($config);
             $connection->connect();
 
-            self::$connections[$tag] = $connection;
+            self::$connections[$parsedTag] = $connection;
         }
 
         if ($connection->ping() === false) {
             $connection->reconnect();
         }
 
-        $container->singleton(Connection::class, $connection, $tag === 'default' ? null : $tag);
+        $container->singleton(Connection::class, $connection, $parsedTag === 'default' ? null : $parsedTag);
 
         return new GenericDatabase(
             connection: $connection,

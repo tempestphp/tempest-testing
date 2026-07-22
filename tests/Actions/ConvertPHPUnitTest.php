@@ -14,6 +14,10 @@ final class ConvertPHPUnitTest
     {
         $input = file_get_contents(__DIR__ . '/../Fixtures/phpunit_test.stub.php');
 
+        if ($input === false) {
+            test()->fail('PHPUnit fixture could not be read.');
+        }
+
         test($convert($input))
             ->contains('use function Tempest\Testing\test;')
             ->contains('use Tempest\Testing\Test;')

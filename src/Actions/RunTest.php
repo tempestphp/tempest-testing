@@ -6,6 +6,7 @@ use Psr\Container\ContainerInterface;
 use Tempest\Container\Container;
 use Tempest\Container\Singleton;
 use Tempest\Reflection\MethodReflector;
+use Tempest\Reflection\ParameterReflector;
 use Tempest\Testing\Events\TestAfterExecuted;
 use Tempest\Testing\Events\TestBeforeExecuted;
 use Tempest\Testing\Events\TestFailed;
@@ -31,7 +32,9 @@ final class RunTest
 
         $providedData = [];
 
-        foreach ($test->provide ?? [[]] as $provider) {
+        $providers = $test->provide ?? [[]];
+
+        foreach ($providers as $provider) {
             if (is_array($provider)) {
                 $providedData[] = $provider;
                 continue;
@@ -51,7 +54,11 @@ final class RunTest
             }
 
             if (is_iterable($provider)) {
-                $providedData = [...$providedData, ...iterator_to_array($provider)];
+                foreach ($provider as $data) {
+                    if (is_array($data)) {
+                        $providedData[] = $data;
+                    }
+                }
             }
         }
 
@@ -107,7 +114,10 @@ final class RunTest
     private function callMethod(object $instance, MethodReflector $method, array $data = []): void
     {
         foreach ($method->getParameters() as $parameter) {
-            if (isset($data[$parameter->getName()])) {
+            /** @var ParameterReflector $parameter */
+            $parameterName = $parameter->getName();
+
+            if (isset($data[$parameterName])) {
                 continue;
             }
 
@@ -115,11 +125,19 @@ final class RunTest
                 continue;
             }
 
-            if ($parameter->getType()->isScalar()) {
+            $parameterType = $parameter->getType();
+
+            if ($parameterType->isScalar()) {
                 continue;
             }
 
-            $data[$parameter->getName()] = $this->container->get($parameter->getType()->getName());
+            $typeName = $parameterType->getName();
+
+            if (! class_exists($typeName) && ! interface_exists($typeName)) {
+                continue;
+            }
+
+            $data[$parameterName] = $this->container->get($typeName);
         }
 
         $instance->{$method->getName()}(...$data);

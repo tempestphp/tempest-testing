@@ -3,6 +3,7 @@
 namespace Tempest\Testing\Testers\Database;
 
 use Tempest\Container\Container;
+use Tempest\Database\MigratesUp;
 use Tempest\Database\Migrations\MigrationManager;
 
 use function Tempest\Database\query;
@@ -41,7 +42,15 @@ final readonly class DatabaseTester
         }
 
         foreach ($migrationClasses as $migrationClass) {
-            $migration = is_string($migrationClass) ? $this->container->get($migrationClass) : $migrationClass;
+            if (is_string($migrationClass) && class_exists($migrationClass)) {
+                $migration = $this->container->get($migrationClass);
+            } else {
+                $migration = $migrationClass;
+            }
+
+            if (! $migration instanceof MigratesUp) {
+                continue;
+            }
 
             $migrationManager->executeUp($migration);
         }
@@ -52,7 +61,7 @@ final readonly class DatabaseTester
         $select = query($table)->count();
 
         foreach ($data as $key => $value) {
-            $select->whereField($key, $value);
+            $select->whereField((string) $key, $value);
         }
 
         test($select->execute() > 0)->isTrue('Failed asserting that a row in the table %s matches the given data.', $table);
@@ -72,7 +81,7 @@ final readonly class DatabaseTester
         $select = query($table)->count();
 
         foreach ($data as $key => $value) {
-            $select->whereField($key, $value);
+            $select->whereField((string) $key, $value);
         }
 
         test($select->execute() === 0)->isTrue('Failed asserting that no row in the table %s matches the given data.', $table);

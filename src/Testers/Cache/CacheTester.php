@@ -20,8 +20,10 @@ final readonly class CacheTester
 
     public function fake(string|UnitEnum|null $tag = null): TestingCache
     {
+        $parsedTag = Str\parse($tag) ?? 'default';
+
         $cache = new TestingCache(
-            tag: Str\to_kebab_case(Str\parse($tag, default: 'default')),
+            tag: Str\to_kebab_case($parsedTag),
             clock: $this->container->get(Clock::class)->toPsrClock(),
         );
 

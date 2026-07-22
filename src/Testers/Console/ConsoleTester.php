@@ -77,16 +77,18 @@ final class ConsoleTester
 
         if ($command instanceof Closure) {
             $fiber = new Fiber(function () use ($clone, $command, $console): void {
-                $clone->exitCode = $command($console) ?? ExitCode::SUCCESS;
+                $exitCode = $command($console) ?? ExitCode::SUCCESS;
+                $clone->exitCode = $exitCode instanceof ExitCode ? $exitCode : ExitCode::SUCCESS;
             });
         } else {
             $fiber = new Fiber(function () use ($command, $arguments, $clone): void {
                 $clone->container->singleton(ConsoleArgumentBag::class, new ConsoleArgumentBag(['tempest']));
-                $clone->exitCode = $this->container->invoke(
+                $exitCode = $this->container->invoke(
                     ExecuteConsoleCommand::class,
                     command: $command,
                     arguments: $arguments,
                 );
+                $clone->exitCode = $exitCode instanceof ExitCode ? $exitCode : ExitCode::SUCCESS;
             });
         }
 
@@ -117,9 +119,9 @@ final class ConsoleTester
 
     public function input(int|string|Key $input): self
     {
-        $this->output->clear();
+        $this->outputBuffer()->clear();
 
-        $this->input->add($input);
+        $this->inputBuffer()->add($input);
 
         return $this;
     }
@@ -146,26 +148,28 @@ final class ConsoleTester
     public function print(): self
     {
         echo 'OUTPUT:' . PHP_EOL;
-        echo $this->output->asUnformattedString();
+        echo $this->outputBuffer()->asUnformattedString();
 
         return $this;
     }
 
     public function printFormatted(): self
     {
-        echo $this->output->asFormattedString();
+        echo $this->outputBuffer()->asFormattedString();
 
         return $this;
     }
 
     public function getBuffer(?callable $callback = null): array
     {
-        $buffer = array_map('trim', $this->output->getBufferWithoutFormatting());
+        $buffer = array_map('trim', $this->outputBuffer()->getBufferWithoutFormatting());
 
-        $this->output->clear();
+        $this->outputBuffer()->clear();
 
         if ($callback !== null) {
-            return $callback($buffer);
+            $result = $callback($buffer);
+
+            return is_array($result) ? $result : [$result];
         }
 
         return $buffer;
@@ -185,17 +189,14 @@ final class ConsoleTester
 
     public function assertSeeCount(string $text, int $expectedCount): self
     {
-        $actualCount = substr_count($this->output->asUnformattedString(), $text);
+        $actualCount = substr_count($this->outputBuffer()->asUnformattedString(), $text);
 
-        Assert::assertSame(
+        test($actualCount)->is(
             $expectedCount,
-            $actualCount,
-            sprintf(
-                'Failed to assert that console output counted: %s exactly %d times. These lines were printed: %s',
-                $text,
-                $expectedCount,
-                PHP_EOL . PHP_EOL . $this->output->asUnformattedString() . PHP_EOL,
-            ),
+            'Failed to assert that console output counted: %s exactly %s times. These lines were printed: %s',
+            $text,
+            $expectedCount,
+            PHP_EOL . PHP_EOL . $this->outputBuffer()->asUnformattedString() . PHP_EOL,
         );
 
         return $this;
@@ -208,7 +209,7 @@ final class ConsoleTester
 
     public function contains(string $text): self
     {
-        test($this->output->asUnformattedString())
+        test($this->outputBuffer()->asUnformattedString())
             ->contains($text, 'console output did not contain: %s', $text);
 
         return $this;
@@ -216,7 +217,7 @@ final class ConsoleTester
 
     public function containsNot(string $text): self
     {
-        test($this->output->asUnformattedString())
+        test($this->outputBuffer()->asUnformattedString())
             ->containsNot($text, "console output contained %s while it shouldn't", $text);
 
         return $this;
@@ -224,14 +225,11 @@ final class ConsoleTester
 
     public function assertContainsFormattedText(string $text): self
     {
-        Assert::assertStringContainsString(
+        test($this->outputBuffer()->asFormattedString())->contains(
             $text,
-            $this->output->asFormattedString(),
-            sprintf(
-                'Failed to assert that console output included formatted text: %s. These lines were printed: %s',
-                $text,
-                PHP_EOL . $this->output->asFormattedString(),
-            ),
+            'Failed to assert that console output included formatted text: %s. These lines were printed: %s',
+            $text,
+            PHP_EOL . $this->outputBuffer()->asFormattedString(),
         );
 
         return $this;
@@ -239,7 +237,7 @@ final class ConsoleTester
 
     public function isJson(): self
     {
-        test($this->output->asUnformattedString())->isJson();
+        test($this->outputBuffer()->asUnformattedString())->isJson();
 
         return $this;
     }
@@ -297,8 +295,26 @@ final class ConsoleTester
 
     public function dd(): self
     {
-        ld($this->output->asUnformattedString());
+        ld($this->outputBuffer()->asUnformattedString());
 
         return $this;
+    }
+
+    private function outputBuffer(): OutputBuffer&MemoryOutputBuffer
+    {
+        if ($this->output === null) {
+            $this->output = new MemoryOutputBuffer();
+        }
+
+        return $this->output;
+    }
+
+    private function inputBuffer(): InputBuffer&MemoryInputBuffer
+    {
+        if ($this->input === null) {
+            $this->input = new MemoryInputBuffer();
+        }
+
+        return $this->input;
     }
 }
