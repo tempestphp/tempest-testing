@@ -1,6 +1,6 @@
 tempest/testing is a fast test runner for modern PHP projects.
 
-## Exmaples
+## Examples
 
 ### A fluent testing API
 
