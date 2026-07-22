@@ -90,7 +90,7 @@ final readonly class PrimitiveTester
 
     public function isEqualTo(mixed $expected, ?string $reason = null, mixed ...$reasonData): self
     {
-        if ($expected != $this->subject) {
+        if ($expected != $this->subject) { // @mago-expect lint:identity-comparison
             $this->fail(
                 $reason ?? '%s was not equal to expected %s',
                 ...$reasonData ?: [$this->subject, $expected],
@@ -102,7 +102,7 @@ final readonly class PrimitiveTester
 
     public function isNotEqualTo(mixed $expected, ?string $reason = null, mixed ...$reasonData): self
     {
-        if ($expected == $this->subject) {
+        if ($expected == $this->subject) { // @mago-expect lint:identity-comparison
             $this->fail(
                 $reason ?? '%s was equal to %s while it should not',
                 ...$reasonData ?: [$this->subject, $expected],
@@ -378,7 +378,7 @@ final readonly class PrimitiveTester
 
     public function isEmpty(?string $reason = null, mixed ...$reasonData): self
     {
-        if (! empty($this->subject)) {
+        if (! empty($this->subject)) { // @mago-expect lint:no-empty
             $this->fail(
                 $reason ?? '%s was not empty',
                 ...$reasonData ?: [$this->subject],
@@ -390,7 +390,7 @@ final readonly class PrimitiveTester
 
     public function isNotEmpty(?string $reason = null, mixed ...$reasonData): self
     {
-        if (empty($this->subject)) {
+        if (empty($this->subject)) { // @mago-expect lint:no-empty
             $this->fail(
                 $reason ?? '%s was empty while it should not',
                 ...$reasonData ?: [$this->subject],

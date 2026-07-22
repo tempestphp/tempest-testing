@@ -10,9 +10,7 @@ final class ConvertPHPUnit
     {
         $string = str($input)
             // Add uses
-            ->replaceRegex('/namespace [\w\\\\]+;\s/', function (array $match) {
-                return $match[0] . PHP_EOL . 'use function Tempest\Testing\test;' . PHP_EOL . 'use Tempest\Testing\Test;';
-            })
+            ->replaceRegex('/namespace [\w\\\\]+;\s/', fn (array $match) => $match[0] . PHP_EOL . 'use function Tempest\Testing\test;' . PHP_EOL . 'use Tempest\Testing\Test;')
             // Remove extends from PHPUnit test classes
             ->replaceRegex('/extends [\w]+/', '');
 
@@ -24,14 +22,12 @@ final class ConvertPHPUnit
         foreach ($expectedActualPatterns as $original => $method) {
             $string = $string->replaceRegex(
                 '/\$this->' . $original . '\(\s*(?<expected>.*?),\s*(?<actual>.*?)\s*\)\s*;/',
-                function (array $match) use ($method) {
-                    return sprintf(
-                        'test(%s)->%s(%s);',
-                        $match['actual'],
-                        $method,
-                        $match['expected'],
-                    );
-                },
+                fn (array $match) => sprintf(
+                    'test(%s)->%s(%s);',
+                    $match['actual'],
+                    $method,
+                    $match['expected'],
+                ),
             );
         }
 

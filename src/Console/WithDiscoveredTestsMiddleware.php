@@ -10,7 +10,6 @@ use Tempest\Container\Container;
 use Tempest\Discovery\BootDiscovery;
 use Tempest\Discovery\Composer;
 use Tempest\Discovery\DiscoveryLocation;
-use Tempest\Support\Namespace\Psr4Namespace;
 use Tempest\Testing\Discovery\TestDiscovery;
 
 use function Tempest\Support\arr;
@@ -32,7 +31,7 @@ final readonly class WithDiscoveredTestsMiddleware implements ConsoleMiddleware
             discoveryLocations: arr($this->composer->devNamespaces)
                 ->add($this->composer->mainNamespace)
                 ->filter()
-                ->map(fn (Psr4Namespace $namespace) => DiscoveryLocation::fromNamespace($namespace))
+                ->map(DiscoveryLocation::fromNamespace(...))
                 ->toArray(),
         );
 

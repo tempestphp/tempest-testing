@@ -22,12 +22,14 @@ final class TestDiscovery implements Discovery
     public function discover(DiscoveryLocation $location, ClassReflector $class): void
     {
         foreach ($class->getPublicMethods() as $method) {
-            if ($method->hasAttribute(Test::class)) {
-                $this->discoveryItems->add(
-                    $location,
-                    Test::fromReflector($method),
-                );
+            if (! $method->hasAttribute(Test::class)) {
+                continue;
             }
+
+            $this->discoveryItems->add(
+                $location,
+                Test::fromReflector($method),
+            );
         }
     }
 

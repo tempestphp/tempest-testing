@@ -2,7 +2,6 @@
 
 namespace Tempest\Testing\Exceptions;
 
-use BackedEnum;
 use Exception;
 use UnitEnum;
 

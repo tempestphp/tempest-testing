@@ -32,7 +32,7 @@ final class TestingDatabaseInitializer implements DynamicInitializer
     #[Singleton]
     public function initialize(ClassReflector $class, string|UnitEnum|null $tag, Container $container): Database
     {
-        $tag = Str\parse($tag, default: 'default');
+        $tag = Str\parse($tag) ?? 'default';
 
         /** @var PDOConnection|null $connection */
         $connection = self::$connections[$tag] ?? null;

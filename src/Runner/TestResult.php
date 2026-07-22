@@ -14,7 +14,7 @@ final class TestResult
     private ?float $endTime = null;
 
     public float $elapsedTime {
-        get => round($this->endTime - $this->startTime, 2);
+        get => round(($this->endTime ?? 0) - ($this->startTime ?? 0), 2);
     }
 
     public function startTime(): self

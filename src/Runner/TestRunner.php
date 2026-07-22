@@ -31,7 +31,7 @@ final readonly class TestRunner
         $this->process->start(function (string $type, string $buffer) {
             foreach (explode(PHP_EOL, trim($buffer)) as $line) {
                 if (str_starts_with($line, '[EVENT]')) {
-                    $payload = json_decode(substr($line, strlen('[EVENT] ')), true);
+                    $payload = '[EVENT] ' |> strlen(...) |> (fn ($x) => substr($line, $x)) |> (fn ($x) => json_decode($x, true));
 
                     $event = $payload['event']::deserialize($payload['data']);
 

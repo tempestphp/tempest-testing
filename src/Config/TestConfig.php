@@ -2,7 +2,6 @@
 
 namespace Tempest\Testing\Config;
 
-use Tempest\Reflection\MethodReflector;
 use Tempest\Testing\Test;
 
 final class TestConfig

@@ -9,11 +9,10 @@ use Tempest\Console\HasConsole;
 use Tempest\Container\Container;
 use Tempest\Container\GenericContainer;
 use Tempest\EventBus\EventBusConfig;
+use Tempest\Reflection\ClassReflector;
 use Tempest\Testing\Actions\RunTest;
 use Tempest\Testing\Events\DispatchToParentProcessMiddleware;
 use Tempest\Testing\Test;
-
-use function Tempest\Reflection\reflect;
 
 final class TestRunCommand
 {
@@ -79,7 +78,7 @@ final class TestRunCommand
 
         $clone->singleton(Container::class, $clone);
 
-        $property = reflect($clone)->getProperty('instance');
+        $property = new ClassReflector($clone)->getProperty('instance');
         $property->setValue($clone, $clone);
 
         return $clone;
