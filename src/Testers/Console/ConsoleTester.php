@@ -225,12 +225,13 @@ final class ConsoleTester
 
     public function assertContainsFormattedText(string $text): self
     {
-        test($this->outputBuffer()->asFormattedString())->contains(
-            $text,
-            'Failed to assert that console output included formatted text: %s. These lines were printed: %s',
-            $text,
-            PHP_EOL . $this->outputBuffer()->asFormattedString(),
-        );
+        test($this->outputBuffer()->asFormattedString())
+            ->contains(
+                $text,
+                'Failed to assert that console output included formatted text: %s. These lines were printed: %s',
+                $text,
+                PHP_EOL . $this->outputBuffer()->asFormattedString(),
+            );
 
         return $this;
     }

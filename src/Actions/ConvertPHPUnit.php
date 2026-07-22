@@ -10,7 +10,10 @@ final class ConvertPHPUnit
     {
         $string = str($input)
             // Add uses
-            ->replaceRegex('/namespace [\w\\\\]+;\s/', fn (array $match) => (string) $match[0] . PHP_EOL . 'use function Tempest\Testing\test;' . PHP_EOL . 'use Tempest\Testing\Test;')
+            ->replaceRegex(
+                '/namespace [\w\\\\]+;\s/',
+                fn (array $match) => (string) $match[0] . PHP_EOL . 'use function Tempest\Testing\test;' . PHP_EOL . 'use Tempest\Testing\Test;',
+            )
             // Remove extends from PHPUnit test classes
             ->replaceRegex('/extends [\w]+/', '');
 

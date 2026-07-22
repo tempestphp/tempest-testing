@@ -26,7 +26,7 @@ final class TestHasFailed extends Exception implements TestException
 
         foreach ($trace as $key => $traceEntry) {
             $nextKey = is_int($key) ? $key + 1 : null;
-            $nextClass = $nextKey === null ? null : ($trace[$nextKey]['class'] ?? null);
+            $nextClass = $nextKey === null ? null : $trace[$nextKey]['class'] ?? null;
 
             if (is_string($nextClass) && str_starts_with($nextClass, 'Tempest\Testing\Testers\PrimitiveTester')) {
                 continue;

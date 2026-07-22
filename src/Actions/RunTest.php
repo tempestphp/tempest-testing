@@ -55,9 +55,11 @@ final class RunTest
 
             if (is_iterable($provider)) {
                 foreach ($provider as $data) {
-                    if (is_array($data)) {
-                        $providedData[] = $data;
+                    if (! is_array($data)) {
+                        continue;
                     }
+
+                    $providedData[] = $data;
                 }
             }
         }
