@@ -10,12 +10,9 @@ use Tempest\Support\Arr\ImmutableArray;
 use Tempest\Testing\Actions\ChunkAndRunTests;
 use Tempest\Testing\Config\TestConfig;
 use Tempest\Testing\Events\TestSkipped;
-use Tempest\Testing\Output\DefaultOutput;
-use Tempest\Testing\Output\TeamcityOutput;
-use Tempest\Testing\Output\TestOutput;
 use Tempest\Testing\Runner\TestResult;
 use Tempest\Testing\Test;
-use function Tempest\event;
+use function Tempest\EventBus\event;
 use function Tempest\Support\arr;
 
 final class TestCommand

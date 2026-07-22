@@ -7,8 +7,12 @@
         "tempest/core":  "*",
         "tempest/event-bus":  "*",
         "tempest/console": "*",
-        "symfony/process": "^7.3",
-        "psr/container": "^2.0"
+        "psr/container": "^2.0",
+        "symfony/process": "^7.4"
+    },
+    "require-dev": {
+        "tempest/framework": "^3.16",
+        "carthage-software/mago": "^1.44"
     },
     "autoload": {
         "psr-4": {
@@ -24,6 +28,19 @@
         }
     },
     "scripts":{
-        "qa": "@php tempest test"
+        "fmt": "vendor/bin/mago fmt",
+        "lint": "vendor/bin/mago lint --reporting-format=rich && vendor/bin/mago lint --fix --format-after-fix",
+        "analyse": "vendor/bin/mago analyse --baseline=mago-baseline.toml",
+        "test": "@php tempest test",
+        "qa": [
+            "composer fmt",
+            "composer lint",
+            "composer analyse",
+            "composer test"
+        ],
+        "github:lint": "vendor/bin/mago lint --potentially-unsafe --minimum-fail-level=note --reporting-format=github",
+        "github:fmt": "vendor/bin/mago fmt --check",
+        "github:analyse": "vendor/bin/mago analyse --baseline=mago-baseline.toml",
+        "github:test": "vendor/bin/phpunit"
     }
 }
