@@ -19,7 +19,7 @@ final class TestSkipped implements ConvertsToTeamcityMessage
             TeamcityMessageName::TEST_IGNORED,
             [
                 'name' => $this->name,
-            ]
+            ],
         );
     }
 }

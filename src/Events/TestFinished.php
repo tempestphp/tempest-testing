@@ -19,7 +19,7 @@ final class TestFinished implements DispatchToParentProcess, ConvertsToTeamcityM
             TeamcityMessageName::TEST_FINISHED,
             [
                 'name' => $this->name,
-            ]
+            ],
         );
     }
 

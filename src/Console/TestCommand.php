@@ -12,6 +12,7 @@ use Tempest\Testing\Config\TestConfig;
 use Tempest\Testing\Events\TestSkipped;
 use Tempest\Testing\Runner\TestResult;
 use Tempest\Testing\Test;
+
 use function Tempest\EventBus\event;
 use function Tempest\Support\arr;
 
@@ -40,9 +41,8 @@ final class TestCommand
         bool $verbose = false,
         #[ConsoleArgument(description: 'Use teamcity output format')]
         bool $teamcity = false,
-    ): void
-    {
-        new ChunkAndRunTests()(
+    ): void {
+        (new ChunkAndRunTests())(
             tests: $this->getTests($filter),
             processes: $processes,
         );

@@ -17,6 +17,7 @@ use Tempest\Console\Output\MemoryOutputBuffer;
 use Tempest\Console\OutputBuffer;
 use Tempest\Container\Container;
 use Tempest\Highlight\Highlighter;
+
 use function Tempest\Testing\test;
 
 final class ConsoleTester

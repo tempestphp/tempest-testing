@@ -4,6 +4,7 @@ namespace Tempest\Testing\Testers\Database;
 
 use Tempest\Container\Container;
 use Tempest\Database\Migrations\MigrationManager;
+
 use function Tempest\Database\query;
 use function Tempest\Testing\test;
 

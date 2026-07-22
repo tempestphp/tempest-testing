@@ -4,6 +4,7 @@ namespace Tempest\Testing\Testers\Console;
 
 use Tempest\Console\ExitCode;
 use Tempest\Testing\Test;
+
 use function Tempest\Testing\test;
 
 final class ConsoleTesterTest
@@ -14,21 +15,24 @@ final class ConsoleTesterTest
     public function succeeds(): void
     {
         test(fn () => $this->console->call('')->succeeds())->succeeds();
-        test(fn () => $this->console->call('unknown')->succeeds())->fails('console exit code did not match expected `Tempest\\Console\\ExitCode::SUCCESS`, instead got `Tempest\\Console\\ExitCode::ERROR`');
+        test(fn () => $this->console->call('unknown')->succeeds())
+            ->fails('console exit code did not match expected `Tempest\\Console\\ExitCode::SUCCESS`, instead got `Tempest\\Console\\ExitCode::ERROR`');
     }
 
     #[Test]
     public function hasExitCode(): void
     {
         test(fn () => $this->console->call('')->hasExitCode(ExitCode::SUCCESS))->succeeds();
-        test(fn () => $this->console->call('unknown')->hasExitCode(ExitCode::SUCCESS))->fails('console exit code did not match expected `Tempest\\Console\\ExitCode::SUCCESS`, instead got `Tempest\\Console\\ExitCode::ERROR`');
+        test(fn () => $this->console->call('unknown')->hasExitCode(ExitCode::SUCCESS))
+            ->fails('console exit code did not match expected `Tempest\\Console\\ExitCode::SUCCESS`, instead got `Tempest\\Console\\ExitCode::ERROR`');
     }
 
     #[Test]
     public function fails(): void
     {
         test(fn () => $this->console->call('unknown')->fails())->succeeds();
-        test(fn () => $this->console->call('')->fails())->fails('console exit code did not match expected `Tempest\\Console\\ExitCode::ERROR`, instead got `Tempest\\Console\\ExitCode::SUCCESS`');
+        test(fn () => $this->console->call('')->fails())
+            ->fails('console exit code did not match expected `Tempest\\Console\\ExitCode::ERROR`, instead got `Tempest\\Console\\ExitCode::SUCCESS`');
     }
 
     #[Test]

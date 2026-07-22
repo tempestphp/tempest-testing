@@ -5,9 +5,9 @@ namespace Tempest\Testing\Testers\Database;
 use RuntimeException;
 use Tempest\Container\Container;
 use Tempest\Container\GenericContainer;
+use Tempest\Database\Connection\Connection;
 use Tempest\Database\Database;
 use Tempest\Database\DatabaseInitializer;
-use Tempest\Database\Connection\Connection;
 use Tempest\Testing\After;
 use Tempest\Testing\Before;
 

@@ -9,6 +9,7 @@ use Tempest\Testing\After;
 use Tempest\Testing\Before;
 use Tempest\Testing\Test;
 use Tempest\Testing\Tests\Fixtures\Dependency;
+
 use function Tempest\Reflection\reflect;
 use function Tempest\Testing\test;
 

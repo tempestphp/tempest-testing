@@ -5,11 +5,14 @@ namespace Tempest\Testing\Runner;
 use Symfony\Component\Process\Process;
 use Tempest\Support\Arr\ImmutableArray;
 use Tempest\Testing\Test;
+
 use function Tempest\EventBus\event;
 
 final readonly class TestRunner
 {
-    public function __construct(private string $name = 'Default') {}
+    public function __construct(
+        private string $name = 'Default',
+    ) {}
 
     private Process $process;
 
@@ -22,7 +25,7 @@ final readonly class TestRunner
             PHP_BINDIR . '/php',
             'tempest',
             'test:run',
-            ...$tests
+            ...$tests,
         ]);
 
         $this->process->start(function (string $type, string $buffer) {

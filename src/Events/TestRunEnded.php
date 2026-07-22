@@ -15,7 +15,7 @@ final class TestRunEnded implements ConvertsToTeamcityMessage
             TeamcityMessageName::TEST_SWEET_FINISHED,
             [
                 'name' => 'Default',
-            ]
+            ],
         );
     }
 }

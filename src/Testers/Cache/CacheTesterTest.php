@@ -6,6 +6,7 @@ use Tempest\Cache\Cache;
 use Tempest\Cache\CacheUsageWasForbidden;
 use Tempest\Container\Container;
 use Tempest\Testing\Test;
+
 use function Tempest\Testing\test;
 
 final class CacheTesterTest

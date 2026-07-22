@@ -1,8 +1,6 @@
 <?php
 
-namespace Tempest\Testing
-{
-
+namespace Tempest\Testing {
     use Tempest\Testing\Testers\PrimitiveTester;
 
     function test(mixed $subject = null): PrimitiveTester

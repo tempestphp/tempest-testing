@@ -24,7 +24,7 @@ final class TestFailed implements DispatchToParentProcess, ConvertsToTeamcityMes
                 'name' => $this->name,
                 'message' => $this->reason,
                 'details' => $this->location,
-            ]
+            ],
         );
     }
 

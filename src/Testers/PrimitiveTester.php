@@ -5,6 +5,7 @@ namespace Tempest\Testing\Testers;
 use Closure;
 use Tempest\Testing\Exceptions\TestHasFailed;
 use Throwable;
+
 use function Tempest\Testing\test;
 
 final readonly class PrimitiveTester
@@ -63,11 +64,12 @@ final readonly class PrimitiveTester
     {
         if ($expected !== $this->subject) {
             $this->fail(
-                $reason ?? "%s was not expected %s",
-                ...($reasonData ?: [
+                $reason ?? '%s was not expected %s',
+                ...$reasonData
+                ?: [
                     $this->subject,
                     $expected,
-                ]),
+                ],
             );
         }
 
@@ -78,8 +80,8 @@ final readonly class PrimitiveTester
     {
         if ($expected === $this->subject) {
             $this->fail(
-                $reason ?? "%s was expected not to be %s",
-                ...($reasonData ?: [$this->subject, $expected]),
+                $reason ?? '%s was expected not to be %s',
+                ...$reasonData ?: [$this->subject, $expected],
             );
         }
 
@@ -90,8 +92,8 @@ final readonly class PrimitiveTester
     {
         if ($expected != $this->subject) {
             $this->fail(
-                $reason ?? "%s was not equal to expected %s",
-                ...($reasonData ?: [$this->subject, $expected]),
+                $reason ?? '%s was not equal to expected %s',
+                ...$reasonData ?: [$this->subject, $expected],
             );
         }
 
@@ -102,8 +104,8 @@ final readonly class PrimitiveTester
     {
         if ($expected == $this->subject) {
             $this->fail(
-                $reason ?? "%s was equal to %s while it should not",
-                ...($reasonData ?: [$this->subject, $expected]),
+                $reason ?? '%s was equal to %s while it should not',
+                ...$reasonData ?: [$this->subject, $expected],
             );
         }
 
@@ -114,8 +116,8 @@ final readonly class PrimitiveTester
     {
         if (! is_callable($this->subject)) {
             $this->fail(
-                $reason ?? "%s was not callable",
-                ...($reasonData ?: [$this->subject]),
+                $reason ?? '%s was not callable',
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -127,7 +129,7 @@ final readonly class PrimitiveTester
         if (is_callable($this->subject)) {
             $this->fail(
                 $reason ?? '%s was callable while it should not',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -140,8 +142,8 @@ final readonly class PrimitiveTester
 
         if ($expected !== count($this->subject)) {
             $this->fail(
-                $reason ?? "%s did not have expected %s items",
-                ...($reasonData ?: [$this->subject, $expected]),
+                $reason ?? '%s did not have expected %s items',
+                ...$reasonData ?: [$this->subject, $expected],
             );
         }
 
@@ -154,8 +156,8 @@ final readonly class PrimitiveTester
 
         if ($expected === count($this->subject)) {
             $this->fail(
-                $reason ?? "%s had %s items while it should not",
-                ...($reasonData ?: [$this->subject, $expected]),
+                $reason ?? '%s had %s items while it should not',
+                ...$reasonData ?: [$this->subject, $expected],
             );
         }
 
@@ -166,8 +168,8 @@ final readonly class PrimitiveTester
     {
         if (! is_countable($this->subject)) {
             $this->fail(
-                $reason ?? "%s was not countable",
-                ...($reasonData ?: [$this->subject]),
+                $reason ?? '%s was not countable',
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -179,7 +181,7 @@ final readonly class PrimitiveTester
         if (is_countable($this->subject)) {
             $this->fail(
                 $reason ?? '%s was countable while it should not',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -191,21 +193,21 @@ final readonly class PrimitiveTester
         if (! is_string($this->subject) && ! is_array($this->subject)) {
             $this->fail(
                 $reason ?? 'to check contains, the test subject must be a string or an array; instead got %s',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
         if (is_string($this->subject) && ! str_contains($this->subject, $search)) {
             $this->fail(
-                $reason ?? "%s did not contain expected %s",
-                ...($reasonData ?: [$this->subject, $search]),
+                $reason ?? '%s did not contain expected %s',
+                ...$reasonData ?: [$this->subject, $search],
             );
         }
 
         if (is_array($this->subject) && ! in_array($search, $this->subject)) {
             $this->fail(
-                $reason ?? "%s did not contain expected %s",
-                ...($reasonData ?: [$this->subject, $search]),
+                $reason ?? '%s did not contain expected %s',
+                ...$reasonData ?: [$this->subject, $search],
             );
         }
 
@@ -217,21 +219,21 @@ final readonly class PrimitiveTester
         if (! is_string($this->subject) && ! is_array($this->subject)) {
             $this->fail(
                 $reason ?? 'to check contains, the test subject must be a string or an array; instead got %s',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
         if (is_string($this->subject) && str_contains($this->subject, $search)) {
             $this->fail(
-                $reason ?? "%s contained %s while it should not",
-                ...($reasonData ?: [$this->subject, $search]),
+                $reason ?? '%s contained %s while it should not',
+                ...$reasonData ?: [$this->subject, $search],
             );
         }
 
         if (is_array($this->subject) && in_array($search, $this->subject)) {
             $this->fail(
-                $reason ?? "%s contained %s while it should not",
-                ...($reasonData ?: [$this->subject, $search]),
+                $reason ?? '%s contained %s while it should not',
+                ...$reasonData ?: [$this->subject, $search],
             );
         }
 
@@ -244,8 +246,8 @@ final readonly class PrimitiveTester
 
         if (! array_key_exists($key, $this->subject)) {
             $this->fail(
-                $reason ?? "%s did not have key %s",
-                ...($reasonData ?: [$this->subject, $key]),
+                $reason ?? '%s did not have key %s',
+                ...$reasonData ?: [$this->subject, $key],
             );
         }
 
@@ -258,8 +260,8 @@ final readonly class PrimitiveTester
 
         if (array_key_exists($key, $this->subject)) {
             $this->fail(
-                $reason ?? "%s had key %s while it should not",
-                ...($reasonData ?: [$this->subject, $key]),
+                $reason ?? '%s had key %s while it should not',
+                ...$reasonData ?: [$this->subject, $key],
             );
         }
 
@@ -270,8 +272,8 @@ final readonly class PrimitiveTester
     {
         if (! $this->subject instanceof $expectedClass) {
             $this->fail(
-                $reason ?? "%s was not an instance of %s",
-                ...($reasonData ?: [$this->subject, $expectedClass]),
+                $reason ?? '%s was not an instance of %s',
+                ...$reasonData ?: [$this->subject, $expectedClass],
             );
         }
 
@@ -282,8 +284,8 @@ final readonly class PrimitiveTester
     {
         if ($this->subject instanceof $expectedClass) {
             $this->fail(
-                $reason ?? "%s was an instance of %s while it should not",
-                ...($reasonData ?: [$this->subject, $expectedClass]),
+                $reason ?? '%s was an instance of %s while it should not',
+                ...$reasonData ?: [$this->subject, $expectedClass],
             );
         }
 
@@ -294,13 +296,12 @@ final readonly class PrimitiveTester
         string $expectedExceptionClass,
         ?Closure $exceptionTester = null,
         ?string $reason = null,
-        mixed ...$reasonData
-    ): self
-    {
+        mixed ...$reasonData,
+    ): self {
         if (! is_callable($this->subject)) {
             $this->fail(
                 $reason ?? 'to test exceptions, the test subject must be a callable; instead got %s',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -309,8 +310,8 @@ final readonly class PrimitiveTester
         } catch (Throwable $throwable) {
             if (! $throwable instanceof $expectedExceptionClass) {
                 $this->fail(
-                    $reason ?? "expected exception %s was not thrown, instead got %s",
-                    ...($reasonData ?: [$expectedExceptionClass, $throwable::class]),
+                    $reason ?? 'expected exception %s was not thrown, instead got %s',
+                    ...$reasonData ?: [$expectedExceptionClass, $throwable::class],
                 );
             }
 
@@ -322,8 +323,8 @@ final readonly class PrimitiveTester
         }
 
         $this->fail(
-            $reason ?? "expected exception %s was not thrown",
-            ...($reasonData ?: [$expectedExceptionClass]),
+            $reason ?? 'expected exception %s was not thrown',
+            ...$reasonData ?: [$expectedExceptionClass],
         );
     }
 
@@ -338,8 +339,8 @@ final readonly class PrimitiveTester
         } catch (Throwable $throwable) {
             if ($throwable instanceof $expectedExceptionClass) {
                 $this->fail(
-                    $reason ?? "exception %s was thrown while it should not",
-                    ...($reasonData ?: [$throwable::class]),
+                    $reason ?? 'exception %s was thrown while it should not',
+                    ...$reasonData ?: [$throwable::class],
                 );
             }
         }
@@ -354,7 +355,7 @@ final readonly class PrimitiveTester
         if (! array_is_list($this->subject)) {
             $this->fail(
                 $reason ?? '%s was not a list',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -368,7 +369,7 @@ final readonly class PrimitiveTester
         if (array_is_list($this->subject)) {
             $this->fail(
                 $reason ?? '%s was a list while it should not',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -380,7 +381,7 @@ final readonly class PrimitiveTester
         if (! empty($this->subject)) {
             $this->fail(
                 $reason ?? '%s was not empty',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -392,7 +393,7 @@ final readonly class PrimitiveTester
         if (empty($this->subject)) {
             $this->fail(
                 $reason ?? '%s was empty while it should not',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -406,7 +407,7 @@ final readonly class PrimitiveTester
         if ($this->subject <= $minimum) {
             $this->fail(
                 $reason ?? '%s was not greater than %s',
-                ...($reasonData ?: [$this->subject, $minimum]),
+                ...$reasonData ?: [$this->subject, $minimum],
             );
         }
 
@@ -420,7 +421,7 @@ final readonly class PrimitiveTester
         if ($this->subject < $minimum) {
             $this->fail(
                 $reason ?? '%s was not greater than or equal to %s',
-                ...($reasonData ?: [$this->subject, $minimum]),
+                ...$reasonData ?: [$this->subject, $minimum],
             );
         }
 
@@ -434,7 +435,7 @@ final readonly class PrimitiveTester
         if ($this->subject >= $maximum) {
             $this->fail(
                 $reason ?? '%s was not less than %s',
-                ...($reasonData ?: [$this->subject, $maximum]),
+                ...$reasonData ?: [$this->subject, $maximum],
             );
         }
 
@@ -448,7 +449,7 @@ final readonly class PrimitiveTester
         if ($this->subject > $maximum) {
             $this->fail(
                 $reason ?? '%s was not less than or equal to %s',
-                ...($reasonData ?: [$this->subject, $maximum]),
+                ...$reasonData ?: [$this->subject, $maximum],
             );
         }
 
@@ -460,7 +461,7 @@ final readonly class PrimitiveTester
         if ($this->subject !== true) {
             $this->fail(
                 $reason ?? '%s was not true',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -472,7 +473,7 @@ final readonly class PrimitiveTester
         if ($this->subject !== false) {
             $this->fail(
                 $reason ?? '%s was not false',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -481,10 +482,10 @@ final readonly class PrimitiveTester
 
     public function isTrueish(?string $reason = null, mixed ...$reasonData): self
     {
-        if (((bool)$this->subject) !== true) {
+        if ((bool) $this->subject !== true) {
             $this->fail(
                 $reason ?? '%s was not trueish',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -493,10 +494,10 @@ final readonly class PrimitiveTester
 
     public function isFalseish(?string $reason = null, mixed ...$reasonData): self
     {
-        if (((bool)$this->subject) !== false) {
+        if ((bool) $this->subject !== false) {
             $this->fail(
                 $reason ?? '%s was not falseish',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -508,7 +509,7 @@ final readonly class PrimitiveTester
         if (! is_null($this->subject)) {
             $this->fail(
                 $reason ?? '%s was not null',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -519,8 +520,8 @@ final readonly class PrimitiveTester
     {
         if (is_null($this->subject)) {
             $this->fail(
-                $reason ?? "%s was null while it should not",
-                ...($reasonData ?: [$this->subject]),
+                $reason ?? '%s was null while it should not',
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -532,7 +533,7 @@ final readonly class PrimitiveTester
         if (! is_array($this->subject)) {
             $this->fail(
                 $reason ?? '%s was not array',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -544,7 +545,7 @@ final readonly class PrimitiveTester
         if (is_array($this->subject)) {
             $this->fail(
                 $reason ?? '%s was array while it should not',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -556,7 +557,7 @@ final readonly class PrimitiveTester
         if (! is_bool($this->subject)) {
             $this->fail(
                 $reason ?? '%s was not bool',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -568,7 +569,7 @@ final readonly class PrimitiveTester
         if (is_bool($this->subject)) {
             $this->fail(
                 $reason ?? '%s was bool while it should not',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -580,7 +581,7 @@ final readonly class PrimitiveTester
         if (! is_float($this->subject)) {
             $this->fail(
                 $reason ?? '%s was not float',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -592,7 +593,7 @@ final readonly class PrimitiveTester
         if (is_float($this->subject)) {
             $this->fail(
                 $reason ?? '%s was float while it should not',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -604,7 +605,7 @@ final readonly class PrimitiveTester
         if (! is_int($this->subject)) {
             $this->fail(
                 $reason ?? '%s was not int',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -616,7 +617,7 @@ final readonly class PrimitiveTester
         if (is_int($this->subject)) {
             $this->fail(
                 $reason ?? '%s was int while it should not',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -628,7 +629,7 @@ final readonly class PrimitiveTester
         if (! is_numeric($this->subject)) {
             $this->fail(
                 $reason ?? '%s was not numeric',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -640,7 +641,7 @@ final readonly class PrimitiveTester
         if (is_numeric($this->subject)) {
             $this->fail(
                 $reason ?? '%s was numeric while it should not',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -652,7 +653,7 @@ final readonly class PrimitiveTester
         if (! is_object($this->subject)) {
             $this->fail(
                 $reason ?? '%s was not object',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -664,7 +665,7 @@ final readonly class PrimitiveTester
         if (is_object($this->subject)) {
             $this->fail(
                 $reason ?? '%s was object while it should not',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -676,7 +677,7 @@ final readonly class PrimitiveTester
         if (! is_resource($this->subject)) {
             $this->fail(
                 $reason ?? '%s was not resource',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -688,7 +689,7 @@ final readonly class PrimitiveTester
         if (is_resource($this->subject)) {
             $this->fail(
                 $reason ?? '%s was resource while it should not',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -700,7 +701,7 @@ final readonly class PrimitiveTester
         if (! is_string($this->subject)) {
             $this->fail(
                 $reason ?? '%s was not string',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -712,7 +713,7 @@ final readonly class PrimitiveTester
         if (is_string($this->subject)) {
             $this->fail(
                 $reason ?? '%s was string while it should not',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -724,7 +725,7 @@ final readonly class PrimitiveTester
         if (! is_scalar($this->subject)) {
             $this->fail(
                 $reason ?? '%s was not scalar',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -736,7 +737,7 @@ final readonly class PrimitiveTester
         if (is_scalar($this->subject)) {
             $this->fail(
                 $reason ?? '%s was scalar while it should not',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -748,7 +749,7 @@ final readonly class PrimitiveTester
         if (! is_iterable($this->subject)) {
             $this->fail(
                 $reason ?? '%s was not iterable',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -760,7 +761,7 @@ final readonly class PrimitiveTester
         if (is_iterable($this->subject)) {
             $this->fail(
                 $reason ?? '%s was iterable while it should not',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -774,7 +775,7 @@ final readonly class PrimitiveTester
         if (! str_starts_with($this->subject, $prefix)) {
             $this->fail(
                 $reason ?? '%s did not start with %s',
-                ...($reasonData ?: [$this->subject, $prefix]),
+                ...$reasonData ?: [$this->subject, $prefix],
             );
         }
 
@@ -788,7 +789,7 @@ final readonly class PrimitiveTester
         if (str_starts_with($this->subject, $prefix)) {
             $this->fail(
                 $reason ?? '%s started with %s while it should not',
-                ...($reasonData ?: [$this->subject, $prefix]),
+                ...$reasonData ?: [$this->subject, $prefix],
             );
         }
 
@@ -802,7 +803,7 @@ final readonly class PrimitiveTester
         if (! str_ends_with($this->subject, $suffix)) {
             $this->fail(
                 $reason ?? '%s did not end with %s',
-                ...($reasonData ?: [$this->subject, $suffix]),
+                ...$reasonData ?: [$this->subject, $suffix],
             );
         }
 
@@ -816,7 +817,7 @@ final readonly class PrimitiveTester
         if (str_ends_with($this->subject, $suffix)) {
             $this->fail(
                 $reason ?? '%s ended with %s while it should not',
-                ...($reasonData ?: [$this->subject, $suffix]),
+                ...$reasonData ?: [$this->subject, $suffix],
             );
         }
 
@@ -830,7 +831,7 @@ final readonly class PrimitiveTester
         if (! json_validate($this->subject)) {
             $this->fail(
                 $reason ?? '%s was not valid JSON',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 
@@ -846,7 +847,7 @@ final readonly class PrimitiveTester
         if (json_validate($this->subject)) {
             $this->fail(
                 $reason ?? '%s was valid JSON while it should not',
-                ...($reasonData ?: [$this->subject]),
+                ...$reasonData ?: [$this->subject],
             );
         }
 

@@ -12,6 +12,7 @@ use Tempest\Discovery\Composer;
 use Tempest\Discovery\DiscoveryLocation;
 use Tempest\Support\Namespace\Psr4Namespace;
 use Tempest\Testing\Discovery\TestDiscovery;
+
 use function Tempest\Support\arr;
 
 final readonly class WithDiscoveredTestsMiddleware implements ConsoleMiddleware

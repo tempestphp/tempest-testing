@@ -6,6 +6,7 @@ use Closure;
 use Tempest\EventBus\EventBus;
 use Tempest\Support\Str;
 use UnitEnum;
+
 use function Tempest\Testing\test;
 
 final class EventBusTester implements EventBus
@@ -52,8 +53,7 @@ final class EventBusTester implements EventBus
     public function wasDispatched(
         string $expectedEventClass,
         ?Closure $eventTester = null,
-    ): self
-    {
+    ): self {
         test($this->dispatched)->hasKey($expectedEventClass);
 
         if ($eventTester) {

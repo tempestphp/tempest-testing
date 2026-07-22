@@ -6,6 +6,7 @@ use Exception;
 use Tempest\DateTime\Exception\InvalidArgumentException;
 use Tempest\Testing\Provide;
 use Tempest\Testing\Test;
+
 use function Tempest\Testing\test;
 
 final class PrimitiveTesterTest
@@ -59,12 +60,15 @@ final class PrimitiveTesterTest
         test(fn () => test(1)->isNot(1, 'custom %s', 'reason'))->fails("custom `'reason'`");
     }
 
-    #[Test, Provide(
-        ['test' => 1, 'expected' => 1, 'succeeds' => true],
-        ['test' => 1, 'expected' => 2, 'succeeds' => false],
-        ['test' => 1, 'expected' => '1', 'succeeds' => true],
-        ['test' => false, 'expected' => '', 'succeeds' => true],
-    )]
+    #[
+        Test,
+        Provide(
+            ['test' => 1, 'expected' => 1, 'succeeds' => true],
+            ['test' => 1, 'expected' => 2, 'succeeds' => false],
+            ['test' => 1, 'expected' => '1', 'succeeds' => true],
+            ['test' => false, 'expected' => '', 'succeeds' => true],
+        ),
+    ]
     public function isEqualTo(mixed $test, mixed $expected, bool $succeeds): void
     {
         if ($succeeds) {
@@ -91,12 +95,15 @@ final class PrimitiveTesterTest
         test(fn () => test($a)->isEqualTo($c))->fails();
     }
 
-    #[Test, Provide(
-        ['test' => 1, 'expected' => 1, 'succeeds' => false],
-        ['test' => 1, 'expected' => 2, 'succeeds' => true],
-        ['test' => 1, 'expected' => '1', 'succeeds' => false],
-        ['test' => false, 'expected' => '', 'succeeds' => false],
-    )]
+    #[
+        Test,
+        Provide(
+            ['test' => 1, 'expected' => 1, 'succeeds' => false],
+            ['test' => 1, 'expected' => 2, 'succeeds' => true],
+            ['test' => 1, 'expected' => '1', 'succeeds' => false],
+            ['test' => false, 'expected' => '', 'succeeds' => false],
+        ),
+    ]
     public function isNotEqualTo(mixed $test, mixed $expected, bool $succeeds): void
     {
         if ($succeeds) {
@@ -209,7 +216,8 @@ final class PrimitiveTesterTest
     #[Test]
     public function notInstanceOf(): void
     {
-        test(fn () => test($this)->isNotInstanceOf(self::class))->fails("`Tempest\\Testing\\Tests\\PrimitiveTesterTest` was an instance of `'Tempest\\\\Testing\\\\Tests\\\\PrimitiveTesterTest'` while it should not");
+        test(fn () => test($this)->isNotInstanceOf(self::class))
+            ->fails("`Tempest\\Testing\\Tests\\PrimitiveTesterTest` was an instance of `'Tempest\\\\Testing\\\\Tests\\\\PrimitiveTesterTest'` while it should not");
         test(fn () => test('')->isNotInstanceOf(self::class))->succeeds();
         test(fn () => test($this)->isNotInstanceOf(self::class, 'custom %s', 'reason'))->fails("custom `'reason'`");
     }

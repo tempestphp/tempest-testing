@@ -12,6 +12,7 @@ use Tempest\Testing\Events\TestSkipped;
 use Tempest\Testing\Events\TestStarted;
 use Tempest\Testing\Events\TestSucceeded;
 use Tempest\Testing\Runner\TestResult;
+
 use function Tempest\Support\str;
 
 final class DefaultOutput implements TestOutput
@@ -26,11 +27,14 @@ final class DefaultOutput implements TestOutput
     public function onTestsChunked(TestsChunked $event): void
     {
         if ($this->verbose) {
-            $this->writeln()->info(sprintf(
-                "will run on %d %s",
-                $event->processCount,
-                str('process')->pluralize($event->processCount),
-            ))->writeln();
+            $this
+                ->writeln()
+                ->info(sprintf(
+                    'will run on %d %s',
+                    $event->processCount,
+                    str('process')->pluralize($event->processCount),
+                ))
+                ->writeln();
         }
     }
 

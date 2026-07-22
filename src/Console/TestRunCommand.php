@@ -12,6 +12,7 @@ use Tempest\EventBus\EventBusConfig;
 use Tempest\Testing\Actions\RunTest;
 use Tempest\Testing\Events\DispatchToParentProcessMiddleware;
 use Tempest\Testing\Test;
+
 use function Tempest\Reflection\reflect;
 
 final class TestRunCommand

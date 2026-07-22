@@ -9,6 +9,7 @@ use Tempest\Database\Database;
 use Tempest\Database\Query;
 use Tempest\Database\QueryStatements\CreateTableStatement;
 use Tempest\Testing\Test;
+
 use function Tempest\Database\query;
 use function Tempest\Testing\test;
 

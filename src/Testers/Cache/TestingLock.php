@@ -9,6 +9,7 @@ use Tempest\Cache\Lock;
 use Tempest\DateTime\DateTime;
 use Tempest\DateTime\DateTimeInterface;
 use Tempest\DateTime\Duration;
+
 use function Tempest\Testing\test;
 
 final class TestingLock implements Lock
@@ -64,13 +65,14 @@ final class TestingLock implements Lock
 
             test($this->duration)->isNotNull('Expected lock %s to have a duration, but it has none.', $this->key);
 
-            test($this->duration->getTotalSeconds())->greaterThanOrEqual(
-                $for->getTotalSeconds(),
-                'Expected lock %s to have a duration of at least %s seconds, but it has %s seconds.',
-                $this->key,
-                $for->getTotalSeconds(),
-                $this->duration->getTotalSeconds(),
-            );
+            test($this->duration->getTotalSeconds())
+                ->greaterThanOrEqual(
+                    $for->getTotalSeconds(),
+                    'Expected lock %s to have a duration of at least %s seconds, but it has %s seconds.',
+                    $this->key,
+                    $for->getTotalSeconds(),
+                    $this->duration->getTotalSeconds(),
+                );
         }
 
         return $this;
