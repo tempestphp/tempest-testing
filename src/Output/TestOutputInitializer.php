@@ -28,7 +28,7 @@ final class TestOutputInitializer implements Initializer
             $output = $container->get(DefaultOutput::class);
         }
 
-        $output->verbose = $argumentBag->has('verbose');
+        $output->verbose = $argumentBag->has('verbose') || $argumentBag->has('-v');
 
         return $output;
     }

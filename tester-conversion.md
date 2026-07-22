@@ -13,12 +13,13 @@ The new testers will all folow the same design:
 - The tester class underneath is referenced as a protected property on the trait
 - The trait sets up the testers and mocks dependencies. Since this test runner is running in Tempest itself, we need to take care of resetting mocked dependencies when a test is done. 
 - Tests for testers should be placed in the same directory as the tester itself
+- always run `composer qa` at the end of a finished task
 
 These are the tester classes that still need convertion. Work on them one by one and stop when one is done. 
 
 - [x] `\Tempest\Cache\Testing\CacheTester`
 - [x] `\Tempest\Database\Testing\DatabaseTester`
-- [ ] `\Tempest\Mail\Testing\MailTester`
+- [x] `\Tempest\Mail\Testing\MailTester`
 - [ ] `\Tempest\Mail\Testing\AttachmentTester`
 - [ ] `\Tempest\Framework\Testing\Http\HttpRouterTester` (should become `HttpTester` instead)
 - [ ] `\Tempest\Process\Testing\ProcessTester`
