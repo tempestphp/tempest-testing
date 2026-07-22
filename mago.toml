@@ -1,7 +1,7 @@
 php-version = "8.5.0"
 
 [source]
-paths = ["app", "tests"]
+paths = ["src", "tests"]
 includes = ["vendor"]
 excludes = []
 
