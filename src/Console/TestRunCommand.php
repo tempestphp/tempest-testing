@@ -39,7 +39,7 @@ final class TestRunCommand
         string $name,
         #[ConsoleArgument(description: 'Show all output, including succeeding and skipped tests', aliases: ['-v'])]
         bool $verbose = false,
-        #[ConsoleArgument(description: 'Show debug output', aliases: ['--ff', '-f'])]
+        #[ConsoleArgument(description: 'Fail as soon as an error occurs', aliases: ['-f'])]
         bool $failFast = false,
         #[ConsoleArgument(description: 'Show debug output', aliases: ['-d'])]
         bool $debug = false,
