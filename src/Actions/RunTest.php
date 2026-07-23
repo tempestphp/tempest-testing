@@ -10,10 +10,12 @@ use Tempest\Testing\Events\TestAfterExecuted;
 use Tempest\Testing\Events\TestBeforeExecuted;
 use Tempest\Testing\Events\TestFailed;
 use Tempest\Testing\Events\TestFinished;
+use Tempest\Testing\Events\TestSkipped;
 use Tempest\Testing\Events\TestStarted;
 use Tempest\Testing\Events\TestSucceeded;
 use Tempest\Testing\Exceptions\InvalidProviderData;
 use Tempest\Testing\Exceptions\TestHasFailed;
+use Tempest\Testing\Exceptions\TestWasSkipped;
 use Tempest\Testing\Test;
 use Throwable;
 
@@ -81,15 +83,31 @@ final class RunTest
 
             $this->runAfter($test, $instance);
 
-            event(new TestSucceeded($test->name));
+            event(new TestSucceeded(
+                name: $test->name,
+            ));
+        } catch (TestWasSkipped $exception) {
+            $this->runAfter($test, $instance);
+
+            event(new TestSkipped(
+                name: $test->name,
+                reason: $exception->reason,
+                location: $test->location,
+            ));
         } catch (TestHasFailed $exception) {
             $this->runAfter($test, $instance);
 
-            event(TestFailed::fromTestHasFailed($test, $exception));
+            event(TestFailed::fromTestHasFailed(
+                test: $test,
+                exception: $exception,
+            ));
         } catch (Throwable $exception) {
             $this->runAfter($test, $instance);
 
-            event(TestFailed::fromThrowable($test, $exception));
+            event(TestFailed::fromThrowable(
+                test: $test,
+                throwable: $exception,
+            ));
         }
 
         event(new TestFinished($test->name));

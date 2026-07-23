@@ -54,7 +54,7 @@ final class DefaultOutput implements TestOutput
         $this->writeln(sprintf('  <style="fg-red dim">//</style> <style="fg-red">%s</style>', $event->reason));
 
         if ($this->testEnvironment->verbose && $event->trace) {
-            $this->writeln(sprintf('  <style="fg-red dim">//</style> <style="fg-red">%s</style>', $event->trace));
+            $this->writeln($event->trace);
         }
 
         $this->writeln();
@@ -64,8 +64,17 @@ final class DefaultOutput implements TestOutput
     {
         $this->result->addSkipped();
 
-        if ($this->testEnvironment->debug) {
-            $this->info("skipped: {$event->name}");
+        if ($this->testEnvironment->verbose && $event->location) {
+            $this->warning($event->name);
+            $this->writeln(sprintf('  <style="fg-yellow dim">//</style> <style="fg-yellow underline">%s</style>', $event->location));
+
+            if ($event->reason) {
+                $this->writeln(sprintf('  <style="fg-yellow dim">//</style> <style="fg-yellow">%s</style>', $event->reason));
+            }
+
+            $this->writeln();
+        } elseif ($this->testEnvironment->debug) {
+            $this->warning("skipped: {$event->name}");
         }
     }
 
@@ -93,7 +102,7 @@ final class DefaultOutput implements TestOutput
         $this->result->endTime();
 
         $message = sprintf(
-            '<style="bg-green"> %d succeeded </style> <style="bg-red"> %d failed </style> <style="bg-blue"> %d skipped </style> <style="bg-yellow"> %ss </style>',
+            '<style="bg-green"> %d succeeded </style> <style="bg-red"> %d failed </style> <style="bg-yellow"> %d skipped </style> <style="bg-blue"> %ss </style>',
             $this->result->succeeded,
             $this->result->failed,
             $this->result->skipped,

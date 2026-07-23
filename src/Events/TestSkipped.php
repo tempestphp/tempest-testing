@@ -8,10 +8,12 @@ use Tempest\Testing\Output\TeamcityMessage;
 use Tempest\Testing\Output\TeamcityMessageName;
 
 #[StopsPropagation]
-final class TestSkipped implements ConvertsToTeamcityMessage
+final class TestSkipped implements ConvertsToTeamcityMessage, DispatchToParentProcess
 {
     public function __construct(
         public string $name,
+        public ?string $reason = null,
+        public ?string $location = null,
     ) {}
 
     public TeamcityMessage $teamcityMessage {
@@ -20,6 +22,24 @@ final class TestSkipped implements ConvertsToTeamcityMessage
             [
                 'name' => $this->name,
             ],
+        );
+    }
+
+    public function serialize(): array
+    {
+        return [
+            'name' => $this->name,
+            'reason' => $this->reason,
+            'location' => $this->location,
+        ];
+    }
+
+    public static function deserialize(array $data): DispatchToParentProcess
+    {
+        return new self(
+            name: $data['name'],
+            reason: $data['reason'],
+            location: $data['location'],
         );
     }
 }

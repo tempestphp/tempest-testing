@@ -4,6 +4,7 @@ namespace Tempest\Testing\Testers;
 
 use Closure;
 use Tempest\Testing\Exceptions\TestHasFailed;
+use Tempest\Testing\Exceptions\TestWasSkipped;
 use Throwable;
 
 use function Tempest\Testing\test;
@@ -13,6 +14,11 @@ final readonly class PrimitiveTester
     public function __construct(
         private mixed $subject = null,
     ) {}
+
+    public function skip(?string $reason = null): void
+    {
+        throw new TestWasSkipped($reason);
+    }
 
     public function dump(): self
     {

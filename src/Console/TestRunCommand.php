@@ -11,6 +11,9 @@ use Tempest\Core\FrameworkKernel;
 use Tempest\Core\Kernel;
 use Tempest\Discovery\DiscoveryLocation;
 use Tempest\EventBus\EventBusConfig;
+use Tempest\Http\GenericRequest;
+use Tempest\Http\Method;
+use Tempest\Http\Request;
 use Tempest\Testing\Actions\RunTest;
 use Tempest\Testing\Events\DispatchToParentProcessMiddleware;
 use Tempest\Testing\Runner\TestRunner;
@@ -89,10 +92,16 @@ final class TestRunCommand
 
         // Configure the container for this testing process
         $container = $kernel->container;
+
         $runTest = new RunTest($container);
         $container->singleton(RunTest::class, $runTest);
         $container->singleton(TestRunner::class, $testRunner);
+
         $container->get(EventBusConfig::class)->middleware->add(DispatchToParentProcessMiddleware::class);
+
+        $request = new GenericRequest(Method::GET, '/', []);
+        $this->container->singleton(Request::class, fn () => $request);
+        $this->container->singleton(GenericRequest::class, fn () => $request);
 
         return $kernel->container;
     }
