@@ -11,7 +11,7 @@ use function Tempest\EventBus\event;
 final class TestRunner
 {
     public function __construct(
-        private readonly string $name = 'Default', // @mago-expect analysis:unused-property
+        public readonly string $name = 'default', // @mago-expect analysis:unused-property
     ) {}
 
     private ?Process $process = null;
@@ -21,12 +21,15 @@ final class TestRunner
     {
         $tests = $tests->map(fn (Test $test) => '--tests="' . $test->name . '"');
 
-        $this->process = new Process([
+        $command = [
             PHP_BINDIR . '/php',
             'tempest',
             'test:run',
+            $this->name,
             ...$tests,
-        ]);
+        ];
+
+        $this->process = new Process($command);
 
         $this->process->start(function (string $type, string $buffer) {
             foreach (explode(PHP_EOL, trim($buffer)) as $line) {

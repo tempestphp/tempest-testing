@@ -8,6 +8,9 @@ use Tempest\Container\Container;
 use Tempest\Container\DynamicInitializer;
 use Tempest\Container\Singleton;
 use Tempest\Database\Config\DatabaseConfig;
+use Tempest\Database\Config\MysqlConfig;
+use Tempest\Database\Config\PostgresConfig;
+use Tempest\Database\Config\SQLiteConfig;
 use Tempest\Database\Connection\Connection;
 use Tempest\Database\Connection\PDOConnection;
 use Tempest\Database\Database;
@@ -16,12 +19,12 @@ use Tempest\Database\Transactions\GenericTransactionManager;
 use Tempest\EventBus\EventBus;
 use Tempest\Mapper\SerializerFactory;
 use Tempest\Reflection\ClassReflector;
-use Tempest\Support\Str;
+use Tempest\Testing\Runner\TestRunner;
 use UnitEnum;
 
 final class TestingDatabaseInitializer implements DynamicInitializer
 {
-    /** @var array<string, Connection> */
+    /** @var Connection[] */
     private static array $connections = [];
 
     public function canInitialize(ClassReflector $class, string|UnitEnum|null $tag): bool
@@ -32,24 +35,26 @@ final class TestingDatabaseInitializer implements DynamicInitializer
     #[Singleton]
     public function initialize(ClassReflector $class, string|UnitEnum|null $tag, Container $container): Database
     {
-        $parsedTag = Str\parse($tag) ?? 'default';
+        $config = $this->resolveConfig($container, $tag);
+        $connectionKey = $this->getConnectionKey($config);
 
-        /** @var PDOConnection|null $connection */
-        $connection = self::$connections[$parsedTag] ?? null;
+        $connection = $config->usePersistentConnection
+            ? self::$connections[$connectionKey] ?? null
+            : null;
 
-        if ($connection === null) {
-            $config = $container->get(DatabaseConfig::class, $parsedTag === 'default' ? null : $parsedTag);
+        if (! $connection) {
             $connection = new PDOConnection($config);
             $connection->connect();
-
-            self::$connections[$parsedTag] = $connection;
-        }
-
-        if ($connection->ping() === false) {
+            self::$connections[$connectionKey] = $connection;
+        } elseif ($connection->ping() === false) {
             $connection->reconnect();
         }
 
-        $container->singleton(Connection::class, $connection, $parsedTag === 'default' ? null : $parsedTag);
+        $container->singleton(
+            className: Connection::class,
+            definition: $connection,
+            tag: $tag,
+        );
 
         return new GenericDatabase(
             connection: $connection,
@@ -58,4 +63,36 @@ final class TestingDatabaseInitializer implements DynamicInitializer
             eventBus: $container->get(EventBus::class),
         );
     }
+
+    private function getConnectionKey(DatabaseConfig $config): string
+    {
+        return hash('xxh128', serialize([
+            $config->dsn,
+            $config->username,
+            $config->options,
+            $config->password,
+            $config->tag,
+        ]));
+    }
+
+    private function resolveConfig(Container $container, string|UnitEnum|null $tag): DatabaseConfig
+    {
+        $config = clone $container->get(DatabaseConfig::class, $tag);
+        $testRunner = $container->get(TestRunner::class);
+
+        if ($config instanceof SQLiteConfig && $config->path !== ':memory:') {
+            $config->path = str_replace(
+                pathinfo($config->path, PATHINFO_BASENAME),
+                pathinfo($config->path, PATHINFO_FILENAME) . "-{$testRunner->name}.sqlite",
+                $config->path,
+            );
+        } elseif ($config instanceof MySQLConfig) {
+            $config->database = $config->database . "-{$testRunner->name}";
+        } elseif ($config instanceof PostgresConfig) {
+            $config->database = $config->database . "-{$testRunner->name}";
+        }
+
+        return $config;
+    }
+
 }

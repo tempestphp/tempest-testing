@@ -12,6 +12,7 @@ use Tempest\Container\GenericContainer;
 use Tempest\EventBus\EventBusConfig;
 use Tempest\Testing\Actions\RunTest;
 use Tempest\Testing\Events\DispatchToParentProcessMiddleware;
+use Tempest\Testing\Runner\TestRunner;
 use Tempest\Testing\Test;
 
 final class TestRunCommand
@@ -27,11 +28,12 @@ final class TestRunCommand
         middleware: [WithDiscoveredTestsMiddleware::class],
         hidden: true,
     )]
-    public function __invoke(array $tests): void
+    public function __invoke(string $name, array $tests): void
     {
         $container = $this->resolveContainer();
         $runTest = new RunTest($container);
         $container->singleton(RunTest::class, $runTest);
+        $container->singleton(TestRunner::class, new TestRunner($name));
 
         $this->eventBusConfig->middleware->add(DispatchToParentProcessMiddleware::class);
 
