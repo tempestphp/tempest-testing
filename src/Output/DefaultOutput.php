@@ -2,6 +2,7 @@
 
 namespace Tempest\Testing\Output;
 
+use Tempest\Console\Components\Renderers\MessageRenderer;
 use Tempest\Console\HasConsole;
 use Tempest\Testing\Events\TestFailed;
 use Tempest\Testing\Events\TestFinished;
@@ -84,6 +85,8 @@ final class DefaultOutput implements TestOutput
 
         if ($this->testEnvironment->verbose) {
             $this->success($event->name);
+        } else {
+//            $this->write('<style="fg-green">✓</style>');
         }
     }
 
