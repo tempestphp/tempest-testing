@@ -46,7 +46,7 @@ final class TestCommand
         #[ConsoleArgument(description: 'Use teamcity output format')]
         bool $teamcity = false,
         #[ConsoleArgument(description: 'Show interactive output', aliases: ['-i'])]
-        bool $interactive = true,
+        bool $interaction = true,
     ): void {
         $testEnvironment = new TestEnvironment(
             verbose: $verbose,
@@ -56,7 +56,7 @@ final class TestCommand
 
         $this->container->singleton(TestEnvironment::class, $testEnvironment);
 
-        if ($interactive && ! $teamcity && Terminal::supportsTty()) {
+        if ($interaction && ! $teamcity && Terminal::supportsTty()) {
             $output = new InteractiveOutput(
                 fn (InteractiveOutput $output) => new ChunkAndRunTests(
                     testEnvironment: $testEnvironment,
