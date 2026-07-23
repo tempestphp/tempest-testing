@@ -2,27 +2,21 @@
 
 namespace Tempest\Testing\Console;
 
-use ArrayIterator;
 use ReflectionException;
-use ReflectionProperty;
+use Tempest\Console\ConsoleArgument;
 use Tempest\Console\ConsoleCommand;
 use Tempest\Console\HasConsole;
 use Tempest\Container\Container;
-use Tempest\Container\GenericContainer;
 use Tempest\Core\FrameworkKernel;
 use Tempest\Core\Kernel;
-use Tempest\Database\Config\DatabaseConfig;
-use Tempest\Database\Database;
-use Tempest\Discovery\DiscoveryConfig;
 use Tempest\Discovery\DiscoveryLocation;
 use Tempest\EventBus\EventBusConfig;
 use Tempest\Testing\Actions\RunTest;
 use Tempest\Testing\Events\DispatchToParentProcessMiddleware;
 use Tempest\Testing\Runner\TestRunner;
 use Tempest\Testing\Test;
-use Tempest\View\ViewConfig;
-use function Tempest\env;
-use function Tempest\Support\Path\normalize;
+use Tempest\Testing\TestEnvironment;
+
 use function Tempest\Support\Path\to_absolute_path;
 
 final class TestRunCommand
@@ -38,10 +32,29 @@ final class TestRunCommand
         middleware: [WithDiscoveredTestsMiddleware::class],
         hidden: true,
     )]
-    public function __invoke(string $name, array $tests): void
-    {
-        $testRunner = new TestRunner($name);
-        $runTest = new RunTest($this->resolveContainer($testRunner));
+    public function __invoke(
+        string $name,
+        #[ConsoleArgument(description: 'Show all output, including succeeding and skipped tests', aliases: ['-v'])]
+        bool $verbose = false,
+        #[ConsoleArgument(description: 'Show debug output', aliases: ['--ff', '-f'])]
+        bool $failFast = false,
+        #[ConsoleArgument(description: 'Show debug output', aliases: ['-d'])]
+        bool $debug = false,
+        array $tests = [],
+    ): void {
+        $testEnvironment = new TestEnvironment(
+            verbose: $verbose,
+            debug: $debug,
+            failFast: $failFast,
+        );
+
+        $this->container->singleton(TestEnvironment::class, $testEnvironment);
+
+        $testRunner = new TestRunner($name, $testEnvironment);
+
+        $container = $this->resolveContainer($testRunner);
+
+        $runTest = $container->get(RunTest::class);
 
         foreach ($tests as $testName) {
             try {
@@ -76,6 +89,8 @@ final class TestRunCommand
 
         // Configure the container for this testing process
         $container = $kernel->container;
+        $runTest = new RunTest($container);
+        $container->singleton(RunTest::class, $runTest);
         $container->singleton(TestRunner::class, $testRunner);
         $container->get(EventBusConfig::class)->middleware->add(DispatchToParentProcessMiddleware::class);
 

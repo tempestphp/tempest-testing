@@ -5,14 +5,14 @@ namespace Tempest\Testing\Console;
 use Tempest\Console\ConsoleArgument;
 use Tempest\Console\ConsoleCommand;
 use Tempest\Console\HasConsole;
-use Tempest\Core\Environment;
+use Tempest\Container\Container;
 use Tempest\Support\Arr\ImmutableArray;
 use Tempest\Testing\Actions\ChunkAndRunTests;
 use Tempest\Testing\Config\TestConfig;
 use Tempest\Testing\Events\TestSkipped;
 use Tempest\Testing\Test;
+use Tempest\Testing\TestEnvironment;
 
-use function Tempest\Container\get;
 use function Tempest\EventBus\event;
 use function Tempest\Support\arr;
 
@@ -21,6 +21,7 @@ final class TestCommand
     use HasConsole;
 
     public function __construct(
+        private readonly Container $container,
         private readonly TestConfig $testConfig,
     ) {}
 
@@ -35,14 +36,22 @@ final class TestCommand
         int $processes = 5,
         #[ConsoleArgument(description: 'Show all output, including succeeding and skipped tests', aliases: ['-v'])]
         bool $verbose = false,
+        #[ConsoleArgument(description: 'Show debug output', aliases: ['--ff', '-f'])]
+        bool $failFast = false,
         #[ConsoleArgument(description: 'Show debug output', aliases: ['-d'])]
         bool $debug = false,
         #[ConsoleArgument(description: 'Use teamcity output format')]
         bool $teamcity = false,
     ): void {
-        new ChunkAndRunTests(
+        $testEnvironment = new TestEnvironment(
+            verbose: $verbose,
             debug: $debug,
-        )(
+            failFast: $failFast,
+        );
+
+        $this->container->singleton(TestEnvironment::class, $testEnvironment);
+
+        (new ChunkAndRunTests($testEnvironment))(
             tests: $this->getTests($filter),
             processes: $processes,
         );

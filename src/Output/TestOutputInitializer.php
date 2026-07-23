@@ -8,6 +8,7 @@ use Tempest\Container\Container;
 use Tempest\Container\Initializer;
 use Tempest\Container\Singleton;
 use Tempest\Core\Application;
+use Tempest\Testing\TestEnvironment;
 
 final class TestOutputInitializer implements Initializer
 {
@@ -28,7 +29,7 @@ final class TestOutputInitializer implements Initializer
             $output = $container->get(DefaultOutput::class);
         }
 
-        $output->verbose = $argumentBag->has('verbose') || $argumentBag->has('-v');
+        $output->testEnvironment = $container->get(TestEnvironment::class);
 
         return $output;
     }

@@ -5,15 +5,17 @@ namespace Tempest\Testing\Runner;
 use Symfony\Component\Process\Process;
 use Tempest\Core\Environment;
 use Tempest\Support\Arr\ImmutableArray;
+use Tempest\Testing\Events\TestFailed;
 use Tempest\Testing\Test;
+use Tempest\Testing\TestEnvironment;
 
 use function Tempest\EventBus\event;
 
 final class TestRunner
 {
     public function __construct(
-        public readonly string $name = 'default',
-        public readonly bool $debug = false,
+        public readonly string $name,
+        public readonly TestEnvironment $testEnvironment,
     ) {}
 
     private ?Process $process = null;
@@ -21,17 +23,9 @@ final class TestRunner
     /** @param ImmutableArray<array-key, \Tempest\Testing\Test> $tests */
     public function run(ImmutableArray $tests): self
     {
-        $tests = $tests->map(fn (Test $test) => '--tests="' . $test->name . '"');
+        $command = $this->buildCommand($tests);
 
-        $command = [
-            PHP_BINDIR . '/php',
-            'tempest',
-            'test:run',
-            '--name=' . $this->name,
-            ...$tests,
-        ];
-
-        if ($this->debug) {
+        if ($this->testEnvironment->debug) {
             echo '> ENVIRONMENT=testing ' . implode(' ', $command) . PHP_EOL;
         }
 
@@ -46,7 +40,7 @@ final class TestRunner
                 }
 
                 if (str_starts_with($line, '[EVENT]')) {
-                    if ($this->debug) {
+                    if ($this->testEnvironment->debug) {
                         echo $line . PHP_EOL;
                     }
 
@@ -60,6 +54,10 @@ final class TestRunner
                     $event = $eventClass::deserialize($payload['data']);
 
                     event($event);
+
+                    if ($this->testEnvironment->failFast && $event instanceof TestFailed) {
+                        return; // TODO
+                    }
                 } else {
                     echo $line . PHP_EOL;
                 }
@@ -74,5 +72,33 @@ final class TestRunner
         $this->process?->wait();
 
         return $this;
+    }
+
+    /** @return string[] */
+    public function buildCommand(ImmutableArray $tests): array
+    {
+        $tests = $tests->map(fn (Test $test) => '--tests="' . $test->name . '"');
+
+        $command = [
+            PHP_BINDIR . '/php',
+            'tempest',
+            'test:run',
+            '--name=' . $this->name,
+            ...$tests,
+        ];
+
+        if ($this->testEnvironment->debug) {
+            $command[] = '--debug';
+        }
+
+        if ($this->testEnvironment->verbose) {
+            $command[] = '--verbose';
+        }
+
+        if ($this->testEnvironment->failFast) {
+            $command[] = '--fail-fast';
+        }
+
+        return $command;
     }
 }

@@ -12,6 +12,7 @@ use Tempest\Testing\Events\TestSkipped;
 use Tempest\Testing\Events\TestStarted;
 use Tempest\Testing\Events\TestSucceeded;
 use Tempest\Testing\Runner\TestResult;
+use Tempest\Testing\TestEnvironment;
 
 use function Tempest\Support\str;
 
@@ -19,14 +20,15 @@ final class DefaultOutput implements TestOutput
 {
     use HasConsole;
 
+    public TestEnvironment $testEnvironment;
+
     public function __construct(
-        public bool $verbose = false,
         private TestResult $result = new TestResult(),
     ) {}
 
     public function onTestsChunked(TestsChunked $event): void
     {
-        if ($this->verbose) {
+        if ($this->testEnvironment->verbose) {
             $this
                 ->writeln()
                 ->info(sprintf(
@@ -50,6 +52,11 @@ final class DefaultOutput implements TestOutput
         $this->error(sprintf('<style="fg-red">%s</style>', $event->name));
         $this->writeln(sprintf('  <style="fg-red dim">//</style> <style="fg-red underline">%s</style>', $event->location));
         $this->writeln(sprintf('  <style="fg-red dim">//</style> <style="fg-red">%s</style>', $event->reason));
+
+        if ($this->testEnvironment->verbose && $event->trace) {
+            $this->writeln(sprintf('  <style="fg-red dim">//</style> <style="fg-red">%s</style>', $event->trace));
+        }
+
         $this->writeln();
     }
 
@@ -57,7 +64,7 @@ final class DefaultOutput implements TestOutput
     {
         $this->result->addSkipped();
 
-        if ($this->verbose) {
+        if ($this->testEnvironment->debug) {
             $this->info("skipped: {$event->name}");
         }
     }
@@ -66,7 +73,7 @@ final class DefaultOutput implements TestOutput
     {
         $this->result->addSucceeded();
 
-        if ($this->verbose) {
+        if ($this->testEnvironment->verbose) {
             $this->success($event->name);
         }
     }
@@ -93,7 +100,7 @@ final class DefaultOutput implements TestOutput
             $this->result->elapsedTime,
         );
 
-        if ($this->result->failed > 0 || $this->verbose) {
+        if ($this->result->failed > 0 || $this->testEnvironment->verbose) {
             $this->writeln();
         }
 

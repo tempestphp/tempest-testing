@@ -8,13 +8,14 @@ use Tempest\Testing\Events\TestRunStarted;
 use Tempest\Testing\Events\TestsChunked;
 use Tempest\Testing\Runner\TestRunner;
 use Tempest\Testing\Test;
+use Tempest\Testing\TestEnvironment;
 
 use function Tempest\EventBus\event;
 
 final class ChunkAndRunTests
 {
     public function __construct(
-        private bool $debug = false,
+        private TestEnvironment $testEnvironment,
     ) {}
 
     public function __invoke(ImmutableArray $tests, int $processes): void
@@ -27,7 +28,7 @@ final class ChunkAndRunTests
                 /** @var ImmutableArray<array-key, Test> $tests */
                 return new TestRunner(
                     name: (string) $i,
-                    debug: $this->debug,
+                    testEnvironment: $this->testEnvironment,
                 )->run($tests);
             });
 

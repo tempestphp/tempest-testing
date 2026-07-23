@@ -11,14 +11,13 @@ use Tempest\Testing\Events\TestsChunked;
 use Tempest\Testing\Events\TestSkipped;
 use Tempest\Testing\Events\TestStarted;
 use Tempest\Testing\Events\TestSucceeded;
+use Tempest\Testing\TestEnvironment;
 
 final class TeamcityOutput implements TestOutput
 {
     use HasConsole;
 
-    public function __construct(
-        public bool $verbose = false,
-    ) {}
+    public TestEnvironment $testEnvironment;
 
     public function onTestsChunked(TestsChunked $event): void
     {

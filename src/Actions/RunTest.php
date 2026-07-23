@@ -4,7 +4,6 @@ namespace Tempest\Testing\Actions;
 
 use Psr\Container\ContainerInterface;
 use Tempest\Container\Container;
-use Tempest\Container\Singleton;
 use Tempest\Reflection\MethodReflector;
 use Tempest\Reflection\ParameterReflector;
 use Tempest\Testing\Events\TestAfterExecuted;
@@ -16,10 +15,10 @@ use Tempest\Testing\Events\TestSucceeded;
 use Tempest\Testing\Exceptions\InvalidProviderData;
 use Tempest\Testing\Exceptions\TestHasFailed;
 use Tempest\Testing\Test;
+use Throwable;
 
 use function Tempest\EventBus\event;
 
-#[Singleton]
 final class RunTest
 {
     public function __construct(
@@ -74,7 +73,7 @@ final class RunTest
     private function runEntry(Test $test, object $instance, array $data): void
     {
         event(new TestStarted($test->name));
-        
+
         try {
             $this->runBefore($test, $instance);
 
@@ -86,7 +85,11 @@ final class RunTest
         } catch (TestHasFailed $exception) {
             $this->runAfter($test, $instance);
 
-            event(TestFailed::fromException($test->name, $exception));
+            event(TestFailed::fromTestHasFailed($test->name, $exception));
+        } catch (Throwable $exception) {
+            $this->runAfter($test, $instance);
+
+            event(TestFailed::fromtThrowable($test->name, $exception));
         }
 
         event(new TestFinished($test->name));

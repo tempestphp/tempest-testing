@@ -10,10 +10,11 @@ use Tempest\Testing\Events\TestsChunked;
 use Tempest\Testing\Events\TestSkipped;
 use Tempest\Testing\Events\TestStarted;
 use Tempest\Testing\Events\TestSucceeded;
+use Tempest\Testing\TestEnvironment;
 
 interface TestOutput
 {
-    public bool $verbose { set; }
+    public TestEnvironment $testEnvironment { set; }
 
     public function onTestsChunked(TestsChunked $event): void;
 
