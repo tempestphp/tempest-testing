@@ -3,6 +3,7 @@
 namespace Tempest\Testing\Runner;
 
 use Symfony\Component\Process\Process;
+use Tempest\Core\Environment;
 use Tempest\Support\Arr\ImmutableArray;
 use Tempest\Testing\Test;
 
@@ -29,7 +30,9 @@ final class TestRunner
             ...$tests,
         ];
 
-        $this->process = new Process($command);
+        $this->process = new Process($command, env: [
+            'ENVIRONMENT' => Environment::TESTING->value,
+        ]);
 
         $this->process->start(function (string $type, string $buffer) {
             foreach (explode(PHP_EOL, trim($buffer)) as $line) {
