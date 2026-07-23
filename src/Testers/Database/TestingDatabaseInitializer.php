@@ -87,12 +87,11 @@ final class TestingDatabaseInitializer implements DynamicInitializer
                 $config->path,
             );
         } elseif ($config instanceof MySQLConfig) {
-            $config->database = $config->database . "-{$testRunner->name}";
+            $config->database .= "-{$testRunner->name}";
         } elseif ($config instanceof PostgresConfig) {
-            $config->database = $config->database . "-{$testRunner->name}";
+            $config->database .= "-{$testRunner->name}";
         }
 
         return $config;
     }
-
 }

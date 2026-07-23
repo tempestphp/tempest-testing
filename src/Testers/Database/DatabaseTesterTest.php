@@ -3,8 +3,6 @@
 namespace Tempest\Testing\Testers\Database;
 
 use Tempest\Container\Container;
-use Tempest\Database\Config\DatabaseConfig;
-use Tempest\Database\Config\SQLiteConfig;
 use Tempest\Database\Database;
 use Tempest\Database\Query;
 use Tempest\Database\QueryStatements\CreateTableStatement;
@@ -61,7 +59,7 @@ final class DatabaseTesterTest
 
         test(fn () => $this->database->assertTableHasCount('database_tester_entries', 1))
             ->fails('Failed asserting that the table `\'database_tester_entries\'` contains `1` rows.');
-     }
+    }
 
     private function createEntriesTable(Database $database): void
     {
