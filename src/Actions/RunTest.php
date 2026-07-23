@@ -85,11 +85,11 @@ final class RunTest
         } catch (TestHasFailed $exception) {
             $this->runAfter($test, $instance);
 
-            event(TestFailed::fromTestHasFailed($test->name, $exception));
+            event(TestFailed::fromTestHasFailed($test, $exception));
         } catch (Throwable $exception) {
             $this->runAfter($test, $instance);
 
-            event(TestFailed::fromtThrowable($test->name, $exception));
+            event(TestFailed::fromThrowable($test, $exception));
         }
 
         event(new TestFinished($test->name));

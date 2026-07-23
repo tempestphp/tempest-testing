@@ -7,6 +7,7 @@ use Tempest\Testing\Exceptions\TestHasFailed;
 use Tempest\Testing\Output\ConvertsToTeamcityMessage;
 use Tempest\Testing\Output\TeamcityMessage;
 use Tempest\Testing\Output\TeamcityMessageName;
+use Tempest\Testing\Test;
 use Throwable;
 
 #[StopsPropagation]
@@ -30,21 +31,21 @@ final class TestFailed implements DispatchToParentProcess, ConvertsToTeamcityMes
         );
     }
 
-    public static function fromTestHasFailed(string $name, TestHasFailed $exception): self
+    public static function fromTestHasFailed(Test $test, TestHasFailed $exception): self
     {
         return new self(
-            name: $name,
+            name: $test->name,
             reason: $exception->reason,
             location: $exception->location,
         );
     }
 
-    public static function fromtThrowable(string $name, Throwable $throwable): self
+    public static function fromThrowable(Test $test, Throwable $throwable): self
     {
         return new self(
-            name: $name,
+            name: $test->name,
             reason: $throwable->getMessage(),
-            location: $throwable->getFile(),
+            location: $test->location,
             trace: $throwable->getTraceAsString(),
         );
     }

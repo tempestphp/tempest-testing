@@ -26,6 +26,10 @@ final class Test
         get => $this->handler->getDeclaringClass()->getName() . '::' . $this->handler->getName();
     }
 
+    public string $location {
+        get => $this->handler->getDeclaringClass()->getFileName() . ':' . $this->handler->getReflection()->getStartLine();
+    }
+
     public static function fromName(string $name): self
     {
         $reflector = new MethodReflector(new ReflectionMethod(...explode('::', $name)));
