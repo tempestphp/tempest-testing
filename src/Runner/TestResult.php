@@ -14,7 +14,13 @@ final class TestResult
     private ?float $endTime = null;
 
     public float $elapsedTime {
-        get => round(($this->endTime ?? 0) - ($this->startTime ?? 0), 2);
+        get {
+            if ($this->startTime === null) {
+                return 0.0;
+            }
+
+            return round(($this->endTime ?? microtime(true)) - $this->startTime, 2);
+        }
     }
 
     public function startTime(): self

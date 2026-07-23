@@ -2,7 +2,6 @@
 
 namespace Tempest\Testing\Output;
 
-use Tempest\Console\Components\Renderers\MessageRenderer;
 use Tempest\Console\HasConsole;
 use Tempest\Testing\Events\TestFailed;
 use Tempest\Testing\Events\TestFinished;

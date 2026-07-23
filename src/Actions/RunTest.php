@@ -27,7 +27,7 @@ final class RunTest
         private ContainerInterface|Container $container,
     ) {}
 
-    public function __invoke(Test $test): void
+    public function __invoke(Test $test): bool
     {
         $instance = $this->getInstance($test);
 
@@ -68,11 +68,15 @@ final class RunTest
         }
 
         foreach ($providedData as $data) {
-            $this->runEntry($test, $instance, $data);
+            if (! $this->runEntry($test, $instance, $data)) {
+                return false;
+            }
         }
+
+        return true;
     }
 
-    private function runEntry(Test $test, object $instance, array $data): void
+    private function runEntry(Test $test, object $instance, array $data): bool
     {
         event(new TestStarted($test->name));
 
@@ -86,6 +90,8 @@ final class RunTest
             event(new TestSucceeded(
                 name: $test->name,
             ));
+
+            $passed = true;
         } catch (TestWasSkipped $exception) {
             $this->runAfter($test, $instance);
 
@@ -94,6 +100,8 @@ final class RunTest
                 reason: $exception->reason,
                 location: $test->location,
             ));
+
+            $passed = true;
         } catch (TestHasFailed $exception) {
             $this->runAfter($test, $instance);
 
@@ -101,6 +109,8 @@ final class RunTest
                 test: $test,
                 exception: $exception,
             ));
+
+            $passed = false;
         } catch (Throwable $exception) {
             $this->runAfter($test, $instance);
 
@@ -108,9 +118,13 @@ final class RunTest
                 test: $test,
                 throwable: $exception,
             ));
+
+            $passed = false;
         }
 
         event(new TestFinished($test->name));
+
+        return $passed;
     }
 
     private function runBefore(Test $test, object $instance): void

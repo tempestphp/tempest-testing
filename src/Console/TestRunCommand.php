@@ -58,8 +58,13 @@ final class TestRunCommand
         $container = $this->resolveContainer($testRunner);
 
         $runTest = $container->get(RunTest::class);
+        $stopFile = getenv('TEMPEST_TESTING_STOP_FILE') ?: null;
 
         foreach ($tests as $testName) {
+            if ($failFast && $stopFile !== null && file_exists($stopFile)) {
+                break;
+            }
+
             try {
                 $test = Test::fromName($testName);
             } catch (ReflectionException) {
@@ -68,7 +73,15 @@ final class TestRunCommand
                 continue;
             }
 
-            $runTest($test);
+            $passed = $runTest($test);
+
+            if (! $passed && $stopFile !== null) {
+                file_put_contents($stopFile, '1');
+            }
+
+            if ($failFast && ! $passed) {
+                break;
+            }
         }
     }
 

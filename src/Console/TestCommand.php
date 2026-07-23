@@ -5,11 +5,14 @@ namespace Tempest\Testing\Console;
 use Tempest\Console\ConsoleArgument;
 use Tempest\Console\ConsoleCommand;
 use Tempest\Console\HasConsole;
+use Tempest\Console\Terminal\Terminal;
 use Tempest\Container\Container;
 use Tempest\Support\Arr\ImmutableArray;
 use Tempest\Testing\Actions\ChunkAndRunTests;
 use Tempest\Testing\Config\TestConfig;
 use Tempest\Testing\Events\TestSkipped;
+use Tempest\Testing\Output\InteractiveOutput;
+use Tempest\Testing\Output\TestOutput;
 use Tempest\Testing\Test;
 use Tempest\Testing\TestEnvironment;
 
@@ -32,16 +35,18 @@ final class TestCommand
     public function __invoke(
         #[ConsoleArgument(description: 'Only run tests matching this fuzzy filter')]
         ?string $filter = null,
-        #[ConsoleArgument(description: 'Number of processes to run tests in parallel')]
+        #[ConsoleArgument(description: 'Number of processes to run tests in parallel', aliases: ['-p'])]
         int $processes = 5,
         #[ConsoleArgument(description: 'Show all output, including succeeding and skipped tests', aliases: ['-v'])]
         bool $verbose = false,
-        #[ConsoleArgument(description: 'Show debug output', aliases: ['--ff', '-f'])]
+        #[ConsoleArgument(description: 'Fail as soon as an error occurs', aliases: ['-f'])]
         bool $failFast = false,
         #[ConsoleArgument(description: 'Show debug output', aliases: ['-d'])]
         bool $debug = false,
         #[ConsoleArgument(description: 'Use teamcity output format')]
         bool $teamcity = false,
+        #[ConsoleArgument(description: 'Show interactive output', aliases: ['-i'])]
+        bool $interactive = true,
     ): void {
         $testEnvironment = new TestEnvironment(
             verbose: $verbose,
@@ -51,10 +56,26 @@ final class TestCommand
 
         $this->container->singleton(TestEnvironment::class, $testEnvironment);
 
-        (new ChunkAndRunTests($testEnvironment))(
-            tests: $this->getTests($filter),
-            processes: $processes,
-        );
+        if ($interactive && ! $teamcity && Terminal::supportsTty()) {
+            $output = new InteractiveOutput(
+                fn (InteractiveOutput $output) => new ChunkAndRunTests(
+                    testEnvironment: $testEnvironment,
+                    outputHandler: $output->appendProcessOutput(...),
+                )->runWithUpdates(
+                    tests: $this->getTests($filter),
+                    processes: $processes,
+                ),
+            );
+            $output->testEnvironment = $testEnvironment;
+
+            $this->container->singleton(TestOutput::class, $output);
+            $this->console->component($output);
+        } else {
+            new ChunkAndRunTests($testEnvironment)(
+                tests: $this->getTests($filter),
+                processes: $processes,
+            );
+        }
     }
 
     private function getTests(?string $filter): ImmutableArray
