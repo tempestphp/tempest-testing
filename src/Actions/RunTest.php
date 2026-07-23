@@ -74,7 +74,7 @@ final class RunTest
     private function runEntry(Test $test, object $instance, array $data): void
     {
         event(new TestStarted($test->name));
-
+        
         try {
             $this->runBefore($test, $instance);
 

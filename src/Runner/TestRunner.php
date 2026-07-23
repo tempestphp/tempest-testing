@@ -27,7 +27,7 @@ final class TestRunner
             PHP_BINDIR . '/php',
             'tempest',
             'test:run',
-            $this->name,
+            '--name=' . $this->name,
             ...$tests,
         ];
 

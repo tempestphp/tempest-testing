@@ -24,6 +24,6 @@ trait TestsConsole
     #[After]
     public function testsConsoleAfter(Container $container): void
     {
-        //        $container->singleton(Console::class, $this->originalConsole);
+        $container->singleton(Console::class, $this->originalConsole);
     }
 }
