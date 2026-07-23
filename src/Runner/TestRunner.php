@@ -13,6 +13,7 @@ final class TestRunner
 {
     public function __construct(
         public readonly string $name = 'default',
+        public readonly bool $debug = false,
     ) {}
 
     private ?Process $process = null;
@@ -30,6 +31,10 @@ final class TestRunner
             ...$tests,
         ];
 
+        if ($this->debug) {
+            echo '> ENVIRONMENT=testing ' . implode(' ', $command) . PHP_EOL;
+        }
+
         $this->process = new Process($command, env: [
             'ENVIRONMENT' => Environment::TESTING->value,
         ]);
@@ -41,6 +46,10 @@ final class TestRunner
                 }
 
                 if (str_starts_with($line, '[EVENT]')) {
+                    if ($this->debug) {
+                        echo $line . PHP_EOL;
+                    }
+
                     $payload = json_decode(substr($line, strlen('[EVENT] ')), true);
 
                     if (! is_array($payload) || ! is_string($payload['event'] ?? null) || ! array_key_exists('data', $payload)) {

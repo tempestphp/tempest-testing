@@ -35,10 +35,14 @@ final class TestCommand
         int $processes = 5,
         #[ConsoleArgument(description: 'Show all output, including succeeding and skipped tests', aliases: ['-v'])]
         bool $verbose = false,
+        #[ConsoleArgument(description: 'Show debug output', aliases: ['-d'])]
+        bool $debug = false,
         #[ConsoleArgument(description: 'Use teamcity output format')]
         bool $teamcity = false,
     ): void {
-        (new ChunkAndRunTests())(
+        new ChunkAndRunTests(
+            debug: $debug,
+        )(
             tests: $this->getTests($filter),
             processes: $processes,
         );

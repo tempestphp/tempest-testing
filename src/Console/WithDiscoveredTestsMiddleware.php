@@ -10,10 +10,12 @@ use Tempest\Container\Container;
 use Tempest\Discovery\BootDiscovery;
 use Tempest\Discovery\Composer;
 use Tempest\Discovery\DiscoveryLocation;
+use Tempest\Discovery\SkipDiscovery;
 use Tempest\Testing\Discovery\TestDiscovery;
 
 use function Tempest\Support\arr;
 
+#[SkipDiscovery]
 final readonly class WithDiscoveredTestsMiddleware implements ConsoleMiddleware
 {
     public function __construct(

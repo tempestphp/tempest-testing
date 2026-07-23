@@ -13,6 +13,10 @@ use function Tempest\EventBus\event;
 
 final class ChunkAndRunTests
 {
+    public function __construct(
+        private bool $debug = false,
+    ) {}
+
     public function __invoke(ImmutableArray $tests, int $processes): void
     {
         $chunks = max(1, (int) ceil($tests->count() / $processes));
@@ -21,7 +25,10 @@ final class ChunkAndRunTests
             ->chunk($chunks)
             ->map(function (ImmutableArray $tests, int|string $i): TestRunner { // @mago-expect lint:prefer-arrow-function
                 /** @var ImmutableArray<array-key, Test> $tests */
-                return new TestRunner((string) $i)->run($tests);
+                return new TestRunner(
+                    name: (string) $i,
+                    debug: $this->debug,
+                )->run($tests);
             });
 
         event(new TestsChunked($tests->count()));

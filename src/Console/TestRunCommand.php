@@ -9,11 +9,21 @@ use Tempest\Console\ConsoleCommand;
 use Tempest\Console\HasConsole;
 use Tempest\Container\Container;
 use Tempest\Container\GenericContainer;
+use Tempest\Core\FrameworkKernel;
+use Tempest\Core\Kernel;
+use Tempest\Database\Config\DatabaseConfig;
+use Tempest\Database\Database;
+use Tempest\Discovery\DiscoveryConfig;
+use Tempest\Discovery\DiscoveryLocation;
 use Tempest\EventBus\EventBusConfig;
 use Tempest\Testing\Actions\RunTest;
 use Tempest\Testing\Events\DispatchToParentProcessMiddleware;
 use Tempest\Testing\Runner\TestRunner;
 use Tempest\Testing\Test;
+use Tempest\View\ViewConfig;
+use function Tempest\env;
+use function Tempest\Support\Path\normalize;
+use function Tempest\Support\Path\to_absolute_path;
 
 final class TestRunCommand
 {
@@ -21,7 +31,7 @@ final class TestRunCommand
 
     public function __construct(
         private readonly Container $container,
-        private readonly EventBusConfig $eventBusConfig,
+        private readonly Kernel $kernel,
     ) {}
 
     #[ConsoleCommand(
@@ -30,12 +40,8 @@ final class TestRunCommand
     )]
     public function __invoke(string $name, array $tests): void
     {
-        $container = $this->resolveContainer();
-        $runTest = new RunTest($container);
-        $container->singleton(RunTest::class, $runTest);
-        $container->singleton(TestRunner::class, new TestRunner($name));
-
-        $this->eventBusConfig->middleware->add(DispatchToParentProcessMiddleware::class);
+        $testRunner = new TestRunner($name);
+        $runTest = new RunTest($this->resolveContainer($testRunner));
 
         foreach ($tests as $testName) {
             try {
@@ -50,39 +56,29 @@ final class TestRunCommand
         }
     }
 
-    private function resolveContainer(): Container
+    private function resolveContainer(TestRunner $testRunner): Container
     {
-        $container = $this->container;
+        // Setup discovery locations
+        $discoveryLocations = [];
 
-        if (! $container instanceof GenericContainer) {
-            return $container;
+        $testsPath = to_absolute_path($this->kernel->root, 'tests');
+
+        if (is_dir($testsPath)) {
+            $discoveryLocations[] = new DiscoveryLocation('Tests', $testsPath);
         }
 
-        $clonedSingletons = new ArrayIterator();
-
-        foreach ($container->singletonDefinitions as $index => $singleton) {
-            $clonedSingletons[$index] = is_object($singleton) ? clone $singleton : $singleton;
-        }
-
-        $clonedDefinitions = new ArrayIterator();
-
-        foreach ($container->definitions as $index => $definition) {
-            $clonedDefinitions[$index] = is_object($definition) ? clone $definition : $definition;
-        }
-
-        $clone = new GenericContainer(
-            definitions: $clonedDefinitions,
-            singletonDefinitions: $clonedSingletons,
-            initializers: $container->initializers,
-            dynamicInitializers: $container->dynamicInitializers,
-            decorators: $container->decorators,
+        // Boot a new kernel for this testing process
+        $kernel = FrameworkKernel::boot(
+            root: $this->kernel->root,
+            discoveryLocations: $discoveryLocations,
+            internalStorage: $this->kernel->root . '/.tempest/test_internal_storage/' . $testRunner->name,
         );
 
-        $clone->singleton(Container::class, $clone);
+        // Configure the container for this testing process
+        $container = $kernel->container;
+        $container->singleton(TestRunner::class, $testRunner);
+        $container->get(EventBusConfig::class)->middleware->add(DispatchToParentProcessMiddleware::class);
 
-        $property = new ReflectionProperty($clone, 'instance');
-        $property->setValue($clone, $clone);
-
-        return $clone;
+        return $kernel->container;
     }
 }
