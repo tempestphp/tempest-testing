@@ -11,7 +11,7 @@ use function Tempest\EventBus\event;
 final class TestRunner
 {
     public function __construct(
-        public readonly string $name = 'default', // @mago-expect analysis:unused-property
+        public readonly string $name = 'default',
     ) {}
 
     private ?Process $process = null;
