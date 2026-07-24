@@ -12,6 +12,7 @@ final class TestFinished implements DispatchToParentProcess, ConvertsToTeamcityM
 {
     public function __construct(
         public string $name,
+        public float $duration = 0.0,
     ) {}
 
     public TeamcityMessage $teamcityMessage {
@@ -19,6 +20,7 @@ final class TestFinished implements DispatchToParentProcess, ConvertsToTeamcityM
             TeamcityMessageName::TEST_FINISHED,
             [
                 'name' => $this->name,
+                'duration' => (string) (int) round($this->duration),
             ],
         );
     }
@@ -27,13 +29,21 @@ final class TestFinished implements DispatchToParentProcess, ConvertsToTeamcityM
     {
         return [
             'name' => $this->name,
+            'duration' => $this->duration,
         ];
     }
 
     public static function deserialize(array $data): DispatchToParentProcess
     {
+        $duration = $data['duration'] ?? 0.0;
+
+        if (! is_int($duration) && ! is_float($duration) && ! is_string($duration)) {
+            $duration = 0.0;
+        }
+
         return new self(
             name: $data['name'],
+            duration: (float) $duration,
         );
     }
 }

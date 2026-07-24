@@ -78,6 +78,8 @@ final class RunTest
 
     private function runEntry(Test $test, object $instance, array $data): bool
     {
+        $start = hrtime(true);
+
         event(new TestStarted($test->name));
 
         try {
@@ -122,7 +124,10 @@ final class RunTest
             $passed = false;
         }
 
-        event(new TestFinished($test->name));
+        event(new TestFinished(
+            name: $test->name,
+            duration: (hrtime(true) - $start) / 1_000_000,
+        ));
 
         return $passed;
     }

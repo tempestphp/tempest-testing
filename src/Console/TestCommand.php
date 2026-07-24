@@ -61,11 +61,7 @@ final class TestCommand
 
         $this->container->singleton(TestEnvironment::class, $testEnvironment);
 
-        $shouldBeInteractive =
-            ! $debug
-            && ! $teamcity
-            && $interaction
-            && ($this->supportsTty ?? Terminal::supportsTty(...))();
+        $shouldBeInteractive = ! $debug && ! $teamcity && $interaction && ($this->supportsTty ?? Terminal::supportsTty(...))();
 
         if ($shouldBeInteractive) {
             $output = new InteractiveOutput(

@@ -180,8 +180,7 @@ final class TestRunner
 
         if (str_starts_with($line, '[EVENT]')) {
             if ($this->testEnvironment->debug) {
-                $timestamp = date('Y-m-d H:i:s.v');
-                $this->writeOutput("[$timestamp] {$line}");
+                $this->writeOutput($line);
             }
 
             $payload = json_decode(substr($line, strlen('[EVENT] ')), true);

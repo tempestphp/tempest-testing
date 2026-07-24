@@ -41,6 +41,7 @@ final class FailingTest
         });
         $this->events->wasDispatched(TestFinished::class, function (TestFinished $event) use ($test): void {
             test($event->name)->is($test->name);
+            test($event->duration)->greaterThanOrEqual(0);
         });
         $this->events->wasNotDispatched(TestSucceeded::class);
     }
@@ -65,6 +66,7 @@ final class FailingTest
         });
         $this->events->wasDispatched(TestFinished::class, function (TestFinished $event) use ($test): void {
             test($event->name)->is($test->name);
+            test($event->duration)->greaterThanOrEqual(0);
         });
         $this->events->wasNotDispatched(TestSucceeded::class);
     }
@@ -104,6 +106,24 @@ final class FailingTest
         test($deserialized->reason)->is($event->reason);
         test($deserialized->location)->is($event->location);
         test($deserialized->trace)->is($event->trace);
+    }
+
+    #[Test]
+    public function test_finished_serializes_and_deserializes_duration(): void
+    {
+        $event = new TestFinished(
+            name: 'Tests\ExampleTest::it_finishes',
+            duration: 12.34,
+        );
+
+        $deserialized = TestFinished::deserialize($event->serialize());
+
+        if (! $deserialized instanceof TestFinished) {
+            test()->fail('Expected deserialized event to be a TestFinished instance.');
+        }
+
+        test($deserialized->name)->is($event->name);
+        test($deserialized->duration)->is($event->duration);
     }
 
     #[Test]
