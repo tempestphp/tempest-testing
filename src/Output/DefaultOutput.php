@@ -64,9 +64,7 @@ final class DefaultOutput implements TestOutput
     {
         $this->result->addSkipped();
 
-        $showSkipped = $this->testEnvironment->debug
-            || ($this->testEnvironment->skipped && $event->location)
-            || ($this->testEnvironment->verbose && $event->location);
+        $showSkipped = $this->testEnvironment->debug || $this->testEnvironment->skipped && $event->location || $this->testEnvironment->verbose && $event->location;
 
         if ($showSkipped) {
             $this->warning($event->name);

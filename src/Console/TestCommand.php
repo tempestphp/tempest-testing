@@ -74,7 +74,7 @@ final class TestCommand
             $this->container->singleton(TestOutput::class, $output);
             $this->console->component($output);
         } else {
-            new ChunkAndRunTests($testEnvironment)(
+            (new ChunkAndRunTests($testEnvironment))(
                 tests: $this->getTests($filter),
                 processes: $processes,
             );
