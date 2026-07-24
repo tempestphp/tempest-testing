@@ -2,6 +2,7 @@
 
 namespace Tempest\Testing\Tests;
 
+use Closure;
 use Generator;
 use ReflectionClass;
 use ReflectionMethod;
@@ -44,7 +45,10 @@ final class OutputImplementationsTest
 
         $output = new TestOutputInitializer()->initialize($container);
 
-        test($output)->instanceOf(DefaultOutput::class);
+        if (! $output instanceof DefaultOutput) {
+            test()->fail('Output was not a DefaultOutput.');
+        }
+
         test($output->testEnvironment)->is($environment);
     }
 
@@ -58,7 +62,10 @@ final class OutputImplementationsTest
 
         $output = new TestOutputInitializer()->initialize($container);
 
-        test($output)->instanceOf(TeamcityOutput::class);
+        if (! $output instanceof TeamcityOutput) {
+            test()->fail('Output was not a TeamcityOutput.');
+        }
+
         test($output->testEnvironment)->is($environment);
     }
 
@@ -334,11 +341,12 @@ final class OutputImplementationsTest
         return $output;
     }
 
+    /** @param null|Closure(InteractiveOutput): iterable $runner */
     private function interactiveOutput(
         ?TestEnvironment $environment = null,
-        ?\Closure $runner = null,
+        ?Closure $runner = null,
     ): InteractiveOutput {
-        $output = new InteractiveOutput($runner ?? fn (): array => []);
+        $output = new InteractiveOutput($runner ?? fn (InteractiveOutput $output): array => []);
         $output->testEnvironment = $environment ?? new TestEnvironment();
 
         return $output;
@@ -355,14 +363,24 @@ final class OutputImplementationsTest
     private function renderLiveBody(InteractiveOutput $output, Terminal $terminal): string
     {
         $method = new ReflectionMethod($output, 'renderLiveBody');
+        $body = $method->invoke($output, $terminal);
 
-        return $method->invoke($output, $terminal);
+        if (! is_string($body)) {
+            test()->fail('Live body did not render to a string.');
+        }
+
+        return $body;
     }
 
     private function renderFinalBody(InteractiveOutput $output, Terminal $terminal): string
     {
         $method = new ReflectionMethod($output, 'renderFinalBody');
+        $body = $method->invoke($output, $terminal);
 
-        return $method->invoke($output, $terminal);
+        if (! is_string($body)) {
+            test()->fail('Final body did not render to a string.');
+        }
+
+        return $body;
     }
 }

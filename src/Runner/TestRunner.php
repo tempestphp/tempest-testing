@@ -3,6 +3,7 @@
 namespace Tempest\Testing\Runner;
 
 use Closure;
+use ReflectionClass;
 use Symfony\Component\Process\Process;
 use Tempest\Core\Environment;
 use Tempest\Support\Arr\ImmutableArray;
@@ -194,7 +195,11 @@ final class TestRunner
                 return;
             }
 
-            $event = $eventClass::deserialize($payload['data']);
+            if (! new ReflectionClass($eventClass)->isInstantiable()) {
+                return;
+            }
+
+            $event = $eventClass::deserialize($payload['data']); // @mago-expect analysis:possibly-static-access-on-interface
 
             event($event);
 

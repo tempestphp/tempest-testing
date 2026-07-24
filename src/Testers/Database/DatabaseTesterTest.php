@@ -67,8 +67,10 @@ final class DatabaseTesterTest
             $firstDatabase = $container->get(Database::class, 'first');
             $secondDatabase = $container->get(Database::class, 'second');
 
-            test($firstDatabase)->instanceOf(GenericDatabase::class);
-            test($secondDatabase)->instanceOf(GenericDatabase::class);
+            if (! $firstDatabase instanceof GenericDatabase || ! $secondDatabase instanceof GenericDatabase) {
+                test()->fail('Tagged databases did not resolve to generic databases.');
+            }
+
             test($firstDatabase->connection->config->dsn)->contains($firstRunnerPath);
             test($secondDatabase->connection->config->dsn)->contains($secondRunnerPath);
             test($firstDatabase->connection)->isNot($secondDatabase->connection);
@@ -85,30 +87,10 @@ final class DatabaseTesterTest
                 ['name' => 'second', 'age' => 2],
             ));
 
-            test(
-                (int) $firstDatabase->fetchFirst(new Query(
-                    'SELECT COUNT(*) AS count FROM database_tester_entries WHERE name = :name',
-                    ['name' => 'first'],
-                ))['count'],
-            )->is(1);
-            test(
-                (int) $firstDatabase->fetchFirst(new Query(
-                    'SELECT COUNT(*) AS count FROM database_tester_entries WHERE name = :name',
-                    ['name' => 'second'],
-                ))['count'],
-            )->is(0);
-            test(
-                (int) $secondDatabase->fetchFirst(new Query(
-                    'SELECT COUNT(*) AS count FROM database_tester_entries WHERE name = :name',
-                    ['name' => 'second'],
-                ))['count'],
-            )->is(1);
-            test(
-                (int) $secondDatabase->fetchFirst(new Query(
-                    'SELECT COUNT(*) AS count FROM database_tester_entries WHERE name = :name',
-                    ['name' => 'first'],
-                ))['count'],
-            )->is(0);
+            test($this->entryCount($firstDatabase, 'first'))->is(1);
+            test($this->entryCount($firstDatabase, 'second'))->is(0);
+            test($this->entryCount($secondDatabase, 'second'))->is(1);
+            test($this->entryCount($secondDatabase, 'first'))->is(0);
         } finally {
             $this->clearTestingConnections();
             @unlink($firstPath);
@@ -227,7 +209,10 @@ final class DatabaseTesterTest
 
         $config = $this->resolveConfig(new SQLiteConfig(path: $path), 'runner-a');
 
-        test($config)->instanceOf(SQLiteConfig::class);
+        if (! $config instanceof SQLiteConfig) {
+            test()->fail('SQLite config was not resolved.');
+        }
+
         test($config->path)->is(sys_get_temp_dir() . '/tempest-testing-runner-a.sqlite');
     }
 
@@ -236,7 +221,10 @@ final class DatabaseTesterTest
     {
         $config = $this->resolveConfig(new SQLiteConfig(path: ':memory:'), 'runner-a');
 
-        test($config)->instanceOf(SQLiteConfig::class);
+        if (! $config instanceof SQLiteConfig) {
+            test()->fail('SQLite config was not resolved.');
+        }
+
         test($config->path)->is(':memory:');
     }
 
@@ -245,7 +233,10 @@ final class DatabaseTesterTest
     {
         $config = $this->resolveConfig(new MysqlConfig(database: 'app'), 'runner-a');
 
-        test($config)->instanceOf(MysqlConfig::class);
+        if (! $config instanceof MysqlConfig) {
+            test()->fail('MySQL config was not resolved.');
+        }
+
         test($config->database)->is('app-runner-a');
     }
 
@@ -254,7 +245,10 @@ final class DatabaseTesterTest
     {
         $config = $this->resolveConfig(new PostgresConfig(database: 'app'), 'runner-a');
 
-        test($config)->instanceOf(PostgresConfig::class);
+        if (! $config instanceof PostgresConfig) {
+            test()->fail('Postgres config was not resolved.');
+        }
+
         test($config->database)->is('app-runner-a');
     }
 
@@ -275,8 +269,10 @@ final class DatabaseTesterTest
             $runnerBContainer = $this->initializerContainer($baseConfig, 'runner-b');
             new TestingDatabaseInitializer()->initialize(new ClassReflector(Database::class), 'main', $runnerBContainer);
 
-            test($runnerAConfig)->instanceOf(SQLiteConfig::class);
-            test($runnerBConfig)->instanceOf(SQLiteConfig::class);
+            if (! $runnerAConfig instanceof SQLiteConfig || ! $runnerBConfig instanceof SQLiteConfig) {
+                test()->fail('Runner configs were not resolved to SQLite configs.');
+            }
+
             test($runnerAConfig->path)->isNot($runnerBConfig->path);
             test($this->connectionKey($runnerAConfig))->isNot($this->connectionKey($runnerBConfig));
             test($runnerBContainer->get(Connection::class, 'main'))->isNot($runnerAConnection);
@@ -301,6 +297,20 @@ final class DatabaseTesterTest
         ));
     }
 
+    private function entryCount(Database $database, string $name): int
+    {
+        $row = $database->fetchFirst(new Query(
+            'SELECT COUNT(*) AS count FROM database_tester_entries WHERE name = :name',
+            ['name' => $name],
+        ));
+
+        if (! is_array($row) || ! array_key_exists('count', $row)) {
+            test()->fail('Could not fetch entry count.');
+        }
+
+        return (int) $row['count'];
+    }
+
     private function initializerContainer(DatabaseConfig $config, string $runnerName): GenericContainer
     {
         $container = new GenericContainer();
@@ -315,18 +325,30 @@ final class DatabaseTesterTest
     {
         $method = new ReflectionMethod(TestingDatabaseInitializer::class, 'resolveConfig');
 
-        return $method->invoke(
+        $config = $method->invoke(
             new TestingDatabaseInitializer(),
             $this->initializerContainer($config, $runnerName),
             $tag,
         );
+
+        if (! $config instanceof DatabaseConfig) {
+            test()->fail('Testing database initializer did not resolve a database config.');
+        }
+
+        return $config;
     }
 
     private function connectionKey(DatabaseConfig $config): string
     {
         $method = new ReflectionMethod(TestingDatabaseInitializer::class, 'getConnectionKey');
 
-        return $method->invoke(new TestingDatabaseInitializer(), $config);
+        $key = $method->invoke(new TestingDatabaseInitializer(), $config);
+
+        if (! is_string($key)) {
+            test()->fail('Testing database initializer did not resolve a connection key.');
+        }
+
+        return $key;
     }
 
     private function storeTestingConnection(DatabaseConfig $config, Connection $connection): void
@@ -334,6 +356,11 @@ final class DatabaseTesterTest
         $property = new ReflectionClass(TestingDatabaseInitializer::class)->getProperty('connections');
 
         $connections = $property->getValue();
+
+        if (! is_array($connections)) {
+            test()->fail('Testing database connections cache was not an array.');
+        }
+
         $connections[$this->connectionKey($config)] = $connection;
 
         $property->setValue(null, $connections);
@@ -342,8 +369,17 @@ final class DatabaseTesterTest
     private function clearTestingConnections(): void
     {
         $property = new ReflectionClass(TestingDatabaseInitializer::class)->getProperty('connections');
+        $connections = $property->getValue();
 
-        foreach ($property->getValue() as $connection) {
+        if (! is_array($connections)) {
+            test()->fail('Testing database connections cache was not an array.');
+        }
+
+        foreach ($connections as $connection) {
+            if (! $connection instanceof Connection) {
+                continue;
+            }
+
             $connection->close();
         }
 

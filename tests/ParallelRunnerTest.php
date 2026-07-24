@@ -9,6 +9,7 @@ use Symfony\Component\Process\Process;
 use Tempest\Container\Container;
 use Tempest\EventBus\EventBus;
 use Tempest\Reflection\MethodReflector;
+use Tempest\Support\Arr\ImmutableArray;
 use Tempest\Testing\Actions\ChunkAndRunTests;
 use Tempest\Testing\Events\TestFinished;
 use Tempest\Testing\Events\TestRunEnded;
@@ -139,7 +140,7 @@ final class ParallelRunnerTest
         );
 
         try {
-            $runner->run(arr([]));
+            $runner->run(new ImmutableArray([]));
 
             $process = $this->getRunnerProcess($runner);
 
@@ -286,13 +287,19 @@ final class ParallelRunnerTest
         test($lines)->is(['partial stdout', 'partial stderr']);
     }
 
-    /** @param non-empty-list<string> $methods */
-    private function testsFor(array $methods): \Tempest\Support\Arr\ImmutableArray
+    /**
+     * @param non-empty-list<string> $methods
+     * @return ImmutableArray<array-key, Test>
+     */
+    private function testsFor(array $methods): ImmutableArray
     {
-        return arr(array_map(
+        /** @var array<int, Test> $tests */
+        $tests = array_map(
             fn (string $method) => Test::fromReflector(new MethodReflector(new ReflectionMethod(ParallelRunnerFixture::class, $method))),
             $methods,
-        ));
+        );
+
+        return new ImmutableArray($tests); // @mago-expect analysis:less-specific-nested-return-statement
     }
 
     /** @param array<int, object> $events */
@@ -354,6 +361,10 @@ final class ParallelRunnerTest
         $method = new ReflectionMethod($runner, 'consumeOutput');
         $updated = $method->invokeArgs($runner, [$buffer, &$pending]);
         $this->setRunnerBuffer($runner, $propertyName, $pending);
+
+        if (! is_bool($updated)) {
+            test()->fail('Runner output consumption did not return a boolean.');
+        }
 
         return $updated;
     }

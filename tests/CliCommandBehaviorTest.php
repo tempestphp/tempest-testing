@@ -20,6 +20,7 @@ use Tempest\Http\GenericRequest;
 use Tempest\Http\Request;
 use Tempest\Reflection\ClassReflector;
 use Tempest\Reflection\MethodReflector;
+use Tempest\Support\Arr\ImmutableArray;
 use Tempest\Testing\Actions\RunTest;
 use Tempest\Testing\Config\TestConfig;
 use Tempest\Testing\Console\TestCommand;
@@ -135,11 +136,28 @@ final class CliCommandBehaviorTest
             fn () => $getTests->invoke($command, 'matching'),
         );
 
+        if (! $tests instanceof ImmutableArray) {
+            test()->fail('Filtered tests did not resolve to an immutable array.');
+        }
+
         test($tests->count())->is(1);
-        test($tests[0]->name)->is($matching->name);
+        $filteredTests = array_values($tests->toArray());
+        $filteredTest = $filteredTests[0] ?? null;
+
+        if (! $filteredTest instanceof Test) {
+            test()->fail('Filtered tests did not contain a test.');
+        }
+
+        test($filteredTest->name)->is($matching->name);
         test($eventBus->events)->hasCount(1);
-        test($eventBus->events[0])->instanceOf(TestSkipped::class);
-        test($eventBus->events[0]->name)->is($excluded->name);
+
+        $event = $eventBus->events[0];
+
+        if (! $event instanceof TestSkipped) {
+            test()->fail('Filtered test did not dispatch a skipped event.');
+        }
+
+        test($event->name)->is($excluded->name);
     }
 
     #[Test]
@@ -310,10 +328,15 @@ final class CliCommandFixture
         $middleware = iterator_to_array($config->middleware->unwrap());
 
         $this->log('test-runner=' . $testRunner->name);
-        $this->log('run-test=' . ($container->get(RunTest::class) instanceof RunTest ? 'yes' : 'no'));
-        $this->log('environment=' . ($container->get(TestEnvironment::class) instanceof TestEnvironment ? 'yes' : 'no'));
-        $this->log('request=' . ($container->get(Request::class) instanceof Request ? 'yes' : 'no'));
-        $this->log('generic-request=' . ($container->get(GenericRequest::class) instanceof GenericRequest ? 'yes' : 'no'));
+        $container->get(RunTest::class);
+        $container->get(TestEnvironment::class);
+        $container->get(Request::class);
+        $container->get(GenericRequest::class);
+
+        $this->log('run-test=yes');
+        $this->log('environment=yes');
+        $this->log('request=yes');
+        $this->log('generic-request=yes');
         $this->log('middleware=' . (array_key_exists(DispatchToParentProcessMiddleware::class, $middleware) ? 'yes' : 'no'));
         $this->log('internal-storage=' . $kernel->internalStorage);
     }
@@ -420,7 +443,11 @@ final class CapturingConsole implements Console
     ): int|string|Stringable|UnitEnum|array|null {
         unset($question, $options, $multiple, $multiline, $placeholder, $hint, $validation);
 
-        return $default;
+        if ($default === null || is_int($default) || is_string($default) || $default instanceof Stringable || $default instanceof UnitEnum || is_array($default)) {
+            return $default;
+        }
+
+        return null;
     }
 
     public function confirm(string $question, bool $default = false, ?string $yes = null, ?string $no = null): bool
@@ -512,7 +539,9 @@ final class CapturingConsole implements Console
     public function when(mixed $condition, Closure $callback): self
     {
         if ($condition === true || $condition instanceof Closure && $condition($this) === true) {
-            return $callback($this);
+            $console = $callback($this);
+
+            return $console instanceof self ? $console : $this;
         }
 
         return $this;
@@ -521,7 +550,9 @@ final class CapturingConsole implements Console
     public function unless(mixed $condition, Closure $callback): self
     {
         if ($condition === false || $condition instanceof Closure && $condition($this) === false) {
-            return $callback($this);
+            $console = $callback($this);
+
+            return $console instanceof self ? $console : $this;
         }
 
         return $this;
