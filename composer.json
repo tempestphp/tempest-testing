@@ -8,7 +8,8 @@
         "tempest/event-bus":  "*",
         "tempest/console": "*",
         "psr/container": "^2.0",
-        "symfony/process": "^7.4"
+        "symfony/process": "^7.4",
+        "fidry/cpu-core-counter": "*"
     },
     "require-dev": {
         "tempest/framework": "^3.16",

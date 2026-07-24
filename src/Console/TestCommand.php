@@ -3,6 +3,7 @@
 namespace Tempest\Testing\Console;
 
 use Closure;
+use Fidry\CpuCoreCounter\CpuCoreCounter;
 use Tempest\Console\ConsoleArgument;
 use Tempest\Console\ConsoleCommand;
 use Tempest\Console\HasConsole;
@@ -37,8 +38,8 @@ final class TestCommand
     public function __invoke(
         #[ConsoleArgument(description: 'Only run tests matching this fuzzy filter')]
         ?string $filter = null,
-        #[ConsoleArgument(description: 'Number of processes to run tests in parallel', aliases: ['-p'])]
-        int $processes = 5,
+        #[ConsoleArgument(description: 'Number of processes to run tests in parallel, will default to number of available cores', aliases: ['-p'])]
+        ?int $processes = null,
         #[ConsoleArgument(description: 'Show all output, including succeeding and skipped tests', aliases: ['-v'])]
         bool $verbose = false,
         #[ConsoleArgument(description: 'Fail as soon as an error occurs', aliases: ['-f'])]
@@ -54,6 +55,10 @@ final class TestCommand
         #[ConsoleArgument(description: 'Show interactive output', aliases: ['-i'])]
         bool $interaction = true,
     ): void {
+        if (! $processes) {
+            $processes = new CpuCoreCounter()->getAvailableForParallelisation()->availableCpus;
+        }
+
         $testEnvironment = new TestEnvironment(
             verbose: $verbose,
             debug: $debug,
