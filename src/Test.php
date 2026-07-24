@@ -74,6 +74,6 @@ final class Test
 
     public function matchesFilter(string $filter): bool
     {
-        return str_contains($this->name, $filter);
+        return str_contains($this->name, $filter) || str_contains(str_replace('\\', '', $this->name), $filter);
     }
 }

@@ -61,9 +61,13 @@ final class TestCommand
 
         $this->container->singleton(TestEnvironment::class, $testEnvironment);
 
-        $supportsTty = $this->supportsTty ?? Terminal::supportsTty(...);
+        $shouldBeInteractive =
+            ! $debug
+            && ! $teamcity
+            && $interaction
+            && ($this->supportsTty ?? Terminal::supportsTty(...))();
 
-        if ($interaction && ! $teamcity && $supportsTty()) {
+        if ($shouldBeInteractive) {
             $output = new InteractiveOutput(
                 fn (InteractiveOutput $output) => new ChunkAndRunTests(
                     testEnvironment: $testEnvironment,

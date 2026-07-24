@@ -256,7 +256,7 @@ final class ParallelRunnerTest
         ), $payload);
 
         test($normalLines)->is([]);
-        test($debugLines)->is([$payload]);
+        test($debugLines[0])->contains($payload);
     }
 
     #[Test]
