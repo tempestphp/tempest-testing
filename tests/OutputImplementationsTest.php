@@ -179,7 +179,7 @@ final class OutputImplementationsTest
         $output->onTestStarted(new TestStarted('Tests\ExampleTest::it_runs'));
         test($this->renderLiveBody($output, $terminal))->contains('Tests\ExampleTest::it_runs');
 
-        $output->onTestFinished(new TestFinished('Tests\ExampleTest::it_runs'));
+        $output->onTestFinished(new TestFinished('Tests\ExampleTest::it_runs', 'file.php:1'));
         test($this->renderLiveBody($output, $terminal))->is('');
 
         $output->onTestStarted(new TestStarted('Tests\ExampleTest::it_runs_again'));
@@ -202,6 +202,24 @@ final class OutputImplementationsTest
         test($output->renderFooter($terminal))->contains('1 failed');
         test($output->renderFooter($terminal))->contains('1 skipped');
         test($this->renderLiveBody($output, $terminal))->contains('raw process output');
+    }
+
+    #[Test]
+    public function interactive_output_shows_slow_tests_when_enabled(): void
+    {
+        $output = $this->interactiveOutput(new TestEnvironment(slow: true, slowThreshold: 50.0));
+        $terminal = $this->terminal(height: 20);
+
+        $output->onTestStarted(new TestStarted('Tests\ExampleTest::it_is_slow'));
+        $output->onTestFinished(new TestFinished('Tests\ExampleTest::it_is_slow', 'file.php:1', duration: 75.5));
+        $output->onTestFinished(new TestFinished('Tests\ExampleTest::it_is_fast', 'file.php:2', duration: 10.0));
+
+        test($this->renderLiveBody($output, $terminal))
+            ->contains('Tests\ExampleTest::it_is_slow')
+            ->contains('Took 75.5ms')
+            ->contains('file.php:1')
+            ->containsNot('Tests\ExampleTest::it_is_fast');
+        test($output->renderFooter($terminal))->contains('1 slow');
     }
 
     #[Test]
@@ -304,7 +322,7 @@ final class OutputImplementationsTest
 
                 $output->onTestRunStarted(new TestRunStarted());
                 $output->onTestStarted(new TestStarted('Tests\ExampleTest::it_runs'));
-                $output->onTestFinished(new TestFinished('Tests\ExampleTest::it_runs'));
+                $output->onTestFinished(new TestFinished('Tests\ExampleTest::it_runs', 'file.php:1'));
                 $output->onTestRunEnded(new TestRunEnded());
             })
             ->contains('##teamcity[testSuiteStarted')
@@ -321,14 +339,14 @@ final class OutputImplementationsTest
         test($result->elapsedTime)->is(0.0);
 
         $result->startTime();
-        usleep(20_000);
+        usleep(10_000);
         $running = $result->elapsedTime;
 
         test($running)->greaterThan(0);
 
         $result->endTime();
         $finished = $result->elapsedTime;
-        usleep(20_000);
+        usleep(10_000);
 
         test($result->elapsedTime)->is($finished);
     }

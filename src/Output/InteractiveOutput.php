@@ -60,11 +60,12 @@ final class InteractiveOutput implements InteractiveConsoleComponent, TestOutput
     public function renderFooter(Terminal $terminal): ?string
     {
         return sprintf(
-            '%s<style="bg-green"> %d succeeded </style> <style="bg-red"> %d failed </style> <style="bg-yellow"> %d skipped </style> <style="bg-blue"> %ss </style>',
+            '%s<style="bg-green"> %d succeeded </style> <style="bg-red"> %d failed </style> <style="bg-yellow"> %d skipped </style>%s <style="bg-blue"> %ss </style>',
             self::FOOTER_PREFIX,
             $this->result->succeeded,
             $this->result->failed,
             $this->result->skipped,
+            $this->testEnvironment->slow ? sprintf(' <style="bg-gray"> %d slow </style>', $this->result->slow) : '',
             $this->result->elapsedTime,
         );
     }
@@ -130,6 +131,19 @@ final class InteractiveOutput implements InteractiveConsoleComponent, TestOutput
 
     public function onTestFinished(TestFinished $event): void
     {
+        if ($this->testEnvironment->slow && $event->duration >= $this->testEnvironment->slowThreshold) {
+            $this->result->addSlow();
+
+            $this->appendBodyLine(sprintf(
+                '<style="fg-gray">%s</style>',
+                $event->name,
+            ));
+
+            $this->appendBodyLine(sprintf('  <style="fg-gray dim">//</style> <style="fg-gray">Took %sms</style>', $event->duration));
+            $this->appendBodyLine(sprintf('  <style="fg-gray dim">//</style> <style="fg-gray underline">%s</style>', $event->location));
+            $this->appendBodyLine();
+        }
+
         if ($this->currentTest === $event->name) {
             $this->currentTest = null;
         }

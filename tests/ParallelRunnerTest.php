@@ -233,6 +233,7 @@ final class ParallelRunnerTest
     {
         $payload = $this->eventPayload(TestFinished::class, [
             'name' => ParallelRunnerFixture::class . '::quiet',
+            'location' => 'file.php:1',
         ]);
         $normalLines = [];
         $debugLines = [];
@@ -443,6 +444,6 @@ final class ParallelRunnerFixture
 
     public function slowQuiet(): void
     {
-        usleep(300_000);
+        usleep(120_000);
     }
 }

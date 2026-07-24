@@ -8,6 +8,7 @@ final class TestResult
         public int $succeeded = 0,
         public int $failed = 0,
         public int $skipped = 0,
+        public int $slow = 0,
     ) {}
 
     private ?float $startTime = null;
@@ -54,6 +55,13 @@ final class TestResult
     public function addSkipped(): self
     {
         $this->skipped += 1;
+
+        return $this;
+    }
+
+    public function addSlow(): self
+    {
+        $this->slow += 1;
 
         return $this;
     }

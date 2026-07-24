@@ -342,7 +342,7 @@ final class FailFastFixture
 
     public function slow(): void
     {
-        usleep(300_000);
+        usleep(120_000);
 
         $this->log('slow');
     }

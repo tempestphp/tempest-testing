@@ -16,6 +16,9 @@ use function Tempest\EventBus\event;
 
 final class TestRunner
 {
+    /** @var array<class-string, bool> */
+    private static array $dispatchableEventClasses = [];
+
     public function __construct(
         public readonly string $name,
         public readonly TestEnvironment $testEnvironment,
@@ -191,15 +194,11 @@ final class TestRunner
 
             $eventClass = $payload['event'];
 
-            if (! is_subclass_of($eventClass, DispatchToParentProcess::class)) {
+            if (! $this->isDispatchableEventClass($eventClass)) {
                 return;
             }
 
-            if (! new ReflectionClass($eventClass)->isInstantiable()) {
-                return;
-            }
-
-            $event = $eventClass::deserialize($payload['data']); // @mago-expect analysis:possibly-static-access-on-interface
+            $event = $eventClass::deserialize($payload['data']);
 
             event($event);
 
@@ -215,6 +214,13 @@ final class TestRunner
         }
 
         $this->writeOutput($line);
+    }
+
+    private function isDispatchableEventClass(string $eventClass): bool
+    {
+        self::$dispatchableEventClasses[$eventClass] ??= is_subclass_of($eventClass, DispatchToParentProcess::class) && new ReflectionClass($eventClass)->isInstantiable();
+
+        return self::$dispatchableEventClasses[$eventClass];
     }
 
     private function writeOutput(string $line): void

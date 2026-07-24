@@ -126,6 +126,7 @@ final class RunTest
 
         event(new TestFinished(
             name: $test->name,
+            location: $test->location,
             duration: (hrtime(true) - $start) / 1_000_000,
         ));
 

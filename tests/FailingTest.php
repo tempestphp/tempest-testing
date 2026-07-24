@@ -113,6 +113,7 @@ final class FailingTest
     {
         $event = new TestFinished(
             name: 'Tests\ExampleTest::it_finishes',
+            location: '/tests/ExampleTest.php:10',
             duration: 12.34,
         );
 

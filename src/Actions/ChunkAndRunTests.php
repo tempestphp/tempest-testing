@@ -16,6 +16,8 @@ use function Tempest\EventBus\event;
 
 final class ChunkAndRunTests
 {
+    private const int POLL_INTERVAL_MICROSECONDS = 20_000;
+
     public function __construct(
         private TestEnvironment $testEnvironment,
         private readonly ?Closure $outputHandler = null,
@@ -75,7 +77,7 @@ final class ChunkAndRunTests
             }
 
             if ($running) {
-                usleep(80_000);
+                usleep(self::POLL_INTERVAL_MICROSECONDS);
             }
         } while ($running);
 

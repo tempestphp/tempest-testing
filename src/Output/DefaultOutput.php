@@ -89,6 +89,19 @@ final class DefaultOutput implements TestOutput
 
     public function onTestFinished(TestFinished $event): void
     {
+        if ($this->testEnvironment->slow && $event->duration >= $this->testEnvironment->slowThreshold) {
+            $this->result->addSlow();
+
+            $this->writeln(sprintf(
+                '<style="fg-gray">… </style><style="dim fg-gray">//</style> <style="fg-gray">%s</style>',
+                $event->name,
+            ));
+
+            $this->writeln(sprintf('  <style="fg-gray dim">//</style> <style="fg-gray">Took %sms</style>', $event->duration));
+            $this->writeln(sprintf('  <style="fg-gray dim">//</style> <style="fg-gray underline">%s</style>', $event->location));
+            $this->writeln();
+        }
+
         return;
     }
 
@@ -102,10 +115,11 @@ final class DefaultOutput implements TestOutput
         $this->result->endTime();
 
         $message = sprintf(
-            '<style="bg-green"> %d succeeded </style> <style="bg-red"> %d failed </style> <style="bg-yellow"> %d skipped </style> <style="bg-blue"> %ss </style>',
+            '<style="bg-green"> %d succeeded </style> <style="bg-red"> %d failed </style> <style="bg-yellow"> %d skipped </style>%s <style="bg-blue"> %ss </style>',
             $this->result->succeeded,
             $this->result->failed,
             $this->result->skipped,
+            $this->testEnvironment->slow ? sprintf(' <style="bg-gray"> %d slow </style>', $this->result->slow) : '',
             $this->result->elapsedTime,
         );
 
