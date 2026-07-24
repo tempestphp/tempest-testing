@@ -42,15 +42,15 @@ final class InteractiveOutput implements InteractiveConsoleComponent, TestOutput
 
     public function render(Terminal $terminal): Generator
     {
-        yield $this->body;
+        yield $this->renderLiveBody($terminal);
 
         foreach (($this->runner)($this) as $_) {
-            yield $this->body;
+            yield $this->renderLiveBody($terminal);
         }
 
-        yield $this->body;
-
         $this->setState(ComponentState::DONE);
+
+        yield $this->renderFinalBody($terminal);
 
         return $this->result->failed === 0;
     }
@@ -142,5 +142,43 @@ final class InteractiveOutput implements InteractiveConsoleComponent, TestOutput
         }
 
         $this->body .= $line;
+    }
+
+    private function renderLiveBody(Terminal $terminal): string
+    {
+        $maximumBodyLines = max(0, $terminal->height - 4);
+
+        if ($this->body === '' || $maximumBodyLines === 0) {
+            return '';
+        }
+
+        $lines = explode(PHP_EOL, $this->body);
+
+        if (count($lines) <= $maximumBodyLines) {
+            return $this->body;
+        }
+
+        $lines = array_slice($lines, -$maximumBodyLines);
+
+        while ($lines !== [] && ($lines[0] === '' || str_starts_with($lines[0], ' '))) {
+            array_shift($lines);
+        }
+
+        return implode(PHP_EOL, $lines);
+    }
+
+    private function renderFinalBody(Terminal $terminal): string
+    {
+        $footer = $this->renderFooter($terminal);
+
+        if ($this->body === '') {
+            return $footer ?? '';
+        }
+
+        if ($footer === null) {
+            return $this->body;
+        }
+
+        return $this->body . PHP_EOL . $footer;
     }
 }
