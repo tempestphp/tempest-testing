@@ -16,10 +16,10 @@ final class TestMetadataTest
     #[Test]
     public function location_includes_the_declaring_file_and_start_line(): void
     {
-        $test = Test::fromName(TestMetadataFixture::class . '::metadataSubject');
-        $reflection = new ReflectionMethod(TestMetadataFixture::class, 'metadataSubject');
+        $test = Test::fromName(TestMetadataFixture::class . '::_metadataSubject');
+        $reflection = new ReflectionMethod(TestMetadataFixture::class, '_metadataSubject');
 
-        test($test->location)->is($reflection->getFileName() . ':' . $reflection->getStartLine());
+        test($test->location)->is($this->expectedLocation($reflection));
     }
 
     #[Test]
@@ -33,15 +33,27 @@ final class TestMetadataTest
     #[Test]
     public function from_name_resolves_test_metadata(): void
     {
-        $test = Test::fromName(TestMetadataFixture::class . '::metadataSubject');
-        $reflection = new ReflectionMethod(TestMetadataFixture::class, 'metadataSubject');
+        $test = Test::fromName(TestMetadataFixture::class . '::_metadataSubject');
+        $reflection = new ReflectionMethod(TestMetadataFixture::class, '_metadataSubject');
 
-        test($test->handler->getName())->is('metadataSubject');
-        test($test->name)->is(TestMetadataFixture::class . '::metadataSubject');
-        test($test->location)->is($reflection->getFileName() . ':' . $reflection->getStartLine());
+        test($test->handler->getName())->is('_metadataSubject');
+        test($test->name)->is(TestMetadataFixture::class . '::_metadataSubject');
+        test($test->location)->is($this->expectedLocation($reflection));
         test(array_map(fn ($method) => $method->getName(), $test->before))->is(['firstBefore', 'secondBefore']);
         test(array_map(fn ($method) => $method->getName(), $test->after))->is(['secondAfter', 'firstAfter']);
         test($test->provide)->is(['metadataProvider', ['value' => 'inline']]);
+    }
+
+    private function expectedLocation(ReflectionMethod $reflection): string
+    {
+        $fileName = $reflection->getFileName();
+        $startLine = $reflection->getStartLine();
+
+        if ($fileName === false || $startLine === false) {
+            test()->fail('Expected test fixture reflection to have a file and start line.');
+        }
+
+        return "{$fileName}:{$startLine}";
     }
 }
 
@@ -66,7 +78,7 @@ final class TestMetadataFixture
             ['value' => 'inline'],
         ),
     ]
-    private function metadataSubject(string $value): void {}
+    private function _metadataSubject(string $value): void {}
 
     public function metadataProvider(): array
     {
