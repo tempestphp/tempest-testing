@@ -33,6 +33,8 @@ final class InteractiveOutput implements InteractiveConsoleComponent, TestOutput
 
     private string $body = '';
 
+    private ?string $currentTest = null;
+
     /** @param Closure(self): iterable $runner */
     public function __construct(
         private readonly Closure $runner,
@@ -74,7 +76,10 @@ final class InteractiveOutput implements InteractiveConsoleComponent, TestOutput
 
     public function onTestsChunked(TestsChunked $event): void {}
 
-    public function onTestStarted(TestStarted $event): void {}
+    public function onTestStarted(TestStarted $event): void
+    {
+        $this->currentTest = $event->name;
+    }
 
     public function onTestFailed(TestFailed $event): void
     {
@@ -123,7 +128,12 @@ final class InteractiveOutput implements InteractiveConsoleComponent, TestOutput
         }
     }
 
-    public function onTestFinished(TestFinished $event): void {}
+    public function onTestFinished(TestFinished $event): void
+    {
+        if ($this->currentTest === $event->name) {
+            $this->currentTest = null;
+        }
+    }
 
     public function onTestRunStarted(TestRunStarted $event): void
     {
@@ -133,6 +143,7 @@ final class InteractiveOutput implements InteractiveConsoleComponent, TestOutput
     public function onTestRunEnded(TestRunEnded $event): void
     {
         $this->result->endTime();
+        $this->currentTest = null;
     }
 
     private function appendBodyLine(string $line = ''): void
@@ -148,14 +159,22 @@ final class InteractiveOutput implements InteractiveConsoleComponent, TestOutput
     {
         $maximumBodyLines = max(0, $terminal->height - 4);
 
+        if ($this->body === '' && $this->currentTest !== null) {
+            return sprintf('<style="fg-blue">%s</style>', $this->currentTest);
+        }
+
         if ($this->body === '' || $maximumBodyLines === 0) {
             return '';
         }
 
         $lines = explode(PHP_EOL, $this->body);
 
+        if ($this->currentTest !== null) {
+            $lines[] = sprintf('<style="fg-blue">%s</style>', $this->currentTest);
+        }
+
         if (count($lines) <= $maximumBodyLines) {
-            return $this->body;
+            return implode(PHP_EOL, $lines);
         }
 
         $lines = array_slice($lines, -$maximumBodyLines);

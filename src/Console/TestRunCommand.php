@@ -113,8 +113,8 @@ final class TestRunCommand
         $container->get(EventBusConfig::class)->middleware->add(DispatchToParentProcessMiddleware::class);
 
         $request = new GenericRequest(Method::GET, '/', []);
-        $this->container->singleton(Request::class, fn () => $request);
-        $this->container->singleton(GenericRequest::class, fn () => $request);
+        $container->singleton(Request::class, fn () => $request);
+        $container->singleton(GenericRequest::class, fn () => $request);
 
         return $kernel->container;
     }

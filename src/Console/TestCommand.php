@@ -2,6 +2,7 @@
 
 namespace Tempest\Testing\Console;
 
+use Closure;
 use Tempest\Console\ConsoleArgument;
 use Tempest\Console\ConsoleCommand;
 use Tempest\Console\HasConsole;
@@ -26,6 +27,7 @@ final class TestCommand
     public function __construct(
         private readonly Container $container,
         private readonly TestConfig $testConfig,
+        private readonly ?Closure $supportsTty = null,
     ) {}
 
     #[ConsoleCommand(
@@ -59,7 +61,9 @@ final class TestCommand
 
         $this->container->singleton(TestEnvironment::class, $testEnvironment);
 
-        if ($interaction && ! $teamcity && Terminal::supportsTty()) {
+        $supportsTty = $this->supportsTty ?? Terminal::supportsTty(...);
+
+        if ($interaction && ! $teamcity && $supportsTty()) {
             $output = new InteractiveOutput(
                 fn (InteractiveOutput $output) => new ChunkAndRunTests(
                     testEnvironment: $testEnvironment,
