@@ -47,8 +47,8 @@ final class TestCommand
         bool $debug = false,
         #[ConsoleArgument(description: 'Show skipped tests')]
         bool $skipped = false,
-        #[ConsoleArgument(description: 'Show slow tests')]
-        bool $slow = false,
+        #[ConsoleArgument(description: 'Show slow tests, optionally threshold in milliseconds')]
+        bool|int $slow = false,
         #[ConsoleArgument(description: 'Use teamcity output format')]
         bool $teamcity = false,
         #[ConsoleArgument(description: 'Show interactive output', aliases: ['-i'])]
@@ -59,7 +59,8 @@ final class TestCommand
             debug: $debug,
             failFast: $failFast,
             skipped: $skipped,
-            slow: $slow,
+            slow: $slow !== false,
+            slowThreshold: is_int($slow) ? $slow : 200,
         );
 
         $this->container->singleton(TestEnvironment::class, $testEnvironment);

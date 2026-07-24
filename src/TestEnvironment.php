@@ -10,6 +10,6 @@ final readonly class TestEnvironment
         public bool $failFast = false,
         public bool $skipped = false,
         public bool $slow = false,
-        public float $slowThreshold = 200.0,
+        public int $slowThreshold = 200,
     ) {}
 }
