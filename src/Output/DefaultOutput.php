@@ -64,7 +64,11 @@ final class DefaultOutput implements TestOutput
     {
         $this->result->addSkipped();
 
-        if ($this->testEnvironment->verbose && $event->location) {
+        $showSkipped = $this->testEnvironment->debug
+            || ($this->testEnvironment->skipped && $event->location)
+            || ($this->testEnvironment->verbose && $event->location);
+
+        if ($showSkipped) {
             $this->warning($event->name);
             $this->writeln(sprintf('  <style="fg-yellow dim">//</style> <style="fg-yellow underline">%s</style>', $event->location));
 
@@ -73,8 +77,6 @@ final class DefaultOutput implements TestOutput
             }
 
             $this->writeln();
-        } elseif ($this->testEnvironment->debug) {
-            $this->warning("skipped: {$event->name}");
         }
     }
 
@@ -84,8 +86,6 @@ final class DefaultOutput implements TestOutput
 
         if ($this->testEnvironment->verbose) {
             $this->success($event->name);
-        } else {
-//            $this->write('<style="fg-green">✓</style>');
         }
     }
 

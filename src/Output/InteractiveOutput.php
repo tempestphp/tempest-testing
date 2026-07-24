@@ -39,6 +39,15 @@ final class InteractiveOutput implements InteractiveConsoleComponent, TestOutput
     /** @var string[] */
     private array $lines = [];
 
+    /** @var string[] */
+    private array $pendingLines = [];
+
+    private string $activeBody = '';
+
+    private ?string $activeFooter = null;
+
+    private bool $bodyChanged = false;
+
     private SpinnerRenderer $spinner;
 
     /** @param Closure(self): iterable $runner */
@@ -68,15 +77,21 @@ final class InteractiveOutput implements InteractiveConsoleComponent, TestOutput
 
     public function renderFooter(Terminal $terminal): ?string
     {
-        return implode(PHP_EOL, [
+        if (! $this->finished && ! $this->bodyChanged && $this->activeFooter !== null) {
+            return $this->activeFooter;
+        }
+
+        $this->activeFooter = implode(PHP_EOL, [
             $this->renderStatusLine(),
             $this->renderSummary($terminal),
         ]);
+
+        return $this->activeFooter;
     }
 
     public function appendProcessOutput(string $line): void
     {
-        $this->lines[] = $line;
+        $this->appendLine($line);
     }
 
     public function onTestsChunked(TestsChunked $event): void
@@ -93,32 +108,32 @@ final class InteractiveOutput implements InteractiveConsoleComponent, TestOutput
     {
         $this->result->addFailed();
 
-        $this->lines[] = sprintf('<style="fg-red">%s</style>', $event->name);
-        $this->lines[] = sprintf('  <style="fg-red dim">//</style> <style="fg-red underline">%s</style>', $event->location);
-        $this->lines[] = sprintf('  <style="fg-red dim">//</style> <style="fg-red">%s</style>', $event->reason);
+        $this->appendLine(sprintf('<style="fg-red">%s</style>', $event->name));
+        $this->appendLine(sprintf('  <style="fg-red dim">//</style> <style="fg-red underline">%s</style>', $event->location));
+        $this->appendLine(sprintf('  <style="fg-red dim">//</style> <style="fg-red">%s</style>', $event->reason));
 
         if ($this->testEnvironment->verbose && $event->trace) {
-            $this->lines[] = $event->trace;
+            $this->appendLine($event->trace);
         }
 
-        $this->lines[] = '';
+        $this->appendLine('');
     }
 
     public function onTestSkipped(TestSkipped $event): void
     {
         $this->result->addSkipped();
 
-        if ($this->testEnvironment->verbose && $event->location) {
-            $this->lines[] = sprintf('<style="fg-yellow">%s</style>', $event->name);
-            $this->lines[] = sprintf('  <style="fg-yellow dim">//</style> <style="fg-yellow underline">%s</style>', $event->location);
+        $showSkipped = $this->testEnvironment->debug || $this->testEnvironment->skipped && $event->location || $this->testEnvironment->verbose && $event->location;
+
+        if ($showSkipped) {
+            $this->appendLine(sprintf('<style="fg-yellow">%s</style>', $event->name));
+            $this->appendLine(sprintf('  <style="fg-yellow dim">//</style> <style="fg-yellow underline">%s</style>', $event->location));
 
             if ($event->reason) {
-                $this->lines[] = sprintf('  <style="fg-yellow dim">//</style> <style="fg-yellow">%s</style>', $event->reason);
+                $this->appendLine(sprintf('  <style="fg-yellow dim">//</style> <style="fg-yellow">%s</style>', $event->reason));
             }
 
-            $this->lines[] = '';
-        } elseif ($this->testEnvironment->debug) {
-            $this->lines[] = "skipped: {$event->name}";
+            $this->appendLine('');
         }
     }
 
@@ -127,7 +142,7 @@ final class InteractiveOutput implements InteractiveConsoleComponent, TestOutput
         $this->result->addSucceeded();
 
         if ($this->testEnvironment->verbose) {
-            $this->lines[] = sprintf('<style="fg-green">%s</style>', $event->name);
+            $this->appendLine(sprintf('<style="fg-green">%s</style>', $event->name));
         }
     }
 
@@ -151,13 +166,18 @@ final class InteractiveOutput implements InteractiveConsoleComponent, TestOutput
 
     private function renderBody(): string
     {
-        $lines = [];
+        $this->bodyChanged = $this->pendingLines !== [] || $this->finished;
 
-        if ($this->lines !== []) {
-            array_push($lines, ...$this->lines);
+        if ($this->pendingLines !== []) {
+            $this->activeBody = implode(PHP_EOL, $this->pendingLines);
+            $this->pendingLines = [];
         }
 
-        return implode(PHP_EOL, $lines);
+        if ($this->finished) {
+            return implode(PHP_EOL, $this->lines);
+        }
+
+        return $this->activeBody;
     }
 
     private function renderStatusLine(): string
@@ -187,5 +207,11 @@ final class InteractiveOutput implements InteractiveConsoleComponent, TestOutput
             $this->result->skipped,
             $this->result->elapsedTime,
         );
+    }
+
+    private function appendLine(string $line): void
+    {
+        $this->lines[] = $line;
+        $this->pendingLines[] = $line;
     }
 }

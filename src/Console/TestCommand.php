@@ -43,6 +43,8 @@ final class TestCommand
         bool $failFast = false,
         #[ConsoleArgument(description: 'Show debug output', aliases: ['-d'])]
         bool $debug = false,
+        #[ConsoleArgument(description: 'Show skipped tests')]
+        bool $skipped = false,
         #[ConsoleArgument(description: 'Use teamcity output format')]
         bool $teamcity = false,
         #[ConsoleArgument(description: 'Show interactive output', aliases: ['-i'])]
@@ -52,6 +54,7 @@ final class TestCommand
             verbose: $verbose,
             debug: $debug,
             failFast: $failFast,
+            skipped: $skipped,
         );
 
         $this->container->singleton(TestEnvironment::class, $testEnvironment);

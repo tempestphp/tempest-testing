@@ -8,5 +8,6 @@ final readonly class TestEnvironment
         public bool $verbose = false,
         public bool $debug = false,
         public bool $failFast = false,
+        public bool $skipped = false,
     ) {}
 }
