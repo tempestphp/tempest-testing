@@ -16,12 +16,14 @@ use Tempest\Database\Connection\PDOConnection;
 use Tempest\Database\Database;
 use Tempest\Database\GenericDatabase;
 use Tempest\Database\Transactions\GenericTransactionManager;
+use Tempest\Discovery\SkipDiscovery;
 use Tempest\EventBus\EventBus;
 use Tempest\Mapper\SerializerFactory;
 use Tempest\Reflection\ClassReflector;
 use Tempest\Testing\Runner\TestRunner;
 use UnitEnum;
 
+#[SkipDiscovery]
 final class TestingDatabaseInitializer implements DynamicInitializer
 {
     /** @var Connection[] */
