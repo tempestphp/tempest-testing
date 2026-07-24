@@ -6,6 +6,7 @@ use Closure;
 use Symfony\Component\Process\Process;
 use Tempest\Core\Environment;
 use Tempest\Support\Arr\ImmutableArray;
+use Tempest\Testing\Events\DispatchToParentProcess;
 use Tempest\Testing\Events\TestFailed;
 use Tempest\Testing\Test;
 use Tempest\Testing\TestEnvironment;
@@ -183,11 +184,16 @@ final class TestRunner
 
             $payload = json_decode(substr($line, strlen('[EVENT] ')), true);
 
-            if (! is_array($payload) || ! is_string($payload['event'] ?? null) || ! array_key_exists('data', $payload)) {
+            if (! is_array($payload) || ! is_string($payload['event'] ?? null) || ! is_array($payload['data'] ?? null)) {
                 return;
             }
 
             $eventClass = $payload['event'];
+
+            if (! is_subclass_of($eventClass, DispatchToParentProcess::class)) {
+                return;
+            }
+
             $event = $eventClass::deserialize($payload['data']);
 
             event($event);
