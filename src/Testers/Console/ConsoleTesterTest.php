@@ -2,7 +2,9 @@
 
 namespace Tempest\Testing\Testers\Console;
 
+use Tempest\Console\Console;
 use Tempest\Console\ExitCode;
+use Tempest\Container\Container;
 use Tempest\Testing\Test;
 
 use function Tempest\Testing\test;
@@ -53,5 +55,32 @@ final class ConsoleTesterTest
     public function isJson(): void
     {
         test(fn () => $this->console->call('config:show')->isJson())->succeeds();
+    }
+
+    #[Test]
+    public function restores_the_original_console_after_each_test(Container $container): void
+    {
+        $originalConsole = $container->get(Console::class);
+
+        $this->console->call(fn (Console $console) => $console->writeln('fake console'));
+
+        test($container->get(Console::class))->isNot($originalConsole);
+
+        $this->testsConsoleAfter($container);
+
+        test($container->get(Console::class))->is($originalConsole);
+    }
+
+    #[Test]
+    public function console_tests_do_not_leak_the_fake_console_into_later_tests(Container $container): void
+    {
+        $originalConsole = $container->get(Console::class);
+
+        $this->console->call(fn (Console $console) => $console->writeln('fake console'));
+        $this->testsConsoleAfter($container);
+        $this->testsConsoleBefore($container);
+
+        test($this->originalConsole)->is($originalConsole);
+        test($container->get(Console::class))->is($originalConsole);
     }
 }
