@@ -27,7 +27,14 @@ final class Test
     }
 
     public string $location {
-        get => $this->handler->getDeclaringClass()->getFileName() . ':' . $this->handler->getReflection()->getStartLine();
+        get {
+            $line = $this->handler->getReflection()->getStartLine();
+            $fileName = $this->handler->getDeclaringClass()->getFileName();
+
+            return $line
+                ? "{$fileName}:{$line}"
+                : $fileName;
+        }
     }
 
     public static function fromName(string $name): self
