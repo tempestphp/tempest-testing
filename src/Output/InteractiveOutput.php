@@ -7,7 +7,6 @@ use Generator;
 use Tempest\Console\Components\ComponentState;
 use Tempest\Console\Components\Concerns\HasErrors;
 use Tempest\Console\Components\Concerns\HasState;
-use Tempest\Console\Components\Renderers\SpinnerRenderer;
 use Tempest\Console\InteractiveConsoleComponent;
 use Tempest\Console\Terminal\Terminal;
 use Tempest\Testing\Events\TestFailed;
@@ -32,43 +31,24 @@ final class InteractiveOutput implements InteractiveConsoleComponent, TestOutput
 
     private TestResult $result;
 
-    private ?string $currentTest = null;
-
-    private bool $finished = false;
-
-    /** @var string[] */
-    private array $lines = [];
-
-    /** @var string[] */
-    private array $pendingLines = [];
-
-    private string $activeBody = '';
-
-    private ?string $activeFooter = null;
-
-    private bool $bodyChanged = false;
-
-    private SpinnerRenderer $spinner;
+    private string $body = '';
 
     /** @param Closure(self): iterable $runner */
     public function __construct(
         private readonly Closure $runner,
     ) {
         $this->result = new TestResult();
-        $this->spinner = new SpinnerRenderer();
     }
 
     public function render(Terminal $terminal): Generator
     {
-        yield $this->renderBody();
+        yield $this->body;
 
         foreach (($this->runner)($this) as $_) {
-            yield $this->renderBody();
+            yield $this->body;
         }
 
-        $this->finished = true;
-
-        yield $this->renderBody();
+        yield $this->body;
 
         $this->setState(ComponentState::DONE);
 
@@ -77,46 +57,38 @@ final class InteractiveOutput implements InteractiveConsoleComponent, TestOutput
 
     public function renderFooter(Terminal $terminal): ?string
     {
-        if (! $this->finished && ! $this->bodyChanged && $this->activeFooter !== null) {
-            return $this->activeFooter;
-        }
-
-        $this->activeFooter = implode(PHP_EOL, [
-            $this->renderStatusLine(),
-            $this->renderSummary($terminal),
-        ]);
-
-        return $this->activeFooter;
+        return sprintf(
+            '%s<style="bg-green"> %d succeeded </style> <style="bg-red"> %d failed </style> <style="bg-yellow"> %d skipped </style> <style="bg-blue"> %ss </style>',
+            self::FOOTER_PREFIX,
+            $this->result->succeeded,
+            $this->result->failed,
+            $this->result->skipped,
+            $this->result->elapsedTime,
+        );
     }
 
     public function appendProcessOutput(string $line): void
     {
-        $this->appendLine($line);
+        $this->appendBodyLine($line);
     }
 
-    public function onTestsChunked(TestsChunked $event): void
-    {
-        return;
-    }
+    public function onTestsChunked(TestsChunked $event): void {}
 
-    public function onTestStarted(TestStarted $event): void
-    {
-        $this->currentTest = $event->name;
-    }
+    public function onTestStarted(TestStarted $event): void {}
 
     public function onTestFailed(TestFailed $event): void
     {
         $this->result->addFailed();
 
-        $this->appendLine(sprintf('<style="fg-red">%s</style>', $event->name));
-        $this->appendLine(sprintf('  <style="fg-red dim">//</style> <style="fg-red underline">%s</style>', $event->location));
-        $this->appendLine(sprintf('  <style="fg-red dim">//</style> <style="fg-red">%s</style>', $event->reason));
+        $this->appendBodyLine(sprintf('<style="fg-red">%s</style>', $event->name));
+        $this->appendBodyLine(sprintf('  <style="fg-red dim">//</style> <style="fg-red underline">%s</style>', $event->location));
+        $this->appendBodyLine(sprintf('  <style="fg-red dim">//</style> <style="fg-red">%s</style>', $event->reason));
 
         if ($this->testEnvironment->verbose && $event->trace) {
-            $this->appendLine($event->trace);
+            $this->appendBodyLine($event->trace);
         }
 
-        $this->appendLine('');
+        $this->appendBodyLine();
     }
 
     public function onTestSkipped(TestSkipped $event): void
@@ -125,16 +97,21 @@ final class InteractiveOutput implements InteractiveConsoleComponent, TestOutput
 
         $showSkipped = $this->testEnvironment->debug || $this->testEnvironment->skipped && $event->location || $this->testEnvironment->verbose && $event->location;
 
-        if ($showSkipped) {
-            $this->appendLine(sprintf('<style="fg-yellow">%s</style>', $event->name));
-            $this->appendLine(sprintf('  <style="fg-yellow dim">//</style> <style="fg-yellow underline">%s</style>', $event->location));
-
-            if ($event->reason) {
-                $this->appendLine(sprintf('  <style="fg-yellow dim">//</style> <style="fg-yellow">%s</style>', $event->reason));
-            }
-
-            $this->appendLine('');
+        if (! $showSkipped) {
+            return;
         }
+
+        $this->appendBodyLine(sprintf('<style="fg-yellow">%s</style>', $event->name));
+
+        if ($event->location) {
+            $this->appendBodyLine(sprintf('  <style="fg-yellow dim">//</style> <style="fg-yellow underline">%s</style>', $event->location));
+        }
+
+        if ($event->reason) {
+            $this->appendBodyLine(sprintf('  <style="fg-yellow dim">//</style> <style="fg-yellow">%s</style>', $event->reason));
+        }
+
+        $this->appendBodyLine();
     }
 
     public function onTestSucceeded(TestSucceeded $event): void
@@ -142,16 +119,11 @@ final class InteractiveOutput implements InteractiveConsoleComponent, TestOutput
         $this->result->addSucceeded();
 
         if ($this->testEnvironment->verbose) {
-            $this->appendLine(sprintf('<style="fg-green">%s</style>', $event->name));
+            $this->appendBodyLine(sprintf('<style="fg-green">%s</style>', $event->name));
         }
     }
 
-    public function onTestFinished(TestFinished $event): void
-    {
-        if ($this->currentTest === $event->name) {
-            $this->currentTest = null;
-        }
-    }
+    public function onTestFinished(TestFinished $event): void {}
 
     public function onTestRunStarted(TestRunStarted $event): void
     {
@@ -161,57 +133,14 @@ final class InteractiveOutput implements InteractiveConsoleComponent, TestOutput
     public function onTestRunEnded(TestRunEnded $event): void
     {
         $this->result->endTime();
-        $this->currentTest = null;
     }
 
-    private function renderBody(): string
+    private function appendBodyLine(string $line = ''): void
     {
-        $this->bodyChanged = $this->pendingLines !== [] || $this->finished;
-
-        if ($this->pendingLines !== []) {
-            $this->activeBody = implode(PHP_EOL, $this->pendingLines);
-            $this->pendingLines = [];
+        if ($this->body !== '') {
+            $this->body .= PHP_EOL;
         }
 
-        if ($this->finished) {
-            return implode(PHP_EOL, $this->lines);
-        }
-
-        return $this->activeBody;
-    }
-
-    private function renderStatusLine(): string
-    {
-        if ($this->finished) {
-            return sprintf('%s<style="bold bg-green"> All done. </style>', self::FOOTER_PREFIX);
-        }
-
-        if ($this->currentTest === null) {
-            return self::FOOTER_PREFIX;
-        }
-
-        return sprintf('%s<style="dim">current:</style> %s', self::FOOTER_PREFIX, $this->currentTest);
-    }
-
-    private function renderSummary(?Terminal $terminal = null): string
-    {
-        $spinner = $terminal === null || $this->finished || $this->getState()->isFinished()
-            ? self::FOOTER_PREFIX
-            : sprintf('<style="fg-gray">%s</style> ', $this->spinner->render($terminal, $this->getState()));
-
-        return sprintf(
-            '%s<style="bg-green"> %d succeeded </style> <style="bg-red"> %d failed </style> <style="bg-yellow"> %d skipped </style> <style="bg-blue"> %ss </style>',
-            $spinner,
-            $this->result->succeeded,
-            $this->result->failed,
-            $this->result->skipped,
-            $this->result->elapsedTime,
-        );
-    }
-
-    private function appendLine(string $line): void
-    {
-        $this->lines[] = $line;
-        $this->pendingLines[] = $line;
+        $this->body .= $line;
     }
 }

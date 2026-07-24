@@ -183,6 +183,31 @@ final class FailFastTest
         }
     }
 
+    #[Test]
+    public function test_runner_tick_drains_stdout_and_stderr_on_the_same_tick(): void
+    {
+        $lines = [];
+        $runner = new TestRunner(
+            name: 'runner',
+            testEnvironment: new TestEnvironment(),
+            outputHandler: function (string $line) use (&$lines): void {
+                $lines[] = $line;
+            },
+        );
+        $process = new Process([
+            PHP_BINDIR . '/php',
+            '-r',
+            'fwrite(STDOUT, "stdout\n"); fwrite(STDERR, "stderr\n");',
+        ]);
+
+        $process->start();
+        $process->wait();
+        $this->setRunnerProcess($runner, $process);
+
+        test($runner->tick())->is(true);
+        test($lines)->is(['stdout', 'stderr']);
+    }
+
     private function testFor(string $method): Test
     {
         return Test::fromReflector(new MethodReflector(new ReflectionMethod(FailFastFixture::class, $method)));
@@ -198,6 +223,12 @@ final class FailFastTest
     {
         $property = new ReflectionProperty($runner, $property);
         $property->setValue($runner, $value);
+    }
+
+    private function setRunnerProcess(TestRunner $runner, Process $process): void
+    {
+        $property = new ReflectionProperty($runner, 'process');
+        $property->setValue($runner, $process);
     }
 
     /** @param string[] $tests */

@@ -61,7 +61,10 @@ final class TestRunner
             return false;
         }
 
-        return $this->consumeOutput($process->getIncrementalOutput(), $this->outputBuffer) || $this->consumeOutput($process->getIncrementalErrorOutput(), $this->errorOutputBuffer);
+        $outputUpdated = $this->consumeOutput($process->getIncrementalOutput(), $this->outputBuffer);
+        $errorOutputUpdated = $this->consumeOutput($process->getIncrementalErrorOutput(), $this->errorOutputBuffer);
+
+        return $outputUpdated || $errorOutputUpdated;
     }
 
     public function failed(): bool
