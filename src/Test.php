@@ -29,7 +29,7 @@ final class Test
     public string $location {
         get {
             $line = $this->handler->getReflection()->getStartLine();
-            $fileName = $this->handler->getDeclaringClass()->getFileName();
+            $fileName = $this->handler->getReflection()->getFileName() ?: $this->handler->getDeclaringClass()->getName();
 
             return $line
                 ? "{$fileName}:{$line}"
