@@ -38,7 +38,7 @@ final class TestCommand
     public function __invoke(
         #[ConsoleArgument(description: 'Only run tests matching this fuzzy filter')]
         ?string $filter = null,
-        #[ConsoleArgument(description: 'Number of processes to run tests in parallel, will default to number of available cores', aliases: ['-p'])]
+        #[ConsoleArgument(description: 'Number of processes to run tests in parallel, will default to number of available cores')]
         ?int $processes = null,
         #[ConsoleArgument(description: 'Show all output, including succeeding and skipped tests', aliases: ['-v'])]
         bool $verbose = false,
