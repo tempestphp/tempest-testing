@@ -207,7 +207,7 @@ final class OutputImplementationsTest
     #[Test]
     public function interactive_output_shows_slow_tests_when_enabled(): void
     {
-        $output = $this->interactiveOutput(new TestEnvironment(slow: true, slowThreshold: 50.0));
+        $output = $this->interactiveOutput(new TestEnvironment(slow: true, slowThreshold: 50));
         $terminal = $this->terminal(height: 20);
 
         $output->onTestStarted(new TestStarted('Tests\ExampleTest::it_is_slow'));

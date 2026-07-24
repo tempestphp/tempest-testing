@@ -60,6 +60,42 @@ final class CliCommandBehaviorTest
         test($environment->debug)->is(true);
         test($environment->failFast)->is(true);
         test($environment->skipped)->is(true);
+        test($environment->slow)->is(false);
+        test($environment->slowThreshold)->is(200);
+    }
+
+    #[Test]
+    public function test_command_registers_slow_environment_options(): void
+    {
+        $slowContainer = $this->container();
+
+        $this->withGlobalContainer(
+            $slowContainer,
+            fn () => $this->command($slowContainer, new TestConfig([]))->__invoke(
+                slow: true,
+                interaction: false,
+            ),
+        );
+
+        $slowEnvironment = $slowContainer->get(TestEnvironment::class);
+
+        test($slowEnvironment->slow)->is(true);
+        test($slowEnvironment->slowThreshold)->is(200);
+
+        $thresholdContainer = $this->container();
+
+        $this->withGlobalContainer(
+            $thresholdContainer,
+            fn () => $this->command($thresholdContainer, new TestConfig([]))->__invoke(
+                slow: 50,
+                interaction: false,
+            ),
+        );
+
+        $thresholdEnvironment = $thresholdContainer->get(TestEnvironment::class);
+
+        test($thresholdEnvironment->slow)->is(true);
+        test($thresholdEnvironment->slowThreshold)->is(50);
     }
 
     #[Test]
@@ -94,6 +130,22 @@ final class CliCommandBehaviorTest
 
         test($output)->contains('Tempest\Testing\Tests\SkippedTest::skip1');
         test($output)->contains('tests/SkippedTest.php');
+    }
+
+    #[Test]
+    public function slow_option_outputs_slow_tests_with_custom_threshold(): void
+    {
+        $output = $this->runTempest([
+            'test',
+            'PrimitiveTesterTest::succeed',
+            '--no-interaction',
+            '--slow=0',
+        ]);
+
+        test($output)->contains('Tempest\Testing\Tests\PrimitiveTesterTest::succeed');
+        test($output)->contains('Took');
+        test($output)->contains('tests/PrimitiveTesterTest.php');
+        test($output)->contains('1 slow');
     }
 
     #[Test]
