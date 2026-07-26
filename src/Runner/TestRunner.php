@@ -4,6 +4,7 @@ namespace Tempest\Testing\Runner;
 
 use Closure;
 use ReflectionClass;
+use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 use Tempest\Core\Environment;
 use Tempest\Support\Arr\ImmutableArray;
@@ -116,7 +117,7 @@ final class TestRunner
         $tests = $tests->map(fn (Test $test) => '--tests="' . $test->name . '"');
 
         $command = [
-            PHP_BINDIR . '/php',
+            new PhpExecutableFinder()->find(includeArgs: false) ?: PHP_BINARY,
             'tempest',
             'test:run',
             '--name=' . $this->name,
