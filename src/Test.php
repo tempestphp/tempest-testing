@@ -6,8 +6,6 @@ use Attribute;
 use ReflectionMethod;
 use Tempest\Reflection\MethodReflector;
 
-use function Tempest\Support\arr;
-
 #[Attribute(Attribute::TARGET_METHOD)]
 final class Test
 {
@@ -50,22 +48,19 @@ final class Test
 
         $self->handler = $reflector;
 
-        /** @var MethodReflector[] $before */
-        $before = arr($reflector->getDeclaringClass()->getPublicMethods())
-            ->filter(fn (MethodReflector $otherMethod) => $otherMethod->hasAttribute(Before::class))
-            ->values()
-            ->toArray();
+        $after = [];
 
-        $self->before = $before;
+        foreach ($reflector->getDeclaringClass()->getPublicMethods() as $method) {
+            if ($method->hasAttribute(Before::class)) {
+                $self->before[] = $method;
+            }
 
-        /** @var MethodReflector[] $after */
-        $after = arr($reflector->getDeclaringClass()->getPublicMethods())
-            ->filter(fn (MethodReflector $otherMethod) => $otherMethod->hasAttribute(After::class))
-            ->values()
-            ->reverse()
-            ->toArray();
+            if ($method->hasAttribute(After::class)) {
+                $after[] = $method;
+            }
+        }
 
-        $self->after = $after;
+        $self->after = array_reverse($after);
 
         $self->provide = $reflector->getAttribute(Provide::class)?->entries;
 
