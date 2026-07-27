@@ -5,6 +5,7 @@ namespace Tempest\Testing\Tests;
 use Closure;
 use ReflectionMethod;
 use ReflectionProperty;
+use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 use Tempest\Container\Container;
 use Tempest\EventBus\EventBus;
@@ -114,7 +115,7 @@ final class ParallelRunnerTest
         );
 
         test($runner->buildCommand($this->testsFor(['quiet', 'quietAgain'])))->is([
-            PHP_BINDIR . '/php',
+            new PhpExecutableFinder()->find(includeArgs: false) ?: PHP_BINARY,
             'tempest',
             'test:run',
             '--name=runner-1',
